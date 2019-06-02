@@ -18,10 +18,12 @@ public class DiscordEvents extends ListenerAdapter {
         if (!event.getChannel().getId().equals(PluginConfiguration.Main.channelID)) return;
         if (event.getAuthor().isBot() || event.getAuthor().isFake()) return;
 
+        if (event.getMessage().getContentRaw().startsWith(PluginConfiguration.Main.consolePrefix))
+        Utility.toConsole(event);
+
         String username = event.getAuthor().getName();
         String message = event.getMessage().getContentRaw();
 
-        //Role staffRole = event.getGuild().getRoleById("531631265443479562");
         Role staffRole = event.getGuild().getRoleById("549039481450397699");
         boolean isStaff = event.getMember().getRoles().contains(staffRole);
 

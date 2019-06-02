@@ -16,6 +16,9 @@ public class PluginConfiguration {
         @Setting(value = "Channel-ID", comment = "Channel to send in-game messages to")
         public static String channelID = "584645953609400337";
 
+        @Setting(value = "Console-Prefix", comment = "Prefix to use console command")
+        public static String consolePrefix = "/";
+
     }
 
     @ConfigSerializable

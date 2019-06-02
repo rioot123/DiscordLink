@@ -67,4 +67,8 @@ public class DiscordLink {
         return SpongeDiscordLib.getJDA();
     }
 
+    public static DiscordLink getInstance() {
+        return instance;
+    }
+
 }

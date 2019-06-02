@@ -4,12 +4,17 @@ import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.MessageEmbed;
+import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.entities.TextChannel;
+import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
 import java.awt.*;
 import java.time.Instant;
+import java.util.concurrent.TimeUnit;
 
 public class Utility {
 
@@ -29,9 +34,9 @@ public class Utility {
                 .getTextChannelById(PluginConfiguration.Main.channelID)
                 .sendMessage(
                         PluginConfiguration.Format.serverToDiscord
-                        .replace("{prefix}", prefix)
-                        .replace("{username}", playerName)
-                        .replace("{message}", message))
+                                .replace("{prefix}", prefix)
+                                .replace("{username}", playerName)
+                                .replace("{message}", message))
                 .queue();
     }
 
@@ -39,10 +44,10 @@ public class Utility {
         switch (type.toLowerCase()) {
             case "message":
                 DiscordLink
-                    .getJDA()
-                    .getTextChannelById(PluginConfiguration.Main.channelID)
-                    .sendMessage(message)
-                    .queue();
+                        .getJDA()
+                        .getTextChannelById(PluginConfiguration.Main.channelID)
+                        .sendMessage(message)
+                        .queue();
                 break;
             case "embed":
                 DiscordLink
@@ -61,6 +66,38 @@ public class Utility {
         }
     }
 
+    public static void autoRemove(int delaySeconds, String type, String message, MessageEmbed embed) {
+        switch (type.toLowerCase()) {
+            case "message":
+                DiscordLink
+                        .getJDA()
+                        .getTextChannelById(PluginConfiguration.Main.channelID)
+                        .sendMessage(message)
+                        .queue(msg -> {
+                            msg.delete().queueAfter(delaySeconds, TimeUnit.SECONDS);
+                        });
+                break;
+            case "embed":
+                DiscordLink
+                        .getJDA()
+                        .getTextChannelById(PluginConfiguration.Main.channelID)
+                        .sendMessage(embed)
+                        .queue(msg -> {
+                            msg.delete().queueAfter(delaySeconds, TimeUnit.SECONDS);
+                        });
+                break;
+            default:
+                DiscordLink
+                        .getJDA()
+                        .getTextChannelById(PluginConfiguration.Main.channelID)
+                        .sendMessage(message)
+                        .queue(msg -> {
+                            msg.delete().queueAfter(delaySeconds, TimeUnit.SECONDS);
+                        });
+                break;
+        }
+    }
+
     public static void setTopic() {
         TextChannel channel = DiscordLink
                 .getJDA()
@@ -72,8 +109,51 @@ public class Utility {
                 .queue();
     }
 
+    public static void toConsole(MessageReceivedEvent event) {
+        String[] args = event.getMessage().getContentRaw()
+                .replace(PluginConfiguration.Main.consolePrefix, "")
+                .split(" ");
+
+        if (!consoleCheck(event)) {
+            Utility.autoRemove(5, "message", "<@" + event.getAuthor().getId() + "> does not have permission for this command!", null);
+            return;
+        }
+
+        String command = String.join(" ", args);
+        Task.builder()
+                .execute(() ->
+                        Sponge.getCommandManager().process(new ConsoleManager(Sponge.getServer().getConsole()), command))
+                .submit(DiscordLink.getInstance());
+    }
+
+    private static boolean consoleCheck(MessageReceivedEvent event) {
+        Role adminRole = event.getGuild().getRoleById("531631265443479562");
+        Role ownerRole = event.getGuild().getRoleById("307551061156298762");
+
+        if (event.getMember().getRoles().contains(ownerRole)) {
+            return true;
+        } else if (event.getMember().getRoles().contains(adminRole)) {
+            if (event.getMessage().getContentRaw().startsWith(PluginConfiguration.Main.consolePrefix + "luckperms") ||
+                    event.getMessage().getContentRaw().startsWith(PluginConfiguration.Main.consolePrefix + "perm") ||
+                    event.getMessage().getContentRaw().startsWith(PluginConfiguration.Main.consolePrefix + "permissions") ||
+                    event.getMessage().getContentRaw().startsWith(PluginConfiguration.Main.consolePrefix + "perm") ||
+                    event.getMessage().getContentRaw().startsWith(PluginConfiguration.Main.consolePrefix + "lp") ||
+                    event.getMessage().getContentRaw().startsWith(PluginConfiguration.Main.consolePrefix + "ban") ||
+                    event.getMessage().getContentRaw().startsWith(PluginConfiguration.Main.consolePrefix + "ipban") ||
+                    event.getMessage().getContentRaw().startsWith(PluginConfiguration.Main.consolePrefix + "tempban") ||
+                    event.getMessage().getContentRaw().startsWith(PluginConfiguration.Main.consolePrefix + "tempmute") ||
+                    event.getMessage().getContentRaw().startsWith(PluginConfiguration.Main.consolePrefix + "mute") ||
+                    event.getMessage().getContentRaw().startsWith(PluginConfiguration.Main.consolePrefix + "kick")) {
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            return false;
+        }
+    }
+
     public static Text format(String unformattedString) {
         return TextSerializers.FORMATTING_CODE.deserialize(unformattedString);
     }
-
 }
