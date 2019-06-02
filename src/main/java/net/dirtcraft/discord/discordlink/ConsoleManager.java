@@ -25,7 +25,7 @@ public class ConsoleManager implements CommandSource {
     public void sendMessage(Text message) {
         String plain = message.toPlain();
         if ("".equals(plain) || plain.trim().isEmpty()) return;
-        Utility.messageToChannel( "message", String.join("\n", plain), null);
+        Utility.messageToChannel( "message", plain, null);
     }
 
     @Override

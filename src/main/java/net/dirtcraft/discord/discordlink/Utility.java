@@ -105,7 +105,7 @@ public class Utility {
         String[] code = channel.getName().split("-");
 
         channel.getManager()
-                .setTopic("ModPack: **" + SpongeDiscordLib.getServerName() + "** — IP: `" + code[1] + ".dirtcraft.gg`")
+                .setTopic("ModPack: **" + SpongeDiscordLib.getServerName() + "** — IP: " + code[1] + ".dirtcraft.gg")
                 .queue();
     }
 
@@ -115,7 +115,7 @@ public class Utility {
                 .split(" ");
 
         if (!consoleCheck(event)) {
-            Utility.autoRemove(5, "message", "<@" + event.getAuthor().getId() + "> does not have permission for this command!", null);
+            Utility.autoRemove(5, "message", "<@" + event.getAuthor().getId() + ">, you do **not** have permission to use this command!", null);
             return;
         }
 

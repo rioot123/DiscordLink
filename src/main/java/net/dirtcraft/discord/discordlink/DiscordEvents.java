@@ -18,8 +18,11 @@ public class DiscordEvents extends ListenerAdapter {
         if (!event.getChannel().getId().equals(PluginConfiguration.Main.channelID)) return;
         if (event.getAuthor().isBot() || event.getAuthor().isFake()) return;
 
-        if (event.getMessage().getContentRaw().startsWith(PluginConfiguration.Main.consolePrefix))
-        Utility.toConsole(event);
+        if (event.getMessage().getContentRaw().startsWith(PluginConfiguration.Main.consolePrefix)) {
+            event.getMessage().delete().queue();
+            Utility.toConsole(event);
+            return;
+        }
 
         String username = event.getAuthor().getName();
         String message = event.getMessage().getContentRaw();
