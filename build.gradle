@@ -1,0 +1,20 @@
+plugins {
+    id 'org.spongepowered.plugin' version '0.8.1'
+}
+
+group = pluginGroup
+version = pluginVersion
+
+repositories {
+    jcenter()
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    compile 'me.lucko.luckperms:luckperms-api:4.4'
+    compile 'org.spongepowered:spongeapi:7.1.0-SNAPSHOT'
+    implementation 'com.github.Dirt-Craft:Sponge-Discord-Lib:-SNAPSHOT'
+}
+
+sponge.plugin.id = pluginId

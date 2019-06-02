@@ -1,0 +1,21 @@
+[
+    {
+        "modid": "discord-link",
+        "name": "Discord Link",
+        "version": "1.0.0",
+        "description": "Handles gamechats on the DirtCraft Discord.",
+        "authorList": [
+            "juliann"
+        ],
+        "dependencies": [
+            "sponge-discord-lib",
+            "luckperms",
+            "spongeapi@7.1.0-SNAPSHOT"
+        ],
+        "requiredMods": [
+            "sponge-discord-lib",
+            "luckperms",
+            "spongeapi@7.1.0-SNAPSHOT"
+        ]
+    }
+]

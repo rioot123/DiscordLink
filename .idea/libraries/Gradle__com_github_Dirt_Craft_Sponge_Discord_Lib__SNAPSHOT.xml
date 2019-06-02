@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: com.github.Dirt-Craft:Sponge-Discord-Lib:-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.github.Dirt-Craft/Sponge-Discord-Lib/-SNAPSHOT/209061edf9c4b8f1fd563928e0d64705b4cd30e5/Sponge-Discord-Lib--SNAPSHOT.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.github.Dirt-Craft/Sponge-Discord-Lib/-SNAPSHOT/1c247811effe497e4b58f536e09d5e2eb618a17b/Sponge-Discord-Lib--SNAPSHOT-sources.jar!/" />
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.github.Dirt-Craft/Sponge-Discord-Lib/-SNAPSHOT/b10a27cf37591a957c4b5681525943999b46a77e/Sponge-Discord-Lib--SNAPSHOT-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
