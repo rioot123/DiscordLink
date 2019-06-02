@@ -1,5 +1,6 @@
 package net.dirtcraft.discord.discordlink;
 
+import net.dv8tion.jda.core.entities.Member;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.SubjectCollection;
@@ -16,16 +17,23 @@ import java.util.Set;
 public class ConsoleManager implements CommandSource {
 
     private CommandSource actualSource;
+    private Member member;
+    private String command;
 
-    public ConsoleManager(CommandSource actualSource) {
+    public ConsoleManager(CommandSource actualSource, Member member, String command) {
         this.actualSource = actualSource;
+        this.member = member;
+        this.command = command;
     }
 
     @Override
     public void sendMessage(Text message) {
         String plain = message.toPlain();
         if ("".equals(plain) || plain.trim().isEmpty()) return;
-        Utility.messageToChannel( "message", plain, null);
+        Utility.messageToChannel("embed", null,
+                Utility.embedBuilder().addField("__Command__ \"**/" + command.toLowerCase() + "**\" __Sent__", plain, false)
+                        .setFooter("Sent by: " + member.getUser().getAsTag(), null)
+                        .build());
     }
 
     @Override
@@ -49,7 +57,6 @@ public class ConsoleManager implements CommandSource {
     }
     @Override
     public void sendMessages(Text... messages) {
-        //Arrays.stream(messages).forEach(this::sendMessage);
         this.actualSource.sendMessages(messages);
     }
 

@@ -3,17 +3,21 @@ package net.dirtcraft.discord.discordlink;
 import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
 import java.awt.*;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 public class Utility {
@@ -91,9 +95,7 @@ public class Utility {
                         .getJDA()
                         .getTextChannelById(PluginConfiguration.Main.channelID)
                         .sendMessage(message)
-                        .queue(msg -> {
-                            msg.delete().queueAfter(delaySeconds, TimeUnit.SECONDS);
-                        });
+                        .queue(msg -> msg.delete().queueAfter(delaySeconds, TimeUnit.SECONDS));
                 break;
         }
     }
@@ -106,6 +108,36 @@ public class Utility {
 
         channel.getManager()
                 .setTopic("ModPack: **" + SpongeDiscordLib.getServerName() + "** — IP: " + code[1] + ".dirtcraft.gg")
+                .queue();
+    }
+
+    public static void listCommand(MessageReceivedEvent event) {
+        Member member = event.getMember();
+
+        ArrayList<Player> players = new ArrayList<>(Sponge.getServer().getOnlinePlayers());
+        ArrayList<String> playerNames = new ArrayList<>();
+        
+        for (Player player : players) {
+            playerNames.add(player.getName());
+        }
+
+        Collections.sort(playerNames);
+
+
+        EmbedBuilder embed = Utility.embedBuilder();
+        if (players.size() > 1) {
+            embed.addField("__**" + players.size() + "** players online__", String.join("\n", playerNames), false);
+        } else if (players.size() == 1) {
+            embed.addField("__**" + players.size() + "** player online__", String.join("\n", playerNames), false);
+        } else {
+            embed.addField("__**No** players online__", String.join("\n", playerNames), false);
+        }
+                embed.setFooter("Requested By: " + member.getUser().getAsTag(), null);
+
+        DiscordLink
+                .getJDA()
+                .getTextChannelById(PluginConfiguration.Main.channelID)
+                .sendMessage(embed.build())
                 .queue();
     }
 
@@ -122,7 +154,7 @@ public class Utility {
         String command = String.join(" ", args);
         Task.builder()
                 .execute(() ->
-                        Sponge.getCommandManager().process(new ConsoleManager(Sponge.getServer().getConsole()), command))
+                        Sponge.getCommandManager().process(new ConsoleManager(Sponge.getServer().getConsole(), event.getMember(), command), command))
                 .submit(DiscordLink.getInstance());
     }
 
