@@ -130,7 +130,7 @@ public class Utility {
         } else if (players.size() == 1) {
             embed.addField("__**" + players.size() + "** player online__", String.join("\n", playerNames), false);
         } else {
-            embed.addField("__**No** players online__", String.join("\n", playerNames), false);
+            embed.setDescription("There are no players playing **" + SpongeDiscordLib.getServerName() + "**!");
         }
                 embed.setFooter("Requested By: " + member.getUser().getAsTag(), null);
 
