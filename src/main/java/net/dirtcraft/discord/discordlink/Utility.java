@@ -165,17 +165,18 @@ public class Utility {
         if (event.getMember().getRoles().contains(ownerRole)) {
             return true;
         } else if (event.getMember().getRoles().contains(adminRole)) {
-            if (event.getMessage().getContentRaw().startsWith(PluginConfiguration.Main.consolePrefix + "luckperms") ||
-                    event.getMessage().getContentRaw().startsWith(PluginConfiguration.Main.consolePrefix + "perm") ||
-                    event.getMessage().getContentRaw().startsWith(PluginConfiguration.Main.consolePrefix + "permissions") ||
-                    event.getMessage().getContentRaw().startsWith(PluginConfiguration.Main.consolePrefix + "perm") ||
-                    event.getMessage().getContentRaw().startsWith(PluginConfiguration.Main.consolePrefix + "lp") ||
-                    event.getMessage().getContentRaw().startsWith(PluginConfiguration.Main.consolePrefix + "ban") ||
-                    event.getMessage().getContentRaw().startsWith(PluginConfiguration.Main.consolePrefix + "ipban") ||
-                    event.getMessage().getContentRaw().startsWith(PluginConfiguration.Main.consolePrefix + "tempban") ||
-                    event.getMessage().getContentRaw().startsWith(PluginConfiguration.Main.consolePrefix + "tempmute") ||
-                    event.getMessage().getContentRaw().startsWith(PluginConfiguration.Main.consolePrefix + "mute") ||
-                    event.getMessage().getContentRaw().startsWith(PluginConfiguration.Main.consolePrefix + "kick")) {
+            if (event.getMessage().getContentRaw().toLowerCase().startsWith(PluginConfiguration.Main.consolePrefix + "luckperms") ||
+                    event.getMessage().getContentRaw().toLowerCase().startsWith(PluginConfiguration.Main.consolePrefix + "perm") ||
+                    event.getMessage().getContentRaw().toLowerCase().toLowerCase().startsWith(PluginConfiguration.Main.consolePrefix + "permissions") ||
+                    event.getMessage().getContentRaw().toLowerCase().startsWith(PluginConfiguration.Main.consolePrefix + "perm") ||
+                    event.getMessage().getContentRaw().toLowerCase().startsWith(PluginConfiguration.Main.consolePrefix + "lp") ||
+                    event.getMessage().getContentRaw().toLowerCase().startsWith(PluginConfiguration.Main.consolePrefix + "execute") ||
+                    event.getMessage().getContentRaw().toLowerCase().startsWith(PluginConfiguration.Main.consolePrefix + "ban") ||
+                    event.getMessage().getContentRaw().toLowerCase().startsWith(PluginConfiguration.Main.consolePrefix + "ipban") ||
+                    event.getMessage().getContentRaw().toLowerCase().startsWith(PluginConfiguration.Main.consolePrefix + "tempban") ||
+                    event.getMessage().getContentRaw().toLowerCase().startsWith(PluginConfiguration.Main.consolePrefix + "tempmute") ||
+                    event.getMessage().getContentRaw().toLowerCase().startsWith(PluginConfiguration.Main.consolePrefix + "mute") ||
+                    event.getMessage().getContentRaw().toLowerCase().startsWith(PluginConfiguration.Main.consolePrefix + "kick")) {
                 return false;
             } else {
                 return true;

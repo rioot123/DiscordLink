@@ -101,7 +101,7 @@ public class DiscordEvents extends ListenerAdapter {
 
     public static List<String> checkURLs(String text)
     {
-        List<String> containedUrls = new ArrayList<String>();
+        List<String> containedUrls = new ArrayList<>();
         String urlRegex = "((https?|ftp|gopher|telnet|file):((//)|(\\\\))+[\\w\\d:#@%/;$()~_?\\+-=\\\\\\.&]*)";
         Pattern pattern = Pattern.compile(urlRegex, Pattern.CASE_INSENSITIVE);
         Matcher urlMatcher = pattern.matcher(text);
