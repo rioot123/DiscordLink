@@ -43,11 +43,10 @@ public class ConsoleManager implements CommandSource {
         Text output = null;
         for (Text message : messages) {
             if(output == null) output = message;
-            else output = output.concat(message);
+            else output = output.concat(Text.of("\n")).concat(message);
         }
-        this.sendMessages(output);
+        if (output != null) this.sendMessage(output);
     }
-
     @Override
     public void sendMessages(Text... messages) {
         //Arrays.stream(messages).forEach(this::sendMessage);
