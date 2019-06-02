@@ -116,7 +116,7 @@ public class Utility {
 
         ArrayList<Player> players = new ArrayList<>(Sponge.getServer().getOnlinePlayers());
         ArrayList<String> playerNames = new ArrayList<>();
-        
+
         for (Player player : players) {
             playerNames.add(player.getName());
         }

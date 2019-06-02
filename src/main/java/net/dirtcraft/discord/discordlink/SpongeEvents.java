@@ -34,7 +34,6 @@ public class SpongeEvents {
     public void onServerStopping(GameStoppingServerEvent event) {
         Utility.messageToChannel("embed", null,
                 Utility.embedBuilder()
-                        .setColor(Color.GREEN)
                         .setDescription(PluginConfiguration.Format.serverStop
                                 .replace("{modpack}", modpack)
                         ).build());
