@@ -40,9 +40,12 @@ public class ConsoleManager implements CommandSource {
 
     @Override
     public void sendMessages(Iterable<Text> messages) {
+        Text output = null;
         for (Text message : messages) {
-            this.sendMessage(message);
+            if(output == null) output = message;
+            else output.concat(message);
         }
+        this.sendMessages(output);
     }
 
     @Override
