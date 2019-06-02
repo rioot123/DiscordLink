@@ -9,6 +9,12 @@ public class PluginConfiguration {
     private PluginConfiguration.Main main = new PluginConfiguration.Main();
     @Setting(value = "Format")
     private PluginConfiguration.Format format = new PluginConfiguration.Format();
+    @Setting(value = "Embed")
+    private PluginConfiguration.Embed embed = new PluginConfiguration.Embed();
+    @Setting(value = "Roles")
+    private PluginConfiguration.Roles roles = new PluginConfiguration.Roles();
+
+
 
     @ConfigSerializable
     public static class Main {
@@ -58,6 +64,20 @@ public class PluginConfiguration {
 
         @Setting(value = "Timestamp")
         public static boolean timestamp = true;
+
+    }
+
+    @ConfigSerializable
+    public static class Roles {
+
+        @Setting(value = "Owner-Role-ID")
+        public static String ownerRoleID = "307551061156298762";
+
+        @Setting(value = "Admin-Role-ID")
+        public static String adminRoleID = "531631265443479562";
+
+        @Setting(value = "Staff-Role-ID")
+        public static String staffRoleID = "549039481450397699";
 
     }
 

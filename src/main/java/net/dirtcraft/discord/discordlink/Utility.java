@@ -159,8 +159,8 @@ public class Utility {
     }
 
     private static boolean consoleCheck(MessageReceivedEvent event) {
-        Role adminRole = event.getGuild().getRoleById("531631265443479562");
-        Role ownerRole = event.getGuild().getRoleById("307551061156298762");
+        Role adminRole = event.getGuild().getRoleById(PluginConfiguration.Roles.adminRoleID);
+        Role ownerRole = event.getGuild().getRoleById(PluginConfiguration.Roles.ownerRoleID);
 
         if (event.getMember().getRoles().contains(ownerRole)) {
             return true;

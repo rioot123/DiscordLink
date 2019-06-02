@@ -8,6 +8,7 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
+import org.spongepowered.api.text.serializer.TextSerializers;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -37,7 +38,7 @@ public class DiscordEvents extends ListenerAdapter {
             return;
         }
 
-        Role staffRole = event.getGuild().getRoleById("549039481450397699");
+        Role staffRole = event.getGuild().getRoleById(PluginConfiguration.Roles.staffRoleID);
         boolean isStaff = event.getMember().getRoles().contains(staffRole);
 
         String staff;
@@ -53,7 +54,7 @@ public class DiscordEvents extends ListenerAdapter {
             toBroadcast.append(
                     Utility.format(PluginConfiguration.Format.discordToServer
                             .replace("{username}", username)
-                            .replace("{message}", message)));
+                            .replace("{message}", TextSerializers.FORMATTING_CODE.stripCodes(message))));
         } else {
             toBroadcast.append(
                     Utility.format(PluginConfiguration.Format.discordToServer
