@@ -48,7 +48,9 @@ public class SpongeEvents {
 
         String prefix = TextSerializers.FORMATTING_CODE.stripCodes(user.getCachedData().getMetaData(Contexts.global()).getPrefix());
         String username = player.getName();
-        String message = TextSerializers.FORMATTING_CODE.stripCodes(event.getRawMessage().toPlain());
+        String message = TextSerializers.FORMATTING_CODE.stripCodes(event.getRawMessage().toPlain())
+                .replace("@everyone", "")
+                .replace("@here", "");
 
         Utility.chatToDiscord(prefix, username, message);
     }
