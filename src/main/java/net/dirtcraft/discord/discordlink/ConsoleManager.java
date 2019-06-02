@@ -43,7 +43,7 @@ public class ConsoleManager implements CommandSource {
         Text output = null;
         for (Text message : messages) {
             if(output == null) output = message;
-            else output.concat(message);
+            else output = output.concat(message);
         }
         this.sendMessages(output);
     }
