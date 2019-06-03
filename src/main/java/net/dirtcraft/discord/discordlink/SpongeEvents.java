@@ -1,8 +1,6 @@
 package net.dirtcraft.discord.discordlink;
 
 import br.net.fabiozumbi12.UltimateChat.Sponge.API.SendChannelMessageEvent;
-import me.lucko.luckperms.api.Contexts;
-import me.lucko.luckperms.api.User;
 import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.core.entities.MessageEmbed;
@@ -44,11 +42,9 @@ public class SpongeEvents {
         if (!event.getChannel().getName().equalsIgnoreCase("global")) return;
         if (!(cause instanceof Player)) return;
         Player player = (Player) cause;
-        User user = DiscordLink.getLuckPerms().getUser(player.getUniqueId());
-        if (user == null) return;
 
 
-        String prefix = TextSerializers.FORMATTING_CODE.stripCodes(user.getCachedData().getMetaData(Contexts.global()).getPrefix());
+        String prefix = TextSerializers.FORMATTING_CODE.stripCodes(player.getOption("prefix").orElse(""));
         String username = player.getName();
         String message = TextSerializers.FORMATTING_CODE.stripCodes(event.getMessage().toPlain())
                 .replace("@everyone", "")
@@ -60,9 +56,7 @@ public class SpongeEvents {
     @Listener
     public void onPlayerJoin(ClientConnectionEvent.Join event, @Root Player player) {
         if (player.hasPlayedBefore()) {
-            User user = DiscordLink.getLuckPerms().getUser(player.getUniqueId());
-            if (user == null) return;
-            String prefix = TextSerializers.FORMATTING_CODE.stripCodes(user.getCachedData().getMetaData(Contexts.global()).getPrefix());
+            String prefix = TextSerializers.FORMATTING_CODE.stripCodes(player.getOption("prefix").orElse(""));
 
             Utility.messageToChannel("message", PluginConfiguration.Format.playerJoin
                     .replace("{username}", player.getName())
@@ -81,9 +75,7 @@ public class SpongeEvents {
 
     @Listener
     public void onPlayerDisconnect(ClientConnectionEvent.Disconnect event, @Root Player player) {
-        User user = DiscordLink.getLuckPerms().getUser(player.getUniqueId());
-        if (user == null) return;
-        String prefix = TextSerializers.FORMATTING_CODE.stripCodes(user.getCachedData().getMetaData(Contexts.global()).getPrefix());
+        String prefix = TextSerializers.FORMATTING_CODE.stripCodes(player.getOption("prefix").orElse(""));
 
         Utility.messageToChannel("message", PluginConfiguration.Format.playerDisconnect
                         .replace("{username}", player.getName())

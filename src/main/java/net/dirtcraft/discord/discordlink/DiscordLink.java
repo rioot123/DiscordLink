@@ -1,8 +1,6 @@
 package net.dirtcraft.discord.discordlink;
 
 import com.google.inject.Inject;
-import me.lucko.luckperms.LuckPerms;
-import me.lucko.luckperms.api.LuckPermsApi;
 import net.dirtcraft.discord.discordlink.Configuration.ConfigManager;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.core.JDA;
@@ -26,7 +24,6 @@ import org.spongepowered.api.plugin.PluginContainer;
                 "juliann"
         },
         dependencies = {
-                @Dependency(id = "luckperms"),
                 @Dependency(id = "sponge-discord-lib"),
                 @Dependency(id = "ultimatechat")
         }
@@ -56,10 +53,6 @@ public class DiscordLink {
 
         getJDA().addEventListener(new DiscordEvents());
         Sponge.getEventManager().registerListeners(instance, new SpongeEvents());
-    }
-
-    public static LuckPermsApi getLuckPerms() {
-        return LuckPerms.getApi();
     }
 
     public static JDA getJDA() {
