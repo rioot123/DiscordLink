@@ -1,7 +1,7 @@
 # Discord-Link
-Handles gamechats on the DIrtCraft Discord.
+Handles gamechats on the DirtCraft Discord.
 
 Requires:
- LuckPerms
- Sponge-Discord-Lib
- UltimateChat
+- ~~LuckPerms~~
+- Sponge-Discord-Lib
+- UltimateChat
