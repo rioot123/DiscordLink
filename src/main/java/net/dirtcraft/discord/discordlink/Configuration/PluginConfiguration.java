@@ -39,7 +39,7 @@ public class PluginConfiguration {
         @Setting(value = "Server-Start", comment = "Message to Discord when the server has started")
         public static String serverStart = "**{modpack}** has successfully started!";
 
-        @Setting(value = "Server-Stop", comment = "Message to Discord when the server is stoppin!")
+        @Setting(value = "Server-Stop", comment = "Message to Discord when the server is stopping")
         public static String serverStop = "**{modpack}** is now restarting...";
 
         @Setting(value = "Player-Join", comment = "Message to Discord when a player joins the server")

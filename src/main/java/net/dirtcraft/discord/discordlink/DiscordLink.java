@@ -50,7 +50,7 @@ public class DiscordLink {
         instance = this;
 
         this.configManager = new ConfigManager(loader);
-        
+
         Utility.setTopic();
 
         getJDA().addEventListener(new DiscordEvents());
