@@ -8,15 +8,15 @@ version = pluginVersion
 repositories {
     jcenter()
     mavenCentral()
-    maven { url 'https://jitpack.io' }
     maven { url = "https://raw.github.com/FabioZumbi12/UltimateChat/mvn-repo/" }
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
     compile 'me.lucko.luckperms:luckperms-api:4.4'
     compile 'br.net.fabiozumbi12.UltimateChat:UltimateChat-Sponge-7:1.8.9'
     compile 'org.spongepowered:spongeapi:7.1.0-SNAPSHOT'
-    implementation 'com.github.Dirt-Craft:Sponge-Discord-Lib:-SNAPSHOT'
+    implementation 'com.github.Dirt-Craft:Sponge-Discord-Lib:4492d16570'
 }
 
 sponge.plugin.id = pluginId

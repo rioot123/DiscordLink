@@ -35,7 +35,7 @@ public class Utility {
     public static void chatToDiscord(String prefix, String playerName, String message) {
         DiscordLink
                 .getJDA()
-                .getTextChannelById(PluginConfiguration.Main.channelID)
+                .getTextChannelById(SpongeDiscordLib.getGamechatChannelID())
                 .sendMessage(
                         PluginConfiguration.Format.serverToDiscord
                                 .replace("{prefix}", prefix)
@@ -49,21 +49,21 @@ public class Utility {
             case "message":
                 DiscordLink
                         .getJDA()
-                        .getTextChannelById(PluginConfiguration.Main.channelID)
+                        .getTextChannelById(SpongeDiscordLib.getGamechatChannelID())
                         .sendMessage(message)
                         .queue();
                 break;
             case "embed":
                 DiscordLink
                         .getJDA()
-                        .getTextChannelById(PluginConfiguration.Main.channelID)
+                        .getTextChannelById(SpongeDiscordLib.getGamechatChannelID())
                         .sendMessage(embed)
                         .queue();
                 break;
             default:
                 DiscordLink
                         .getJDA()
-                        .getTextChannelById(PluginConfiguration.Main.channelID)
+                        .getTextChannelById(SpongeDiscordLib.getGamechatChannelID())
                         .sendMessage(message)
                         .queue();
                 break;
@@ -72,30 +72,24 @@ public class Utility {
 
     public static void autoRemove(int delaySeconds, String type, String message, MessageEmbed embed) {
         switch (type.toLowerCase()) {
-            case "message":
-                DiscordLink
-                        .getJDA()
-                        .getTextChannelById(PluginConfiguration.Main.channelID)
-                        .sendMessage(message)
-                        .queue(msg -> {
-                            msg.delete().queueAfter(delaySeconds, TimeUnit.SECONDS);
-                        });
-                break;
             case "embed":
                 DiscordLink
                         .getJDA()
-                        .getTextChannelById(PluginConfiguration.Main.channelID)
+                        .getTextChannelById(SpongeDiscordLib.getGamechatChannelID())
                         .sendMessage(embed)
                         .queue(msg -> {
                             msg.delete().queueAfter(delaySeconds, TimeUnit.SECONDS);
                         });
                 break;
             default:
+            case "message":
                 DiscordLink
                         .getJDA()
-                        .getTextChannelById(PluginConfiguration.Main.channelID)
+                        .getTextChannelById(SpongeDiscordLib.getGamechatChannelID())
                         .sendMessage(message)
-                        .queue(msg -> msg.delete().queueAfter(delaySeconds, TimeUnit.SECONDS));
+                        .queue(msg -> {
+                            msg.delete().queueAfter(delaySeconds, TimeUnit.SECONDS);
+                        });
                 break;
         }
     }
@@ -103,7 +97,7 @@ public class Utility {
     public static void setTopic() {
         TextChannel channel = DiscordLink
                 .getJDA()
-                .getTextChannelById(PluginConfiguration.Main.channelID);
+                .getTextChannelById(SpongeDiscordLib.getGamechatChannelID());
         String[] code = channel.getName().split("-");
 
         channel.getManager()
@@ -136,7 +130,7 @@ public class Utility {
 
         DiscordLink
                 .getJDA()
-                .getTextChannelById(PluginConfiguration.Main.channelID)
+                .getTextChannelById(SpongeDiscordLib.getGamechatChannelID())
                 .sendMessage(embed.build())
                 .queue();
     }

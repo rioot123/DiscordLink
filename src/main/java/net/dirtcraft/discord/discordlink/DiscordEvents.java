@@ -1,6 +1,7 @@
 package net.dirtcraft.discord.discordlink;
 
 import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
+import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -21,7 +22,7 @@ public class DiscordEvents extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
-        if (!event.getChannel().getId().equals(PluginConfiguration.Main.channelID)) return;
+        if (!event.getChannel().getId().equals(SpongeDiscordLib.getGamechatChannelID())) return;
         if (event.getAuthor().isBot() || event.getAuthor().isFake()) return;
         if (hasAttachment(event)) return;
 
