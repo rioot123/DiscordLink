@@ -9,13 +9,11 @@
         ],
         "dependencies": [
             "sponge-discord-lib",
-            "luckperms",
             "spongeapi@7.2.0-SNAPSHOT",
             "ultimatechat"
         ],
         "requiredMods": [
             "sponge-discord-lib",
-            "luckperms",
             "spongeapi@7.2.0-SNAPSHOT",
             "ultimatechat"
         ]
