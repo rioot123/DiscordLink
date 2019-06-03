@@ -17,8 +17,6 @@ import org.spongepowered.api.plugin.Dependency;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
 
-import javax.security.auth.login.LoginException;
-
 @Plugin(
         id = "discord-link",
         name = "Discord Link",
@@ -52,17 +50,10 @@ public class DiscordLink {
         instance = this;
 
         this.configManager = new ConfigManager(loader);
-
-        try {
-            SpongeDiscordLib.initJDA();
-        } catch (LoginException | InterruptedException exception) {
-            logger.warn("Exception while initializing Discord Bot: " + exception.getMessage());
-        }
-
-        getJDA().addEventListener(new DiscordEvents());
-
+        
         Utility.setTopic();
 
+        getJDA().addEventListener(new DiscordEvents());
         Sponge.getEventManager().registerListeners(instance, new SpongeEvents());
     }
 
