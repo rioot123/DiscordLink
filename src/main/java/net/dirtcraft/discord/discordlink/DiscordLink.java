@@ -15,6 +15,7 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.plugin.Dependency;
 import org.spongepowered.api.plugin.Plugin;
+import org.spongepowered.api.plugin.PluginContainer;
 
 import javax.security.auth.login.LoginException;
 
@@ -27,7 +28,8 @@ import javax.security.auth.login.LoginException;
         },
         dependencies = {
                 @Dependency(id = "luckperms"),
-                @Dependency(id = "sponge-discord-lib")
+                @Dependency(id = "sponge-discord-lib"),
+                @Dependency(id = "ultimatechat")
         }
 )
 public class DiscordLink {
@@ -39,6 +41,9 @@ public class DiscordLink {
 
     @Inject
     private Logger logger;
+
+    @Inject
+    private PluginContainer container;
 
     private static DiscordLink instance;
 
@@ -55,7 +60,9 @@ public class DiscordLink {
         }
 
         getJDA().addEventListener(new DiscordEvents());
+        
         Utility.setTopic();
+
         Sponge.getEventManager().registerListeners(instance, new SpongeEvents());
     }
 

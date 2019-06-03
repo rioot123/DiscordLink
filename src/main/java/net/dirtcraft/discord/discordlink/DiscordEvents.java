@@ -67,32 +67,60 @@ public class DiscordEvents extends ListenerAdapter {
             List<String> urls = checkURLs(event.getMessage().getContentRaw());
             if (!(urls.size() > 0)) {
                 toBroadcast.onClick(TextActions.openUrl(new URL("http://discord.dirtcraft.gg/")));
-                toBroadcast.onHover(TextActions.showText(
-                        Utility.format(
-                                "&5&nClick me&7 to join &cDirtCraft's &9Discord" + "\n"
-                                        + "&7Discord Name&8: &6" + event.getAuthor().getName() + "&8#" + event.getAuthor().getDiscriminator() + "\n"
-                                        + "&7Nickname&8: &6" + event.getMember().getNickname() + "\n"
-                                        + "&7Staff Member&8: &6" + staff
-                        )));
+                if (event.getMember().getNickname() == null) {
+                    toBroadcast.onHover(TextActions.showText(
+                            Utility.format(
+                                    "&5&nClick me&7 to join &cDirtCraft's &9Discord" + "\n"
+                                            + "&7Discord Name&8: &6" + event.getAuthor().getName() + "&8#" + event.getAuthor().getDiscriminator() + "\n"
+                                            + "&7Staff Member&8: &6" + staff
+                            )));
+                } else {
+                    toBroadcast.onHover(TextActions.showText(
+                            Utility.format(
+                                    "&5&nClick me&7 to join &cDirtCraft's &9Discord" + "\n"
+                                            + "&7Discord Name&8: &6" + event.getAuthor().getName() + "&8#" + event.getAuthor().getDiscriminator() + "\n"
+                                            + "&7Nickname&8: &6" + event.getMember().getNickname() + "\n"
+                                            + "&7Staff Member&8: &6" + staff
+                            )));
+                }
             } else {
                 toBroadcast.onClick(TextActions.openUrl(new URL(urls.get(0))));
-                toBroadcast.onHover(TextActions.showText(
-                        Utility.format(
-                                "&5&nClick me&7 to open the &dlink" + "\n"
-                                        + "&7Discord Name&8: &6" + event.getAuthor().getName() + "&8#" + event.getAuthor().getDiscriminator() + "\n"
-                                        + "&7Nickname&8: &6" + event.getMember().getNickname() + "\n"
-                                        + "&7Staff Member&8: &6" + staff
-                        )));
+                if (event.getMember().getNickname() == null) {
+                    toBroadcast.onHover(TextActions.showText(
+                            Utility.format(
+                                    "&5&nClick me&7 to open the &dlink" + "\n"
+                                            + "&7Discord Name&8: &6" + event.getAuthor().getName() + "&8#" + event.getAuthor().getDiscriminator() + "\n"
+                                            + "&7Staff Member&8: &6" + staff
+                            )));
+                } else {
+                    toBroadcast.onHover(TextActions.showText(
+                            Utility.format(
+                                    "&5&nClick me&7 to open the &dlink" + "\n"
+                                            + "&7Discord Name&8: &6" + event.getAuthor().getName() + "&8#" + event.getAuthor().getDiscriminator() + "\n"
+                                            + "&7Nickname&8: &6" + event.getMember().getNickname() + "\n"
+                                            + "&7Staff Member&8: &6" + staff
+                            )));
+                }
             }
         } catch (MalformedURLException exception) {
-            toBroadcast.onHover(TextActions.showText(
-                    Utility.format(
-                            "&cMalformed URL, contact administrator!" + "\n"
-                                    + "&7User&8: &6" + event.getAuthor().getName() + "&8#" + event.getAuthor().getAsTag() + "\n"
-                                    + "&7Nickname&8: &6" + event.getMember().getNickname() + "\n"
-                                    + "&7Staff Member&8: &6" + staff
-                    )
-            ));
+            if (event.getMember().getNickname() == null) {
+                toBroadcast.onHover(TextActions.showText(
+                        Utility.format(
+                                "&cMalformed URL, contact administrator!" + "\n"
+                                        + "&7User&8: &6" + event.getAuthor().getName() + "&8#" + event.getAuthor().getAsTag() + "\n"
+                                        + "&7Staff Member&8: &6" + staff
+                        )
+                ));
+            } else {
+                toBroadcast.onHover(TextActions.showText(
+                        Utility.format(
+                                "&cMalformed URL, contact administrator!" + "\n"
+                                        + "&7User&8: &6" + event.getAuthor().getName() + "&8#" + event.getAuthor().getAsTag() + "\n"
+                                        + "&7Nickname&8: &6" + event.getMember().getNickname() + "\n"
+                                        + "&7Staff Member&8: &6" + staff
+                        )
+                ));
+            }
             exception.printStackTrace();
         }
 

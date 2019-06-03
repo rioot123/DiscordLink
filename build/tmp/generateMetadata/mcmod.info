@@ -10,12 +10,14 @@
         "dependencies": [
             "sponge-discord-lib",
             "luckperms",
-            "spongeapi@7.1.0-SNAPSHOT"
+            "spongeapi@7.2.0-SNAPSHOT",
+            "ultimatechat"
         ],
         "requiredMods": [
             "sponge-discord-lib",
             "luckperms",
-            "spongeapi@7.1.0-SNAPSHOT"
+            "spongeapi@7.2.0-SNAPSHOT",
+            "ultimatechat"
         ]
     }
 ]

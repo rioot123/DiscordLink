@@ -147,7 +147,15 @@ public class Utility {
                 .split(" ");
 
         if (!consoleCheck(event)) {
+            event.getMessage().delete().queue();
             Utility.autoRemove(5, "message", "<@" + event.getAuthor().getId() + ">, you do **not** have permission to use this command!", null);
+            DiscordLink.getJDA()
+                    .getTextChannelsByName("discord-log", true).get(0)
+                    .sendMessage(Utility.embedBuilder()
+                            .setAuthor(event.getAuthor().getName(), null, event.getAuthor().getAvatarUrl())
+                            .addField("__Tried Executing Command__", event.getMessage().getContentDisplay(), false)
+                            .build())
+                    .queue();
             return;
         }
 
@@ -174,6 +182,8 @@ public class Utility {
                     event.getMessage().getContentRaw().toLowerCase().startsWith(PluginConfiguration.Main.consolePrefix + "ban") ||
                     event.getMessage().getContentRaw().toLowerCase().startsWith(PluginConfiguration.Main.consolePrefix + "ipban") ||
                     event.getMessage().getContentRaw().toLowerCase().startsWith(PluginConfiguration.Main.consolePrefix + "tempban") ||
+                    event.getMessage().getContentRaw().toLowerCase().startsWith(PluginConfiguration.Main.consolePrefix + "nameban") ||
+                    event.getMessage().getContentRaw().toLowerCase().startsWith(PluginConfiguration.Main.consolePrefix + "nameunban") ||
                     event.getMessage().getContentRaw().toLowerCase().startsWith(PluginConfiguration.Main.consolePrefix + "tempmute") ||
                     event.getMessage().getContentRaw().toLowerCase().startsWith(PluginConfiguration.Main.consolePrefix + "mute") ||
                     event.getMessage().getContentRaw().toLowerCase().startsWith(PluginConfiguration.Main.consolePrefix + "kick")) {

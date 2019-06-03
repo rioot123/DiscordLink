@@ -1,5 +1,6 @@
 package net.dirtcraft.discord.discordlink;
 
+import br.net.fabiozumbi12.UltimateChat.Sponge.API.SendChannelMessageEvent;
 import me.lucko.luckperms.api.Contexts;
 import me.lucko.luckperms.api.User;
 import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
@@ -10,7 +11,6 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
-import org.spongepowered.api.event.message.MessageChannelEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
@@ -40,15 +40,17 @@ public class SpongeEvents {
     }
 
     @Listener
-    public void onChat(MessageChannelEvent.Chat event, @Root Object cause) {
+    public void onChat(SendChannelMessageEvent event, @Root Object cause) {
+        if (!event.getChannel().getName().equalsIgnoreCase("global")) return;
         if (!(cause instanceof Player)) return;
         Player player = (Player) cause;
         User user = DiscordLink.getLuckPerms().getUser(player.getUniqueId());
         if (user == null) return;
 
+
         String prefix = TextSerializers.FORMATTING_CODE.stripCodes(user.getCachedData().getMetaData(Contexts.global()).getPrefix());
         String username = player.getName();
-        String message = TextSerializers.FORMATTING_CODE.stripCodes(event.getRawMessage().toPlain())
+        String message = TextSerializers.FORMATTING_CODE.stripCodes(event.getMessage().toPlain())
                 .replace("@everyone", "")
                 .replace("@here", "");
 
