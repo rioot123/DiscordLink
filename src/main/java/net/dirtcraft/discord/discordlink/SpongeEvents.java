@@ -38,8 +38,9 @@ public class SpongeEvents {
     }
 
     @Listener
-    public void onChat(SendChannelMessageEvent event, @Root Object cause) {
-        if ((event.getChannel().getName() != null) && (!event.getChannel().getName().equalsIgnoreCase("global"))) return;
+    public void onSendChannelMessage(SendChannelMessageEvent event, @Root Object cause) {
+        if (event.getChannel() == null) return;
+        if (!event.getChannel().getName().equalsIgnoreCase("global")) return;
         if (!(cause instanceof Player)) return;
         Player player = (Player) cause;
 
