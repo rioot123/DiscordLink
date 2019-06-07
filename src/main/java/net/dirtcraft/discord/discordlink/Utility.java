@@ -104,7 +104,7 @@ public class Utility {
     }
 
     public static void setStatus() {
-        DiscordUtil.setStatus(Game.GameType.WATCHING, SpongeDiscordLib.getServerName() + " " + "gamechat", null);
+        DiscordUtil.setStatus(Game.GameType.STREAMING, SpongeDiscordLib.getServerName(), "https://www.twitch.tv/dirtcraft/");
     }
 
     public static void listCommand(MessageReceivedEvent event) {
