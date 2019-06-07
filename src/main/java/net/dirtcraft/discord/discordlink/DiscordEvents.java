@@ -27,6 +27,8 @@ public class DiscordEvents extends ListenerAdapter {
         if (hasAttachment(event)) return;
 
         String username = event.getAuthor().getName();
+        String effectiveName = event.getMember().getEffectiveName();
+
         String message = event.getMessage().getContentDisplay();
 
         if (event.getMessage().getContentRaw().startsWith(PluginConfiguration.Main.botPrefix + "list")) {
@@ -42,13 +44,7 @@ public class DiscordEvents extends ListenerAdapter {
         Role staffRole = event.getGuild().getRoleById(PluginConfiguration.Roles.staffRoleID);
         boolean isStaff = event.getMember().getRoles().contains(staffRole);
 
-        String staff;
-
-        if (isStaff) {
-            staff = "Yes";
-        } else {
-            staff = "No";
-        }
+        String staff = isStaff ? "Yes" : "No";
 
         Text.Builder toBroadcast = Text.builder();
         if (!isStaff) {
@@ -59,7 +55,7 @@ public class DiscordEvents extends ListenerAdapter {
         } else {
             toBroadcast.append(
                     Utility.format(PluginConfiguration.Format.discordToServer
-                            .replace("{username}", username)
+                            .replace("{username}", effectiveName)
                             .replace("{message}", message)
                             .replace("&9&l»", "&c&l»")
                     ));
