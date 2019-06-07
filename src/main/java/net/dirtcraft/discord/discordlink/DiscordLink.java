@@ -58,6 +58,7 @@ public class DiscordLink {
 
         this.configManager = new ConfigManager(loader);
 
+        Utility.setStatus();
         Utility.setTopic();
 
         getJDA().addEventListener(new DiscordEvents());

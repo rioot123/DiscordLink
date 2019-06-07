@@ -1,12 +1,10 @@
 package net.dirtcraft.discord.discordlink;
 
 import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
+import net.dirtcraft.discord.spongediscordlib.DiscordUtil;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.MessageEmbed;
-import net.dv8tion.jda.core.entities.Role;
-import net.dv8tion.jda.core.entities.TextChannel;
+import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
@@ -103,6 +101,10 @@ public class Utility {
         channel.getManager()
                 .setTopic("ModPack: **" + SpongeDiscordLib.getServerName() + "** — IP: " + code[1] + ".dirtcraft.gg")
                 .queue();
+    }
+
+    public static void setStatus() {
+        DiscordUtil.setStatus(Game.GameType.WATCHING, SpongeDiscordLib.getServerName() + " " + "gamechat", null);
     }
 
     public static void listCommand(MessageReceivedEvent event) {
