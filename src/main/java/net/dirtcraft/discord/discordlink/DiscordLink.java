@@ -45,6 +45,9 @@ public class DiscordLink {
 
     @Listener (order = Order.LAST)
     public void onPreInit(GamePreInitializationEvent event) {
+        if (!Sponge.getPluginManager().isLoaded("ultimatechat")) return;
+        if (!Sponge.getPluginManager().isLoaded("sponge-discord-lib")) return;
+
         instance = this;
 
         this.configManager = new ConfigManager(loader);
