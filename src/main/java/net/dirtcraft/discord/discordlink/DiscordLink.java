@@ -24,8 +24,8 @@ import org.spongepowered.api.plugin.PluginContainer;
                 "juliann"
         },
         dependencies = {
-                @Dependency(id = "sponge-discord-lib"),
-                @Dependency(id = "ultimatechat")
+                @Dependency(id = "sponge-discord-lib", optional = true),
+                @Dependency(id = "ultimatechat", optional = true)
         }
 )
 public class DiscordLink {
@@ -45,8 +45,14 @@ public class DiscordLink {
 
     @Listener (order = Order.LAST)
     public void onPreInit(GamePreInitializationEvent event) {
-        if (!Sponge.getPluginManager().isLoaded("ultimatechat")) return;
-        if (!Sponge.getPluginManager().isLoaded("sponge-discord-lib")) return;
+        if (!Sponge.getPluginManager().isLoaded("ultimatechat")) {
+            logger.error("UltimateChat is not installed! " + container.getName() + " will not load.");
+            return;
+        }
+        if (!Sponge.getPluginManager().isLoaded("sponge-discord-lib")) {
+            logger.error("Sponge-Discord-Lib is not installed! " + container.getName() + " will not load.");
+            return;
+        }
 
         instance = this;
 
