@@ -152,8 +152,8 @@ public class Utility {
             DiscordLink.getJDA()
                     .getTextChannelsByName("discord-log", true).get(0)
                     .sendMessage(Utility.embedBuilder()
-                            .setAuthor(event.getAuthor().getName(), null, event.getAuthor().getAvatarUrl())
                             .addField("__Tried Executing Command__", event.getMessage().getContentDisplay(), false)
+                            .setFooter(event.getAuthor().getAsTag(), event.getAuthor().getAvatarUrl())
                             .build())
                     .queue();
             return;
