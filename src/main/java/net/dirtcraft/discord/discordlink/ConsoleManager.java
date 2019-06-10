@@ -32,7 +32,7 @@ public class ConsoleManager implements CommandSource {
         if ("".equals(plain) || plain.trim().isEmpty()) return;
         Utility.messageToChannel("embed", null,
                 Utility.embedBuilder().addField("__Command__ \"**/" + command.toLowerCase() + "**\" __Sent__", plain, false)
-                        .setFooter("Sent by: " + member.getUser().getAsTag(), member.getUser().getAvatarUrl())
+                        .setFooter("Sent By: " + member.getUser().getAsTag(), member.getUser().getAvatarUrl())
                         .build());
     }
 
