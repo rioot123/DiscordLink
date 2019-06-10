@@ -1,5 +1,7 @@
 package net.dirtcraft.discord.discordlink;
 
+import io.github.nucleuspowered.nucleus.api.NucleusAPI;
+import io.github.nucleuspowered.nucleus.api.service.NucleusAFKService;
 import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
 import net.dirtcraft.discord.spongediscordlib.DiscordUtil;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
@@ -15,6 +17,7 @@ import org.spongepowered.api.text.serializer.TextSerializers;
 import java.awt.*;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
@@ -44,25 +47,19 @@ public class Utility {
 
     public static void messageToChannel(String type, String message, MessageEmbed embed) {
         switch (type.toLowerCase()) {
+            default:
             case "message":
                 DiscordLink
                         .getJDA()
                         .getTextChannelById(SpongeDiscordLib.getGamechatChannelID())
                         .sendMessage(message)
                         .queue();
-                break;
+            break;
             case "embed":
                 DiscordLink
                         .getJDA()
                         .getTextChannelById(SpongeDiscordLib.getGamechatChannelID())
                         .sendMessage(embed)
-                        .queue();
-                break;
-            default:
-                DiscordLink
-                        .getJDA()
-                        .getTextChannelById(SpongeDiscordLib.getGamechatChannelID())
-                        .sendMessage(message)
                         .queue();
                 break;
         }
@@ -70,21 +67,21 @@ public class Utility {
 
     public static void autoRemove(int delaySeconds, String type, String message, MessageEmbed embed) {
         switch (type.toLowerCase()) {
-            case "embed":
-                DiscordLink
-                        .getJDA()
-                        .getTextChannelById(SpongeDiscordLib.getGamechatChannelID())
-                        .sendMessage(embed)
-                        .queue(msg -> {
-                            msg.delete().queueAfter(delaySeconds, TimeUnit.SECONDS);
-                        });
-                break;
             default:
             case "message":
                 DiscordLink
                         .getJDA()
                         .getTextChannelById(SpongeDiscordLib.getGamechatChannelID())
                         .sendMessage(message)
+                        .queue(msg -> {
+                            msg.delete().queueAfter(delaySeconds, TimeUnit.SECONDS);
+                        });
+                break;
+            case "embed":
+                DiscordLink
+                        .getJDA()
+                        .getTextChannelById(SpongeDiscordLib.getGamechatChannelID())
+                        .sendMessage(embed)
                         .queue(msg -> {
                             msg.delete().queueAfter(delaySeconds, TimeUnit.SECONDS);
                         });
@@ -110,15 +107,22 @@ public class Utility {
     public static void listCommand(MessageReceivedEvent event) {
         Member member = event.getMember();
 
-        ArrayList<Player> players = new ArrayList<>(Sponge.getServer().getOnlinePlayers());
+        Collection<Player> players = Sponge.getServer().getOnlinePlayers();
+
         ArrayList<String> playerNames = new ArrayList<>();
+        players.forEach(online -> {
+            if (NucleusAPI.getAFKService().isPresent()) {
+                if (NucleusAPI.getAFKService().get().isAFK(online)) {
+                    playerNames.add(online.getName() + " " + "—" + " " + "**AFK**");
+                } else {
+                    playerNames.add(online.getName());
+                }
+            } else {
+                playerNames.add(online.getName());
+            }
+        });
 
-        for (Player player : players) {
-            playerNames.add(player.getName());
-        }
-
-        Collections.sort(playerNames);
-
+        playerNames.sort(String::compareToIgnoreCase);
 
         EmbedBuilder embed = Utility.embedBuilder();
         if (players.size() > 1) {
@@ -128,7 +132,7 @@ public class Utility {
         } else {
             embed.setDescription("There are no players playing **" + SpongeDiscordLib.getServerName() + "**!");
         }
-                embed.setFooter("Requested By: " + member.getUser().getAsTag(), null);
+                embed.setFooter("Requested By: " + member.getUser().getAsTag(), event.getAuthor().getAvatarUrl());
 
         DiscordLink
                 .getJDA()
