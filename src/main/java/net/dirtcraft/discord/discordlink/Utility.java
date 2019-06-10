@@ -150,7 +150,7 @@ public class Utility {
             event.getMessage().delete().queue();
             Utility.autoRemove(5, "message", "<@" + event.getAuthor().getId() + ">, you do **not** have permission to use this command!", null);
             DiscordLink.getJDA()
-                    .getTextChannelsByName("discord-log", true).get(0)
+                    .getTextChannelsByName("command-log", true).get(0)
                     .sendMessage(Utility.embedBuilder()
                             .addField("__Tried Executing Command__", event.getMessage().getContentDisplay(), false)
                             .setFooter(event.getAuthor().getAsTag(), event.getAuthor().getAvatarUrl())
