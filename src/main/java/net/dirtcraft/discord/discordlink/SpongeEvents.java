@@ -13,6 +13,7 @@ import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
 import java.awt.*;
+import java.util.regex.Pattern;
 
 public class SpongeEvents {
 
@@ -49,7 +50,8 @@ public class SpongeEvents {
         String username = player.getName();
         String message = TextSerializers.FORMATTING_CODE.stripCodes(event.getMessage().toPlain())
                 .replace("@everyone", "")
-                .replace("@here", "");
+                .replace("@here", "")
+                .replaceAll("<@\\d+>", "");
 
         Utility.chatToDiscord(prefix, username, message);
     }

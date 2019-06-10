@@ -42,7 +42,10 @@ public class DiscordEvents extends ListenerAdapter {
         }
 
         Role staffRole = event.getGuild().getRoleById(PluginConfiguration.Roles.staffRoleID);
+        Role ownerRole = event.getGuild().getRoleById(PluginConfiguration.Roles.ownerRoleID);
+
         boolean isStaff = event.getMember().getRoles().contains(staffRole);
+        boolean isOwner = event.getMember().getRoles().contains(ownerRole);
 
         String staff = isStaff ? "Yes" : "No";
 
@@ -53,12 +56,22 @@ public class DiscordEvents extends ListenerAdapter {
                             .replace("{username}", username)
                             .replace("{message}", TextSerializers.FORMATTING_CODE.stripCodes(message))));
         } else {
-            toBroadcast.append(
-                    Utility.format(PluginConfiguration.Format.discordToServer
-                            .replace("{username}", effectiveName)
-                            .replace("{message}", message)
-                            .replace("&9&l»", "&c&l»")
-                    ));
+
+            if (!isOwner) {
+                toBroadcast.append(
+                        Utility.format(PluginConfiguration.Format.discordToServer
+                                .replace("{username}", effectiveName)
+                                .replace("{message}", message)
+                                .replace("&9&l»", "&c&l»")
+                        ));
+            } else {
+                toBroadcast.append(
+                        Utility.format(PluginConfiguration.Format.discordToServer
+                                .replace("{username}", effectiveName)
+                                .replace("{message}", message)
+                                .replace("&9&l»", "&4&l»")
+                        ));
+            }
         }
         try {
             List<String> urls = checkURLs(event.getMessage().getContentRaw());
