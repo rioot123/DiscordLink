@@ -26,8 +26,8 @@ public class DiscordEvents extends ListenerAdapter {
         if (event.getAuthor().isBot() || event.getAuthor().isFake()) return;
         if (hasAttachment(event)) return;
 
-        String username = event.getAuthor().getName();
-        String effectiveName = event.getMember().getEffectiveName();
+        String username = TextSerializers.FORMATTING_CODE.stripCodes(event.getAuthor().getName());
+        String effectiveName = TextSerializers.FORMATTING_CODE.stripCodes(event.getMember().getEffectiveName());
 
         String message = event.getMessage().getContentDisplay();
 
