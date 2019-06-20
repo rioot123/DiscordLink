@@ -41,7 +41,7 @@ public class Storage {
 
     public void updateRecord(String code, UUID uuid) {
         try (Connection connection = getConnection();
-             PreparedStatement ps = connection.prepareStatement("UPDATE verification SET uuid = '" + uuid + "' WHERE code = '" + code + "'")) {
+             PreparedStatement ps = connection.prepareStatement("UPDATE verification SET uuid = '" + uuid + "', code = NULL WHERE code = '" + code + "'")) {
 
             ps.executeUpdate();
 
