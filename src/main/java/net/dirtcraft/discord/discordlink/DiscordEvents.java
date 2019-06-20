@@ -8,6 +8,7 @@ import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.serializer.TextSerializers;
@@ -56,56 +57,62 @@ public class DiscordEvents extends ListenerAdapter {
 
         String staff = isStaff ? "&aYes" : "&cNo";
 
-        Text.Builder toBroadcast = Text.builder();
-        String mcUsername = storage.getLastKnownUsername(storage.getUUIDfromDiscordID(event.getMember().getUser().getId()));
-        if (!isStaff) {
+        Task.builder()
+                .async()
+                .execute(() -> {
+                    Text.Builder toBroadcast = Text.builder();
+                    String mcUsername = storage.getLastKnownUsername(storage.getUUIDfromDiscordID(event.getMember().getUser().getId()));
+                    if (!isStaff) {
 
-            toBroadcast.append(Utility.format(PluginConfiguration.Format.discordToServer
-                    .replace("{username}", mcUsername != null ? mcUsername : username)
-                    .replace("{message}", TextSerializers.FORMATTING_CODE.stripCodes(message))
-                    .replace("»", mcUsername != null ? "&6&l»" : "&9&l»")));
+                        toBroadcast.append(Utility.format(PluginConfiguration.Format.discordToServer
+                                .replace("{username}", mcUsername != null ? mcUsername : username)
+                                .replace("{message}", TextSerializers.FORMATTING_CODE.stripCodes(message))
+                                .replace("»", mcUsername != null ? "&6&l»" : "&9&l»")));
 
-        } else {
-            toBroadcast.append(
-                    Utility.format(PluginConfiguration.Format.discordToServer
-                            .replace("{username}", effectiveName)
-                            .replace("{message}", message)
-                            .replace("»", !isOwner ? "&c&l»" : "&4&l»")
-                    ));
-        }
+                    } else {
+                        toBroadcast.append(
+                                Utility.format(PluginConfiguration.Format.discordToServer
+                                        .replace("{username}", effectiveName)
+                                        .replace("{message}", message)
+                                        .replace("»", !isOwner ? "&c&l»" : "&4&l»")
+                                ));
+                    }
 
-        ArrayList<String> hover = new ArrayList<>();
-        hover.add("&5&nClick me&7 to join &cDirtCraft's &9Discord");
-        if (mcUsername != null) {
-            hover.add("&7MC Username&8: &6" + mcUsername);
-        }
-        hover.add("&7Discord Name&8: &6" + event.getAuthor().getName() + "&8#&7" + event.getAuthor().getDiscriminator());
-        if (event.getMember().getNickname() != null) {
-            hover.add("&7Nickname&8: &6" + event.getMember().getNickname());
-        }
-        hover.add("&7Staff Member&8: &6" + staff);
+                    ArrayList<String> hover = new ArrayList<>();
+                    hover.add("&5&nClick me&7 to join &cDirtCraft's &9Discord");
+                    if (mcUsername != null) {
+                        hover.add("&7MC Username&8: &6" + mcUsername);
+                    }
+                    hover.add("&7Discord Name&8: &6" + event.getAuthor().getName() + "&8#&7" + event.getAuthor().getDiscriminator());
+                    if (event.getMember().getNickname() != null) {
+                        hover.add("&7Nickname&8: &6" + event.getMember().getNickname());
+                    }
+                    hover.add("&7Staff Member&8: &6" + staff);
 
-        try {
-            List<String> urls = checkURLs(event.getMessage().getContentRaw());
-            if (!(urls.size() > 0)) {
-                toBroadcast.onClick(TextActions.openUrl(new URL("http://discord.dirtcraft.gg/")));
+                    try {
+                        List<String> urls = checkURLs(event.getMessage().getContentRaw());
+                        if (!(urls.size() > 0)) {
+                            toBroadcast.onClick(TextActions.openUrl(new URL("http://discord.dirtcraft.gg/")));
 
-                toBroadcast.onHover(TextActions.showText(Utility.format(String.join("\n", hover))));
+                            toBroadcast.onHover(TextActions.showText(Utility.format(String.join("\n", hover))));
 
-            } else {
-                toBroadcast.onClick(TextActions.openUrl(new URL(urls.get(0))));
+                        } else {
+                            toBroadcast.onClick(TextActions.openUrl(new URL(urls.get(0))));
 
-                toBroadcast.onHover(TextActions.showText(Utility.format(String.join("\n", hover))));
-            }
-        } catch (MalformedURLException exception) {
-            hover.add("&cMalformed URL, Contact Administrator");
+                            toBroadcast.onHover(TextActions.showText(Utility.format(String.join("\n", hover))));
+                        }
+                    } catch (MalformedURLException exception) {
+                        hover.add("&cMalformed URL, Contact Administrator");
 
-            toBroadcast.onHover(TextActions.showText(Utility.format(String.join("\n", hover))));
+                        toBroadcast.onHover(TextActions.showText(Utility.format(String.join("\n", hover))));
 
-            exception.printStackTrace();
-        }
+                        exception.printStackTrace();
+                    }
 
-        Sponge.getServer().getBroadcastChannel().send(toBroadcast.build());
+                    Sponge.getServer().getBroadcastChannel().send(toBroadcast.build());
+
+                })
+                .submit(DiscordLink.getInstance());
 
     }
 

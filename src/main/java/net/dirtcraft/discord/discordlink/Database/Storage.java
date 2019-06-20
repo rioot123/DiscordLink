@@ -12,16 +12,24 @@ import java.util.UUID;
 public class Storage {
 
     public boolean isVerified(UUID uuid) {
+        boolean result;
         try (Connection connection = getConnection();
-             PreparedStatement ps = connection.prepareStatement("SELECT * FROM verification WHERE uuid = '" + uuid + "'");
-             ResultSet rs = ps.executeQuery()) {
+             PreparedStatement ps = connection.prepareStatement("SELECT * FROM verification WHERE uuid = ?")) {
 
-            return rs.next();
+            ps.setString(1, uuid.toString());
+
+            ResultSet rs = ps.executeQuery();
+
+            result = rs.next();
+
+            rs.close();
 
         } catch (SQLException exception) {
             exception.printStackTrace();
-            return false;
+            result = false;
         }
+
+        return result;
     }
 
     public boolean validCode(String code) {
@@ -96,7 +104,7 @@ public class Storage {
     @Nullable
     public String getUUIDfromDiscordID(String discordID) {
         try (Connection connection = getConnection();
-             PreparedStatement ps = connection.prepareStatement("SELECT uuid FROM verification WHERE discordid = '" + discordID+ "'");
+             PreparedStatement ps = connection.prepareStatement("SELECT uuid FROM verification WHERE discordid = '" + discordID + "'");
              ResultSet rs = ps.executeQuery()) {
 
             if (!rs.next()) return null;
