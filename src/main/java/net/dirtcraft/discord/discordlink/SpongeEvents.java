@@ -1,23 +1,38 @@
 package net.dirtcraft.discord.discordlink;
 
 import br.net.fabiozumbi12.UltimateChat.Sponge.API.SendChannelMessageEvent;
+import net.dirtcraft.discord.discordlink.Commands.CommandManager;
 import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
+import net.dirtcraft.discord.discordlink.Database.Storage;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.filter.cause.Root;
+import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
 import java.awt.*;
-import java.util.regex.Pattern;
 
 public class SpongeEvents {
 
+    private final DiscordLink main;
+    private final Storage storage;
+
+    public SpongeEvents(DiscordLink main, Storage storage) {
+        this.main = main;
+        this.storage = storage;
+    }
+
     private final String modpack = SpongeDiscordLib.getServerName();
+
+    @Listener
+    public void onGameInit(GameInitializationEvent event) {
+        new CommandManager(main, storage);
+    }
 
     @Listener
     public void onServerStarted(GameStartedServerEvent event) {

@@ -25,6 +25,9 @@ public class PluginConfiguration {
         @Setting(value = "Bot-Prefix", comment = "Prefix to use bot commands")
         public static String botPrefix = "!";
 
+        @Setting(value = "Discord-Server-ID")
+        public static String discordServerID = "269639757351354368";
+
     }
 
     @ConfigSerializable
@@ -76,6 +79,8 @@ public class PluginConfiguration {
         @Setting(value = "Staff-Role-ID")
         public static String staffRoleID = "549039481450397699";
 
+        @Setting(value = "Verified-Role-ID")
+        public static String verifiedRoleID = "578447006662524940";
     }
 
 }

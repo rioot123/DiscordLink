@@ -18,6 +18,8 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Gradle: br.net.fabiozumbi12.UltimateChat:UltimateChat-Sponge-7:1.8.9" level="project" />
+    <orderEntry type="library" name="Gradle: com.github.NucleusPowered:Nucleus:1.11.0" level="project" />
+    <orderEntry type="library" name="Gradle: com.github.Dirt-Craft:Dirt-Database-Lib:-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Gradle: br.net.fabiozumbi12.UltimateChat:UltimateChat-Sponge-56:1.8.9" level="project" />
     <orderEntry type="library" name="Gradle: org.spongepowered:spongeapi:7.2.0-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Gradle: org.spongepowered:spongeapi:javadoc:7.2.0-SNAPSHOT" level="project" />

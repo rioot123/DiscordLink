@@ -2,6 +2,7 @@ package net.dirtcraft.discord.discordlink;
 
 import com.google.inject.Inject;
 import net.dirtcraft.discord.discordlink.Configuration.ConfigManager;
+import net.dirtcraft.discord.discordlink.Database.Storage;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.core.JDA;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
@@ -25,15 +26,16 @@ import org.spongepowered.api.plugin.PluginContainer;
         },
         dependencies = {
                 @Dependency(id = "sponge-discord-lib", optional = true),
-                @Dependency(id = "ultimatechat", optional = true)
+                @Dependency(id = "ultimatechat", optional = true),
+                @Dependency(id = "dirt-database-lib")
         }
 )
 public class DiscordLink {
 
     @Inject
     @DefaultConfig(sharedRoot = false)
-    public ConfigurationLoader<CommentedConfigurationNode> loader;
-    public ConfigManager configManager;
+    private ConfigurationLoader<CommentedConfigurationNode> loader;
+    private ConfigManager configManager;
 
     @Inject
     private Logger logger;
@@ -42,6 +44,7 @@ public class DiscordLink {
     private PluginContainer container;
 
     private static DiscordLink instance;
+    private Storage storage;
 
     @Listener (order = Order.LAST)
     public void onPreInit(GamePreInitializationEvent event) {
@@ -57,12 +60,13 @@ public class DiscordLink {
         instance = this;
 
         this.configManager = new ConfigManager(loader);
+        this.storage = new Storage();
 
         Utility.setStatus();
         Utility.setTopic();
 
         getJDA().addEventListener(new DiscordEvents());
-        Sponge.getEventManager().registerListeners(instance, new SpongeEvents());
+        Sponge.getEventManager().registerListeners(instance, new SpongeEvents(instance, storage));
     }
 
     public static JDA getJDA() {
