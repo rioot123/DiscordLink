@@ -44,7 +44,7 @@ public class UnVerify implements CommandExecutor {
                     @Nullable
                     User user = SpongeDiscordLib.getJDA().getUserById(discordID);
 
-                    source.sendMessage(Utility.format(user != null ?
+                    player.sendMessage(Utility.format(user != null ?
                             "&7The account &6" + user.getName() + "&8#&7" + user.getDiscriminator() + " has been &cunverified" :
                             "&7Your account has been &cunverified"));
 
