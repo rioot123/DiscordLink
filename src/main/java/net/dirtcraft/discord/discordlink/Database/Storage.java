@@ -33,13 +33,21 @@ public class Storage {
     }
 
     public boolean validCode(String code) {
+        boolean result;
         try (Connection connection = getConnection();
-             PreparedStatement ps = connection.prepareStatement("SELECT * FROM verification WHERE code = '" + code + "'");
-             ResultSet rs = ps.executeQuery()) {
+             PreparedStatement ps = connection.prepareStatement("SELECT * FROM verification WHERE code = ?")) {
+            ps.setString(1, code);
+            ResultSet rs = ps.executeQuery();
 
-            if (!rs.next()) return false;
+            if (!rs.next()) {
+                rs.close();
+                return false;
+            } else {
+                result = rs.getString("uuid") == null;
+                rs.close();
+            }
 
-            return rs.getString("uuid") == null;
+            return result;
 
         } catch (SQLException exception) {
             exception.printStackTrace();
@@ -49,7 +57,9 @@ public class Storage {
 
     public void updateRecord(String code, UUID uuid) {
         try (Connection connection = getConnection();
-             PreparedStatement ps = connection.prepareStatement("UPDATE verification SET uuid = '" + uuid + "', code = NULL WHERE code = '" + code + "'")) {
+             PreparedStatement ps = connection.prepareStatement("UPDATE verification SET uuid = ?, code = NULL WHERE code = ?")) {
+            ps.setString(1, uuid.toString());
+            ps.setString(2, code);
 
             ps.executeUpdate();
 
@@ -60,7 +70,8 @@ public class Storage {
 
     public void deleteRecord(UUID uuid) {
         try (Connection connection = getConnection();
-             PreparedStatement ps = connection.prepareStatement("DELETE FROM verification WHERE uuid = '" + uuid + "'")) {
+             PreparedStatement ps = connection.prepareStatement("DELETE FROM verification WHERE uuid = ?")) {
+            ps.setString(1, uuid.toString());
 
             ps.executeUpdate();
 
@@ -72,12 +83,19 @@ public class Storage {
     @Nullable
     public String getDiscordUser(UUID uuid) {
         try (Connection connection = getConnection();
-             PreparedStatement ps = connection.prepareStatement("SELECT discordid FROM verification WHERE uuid = '" + uuid + "'");
-             ResultSet rs = ps.executeQuery()) {
+             PreparedStatement ps = connection.prepareStatement("SELECT discordid FROM verification WHERE uuid = ?")) {
+            ps.setString(1, uuid.toString());
 
-            if (!rs.next()) return null;
+            ResultSet rs = ps.executeQuery();
 
-            return rs.getString("discordid");
+            if (!rs.next()) {
+                rs.close();
+                return null;
+            } else {
+                String discordID = rs.getString("discordid");
+                rs.close();
+                return discordID;
+            }
 
         } catch (SQLException exception) {
             exception.printStackTrace();
@@ -88,12 +106,20 @@ public class Storage {
     @Nullable
     public String getLastKnownUsername(String uuid) {
         try (Connection connection = getConnection();
-             PreparedStatement ps = connection.prepareStatement("SELECT Username FROM votedata WHERE UUID = '" + uuid + "'");
-             ResultSet rs = ps.executeQuery()) {
+             PreparedStatement ps = connection.prepareStatement("SELECT Username FROM votedata WHERE UUID = ?")) {
 
-            if (!rs.next()) return null;
+            ps.setString(1, uuid);
+            ResultSet rs = ps.executeQuery();
 
-            return rs.getString("Username");
+            if (!rs.next()) {
+                rs.close();
+                return null;
+            } else {
+                String username = rs.getString("Username");
+                rs.close();
+                return username;
+            }
+
 
         } catch (SQLException exception) {
             exception.printStackTrace();
@@ -104,12 +130,19 @@ public class Storage {
     @Nullable
     public String getUUIDfromDiscordID(String discordID) {
         try (Connection connection = getConnection();
-             PreparedStatement ps = connection.prepareStatement("SELECT uuid FROM verification WHERE discordid = '" + discordID + "'");
-             ResultSet rs = ps.executeQuery()) {
+             PreparedStatement ps = connection.prepareStatement("SELECT uuid FROM verification WHERE discordid = ?")) {
 
-            if (!rs.next()) return null;
+            ps.setString(1, discordID);
+            ResultSet rs = ps.executeQuery();
 
-            return rs.getString("uuid");
+            if (!rs.next()) {
+                rs.close();
+                return null;
+            } else {
+                String uuid = rs.getString("uuid");
+                rs.close();
+                return uuid;
+            }
 
         } catch (SQLException exception) {
             exception.printStackTrace();
