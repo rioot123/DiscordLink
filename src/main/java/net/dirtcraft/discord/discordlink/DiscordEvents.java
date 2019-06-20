@@ -54,11 +54,11 @@ public class DiscordEvents extends ListenerAdapter {
         boolean isStaff = event.getMember().getRoles().contains(staffRole);
         boolean isOwner = event.getMember().getRoles().contains(ownerRole);
 
-        String staff = isStaff ? "Yes" : "No";
+        String staff = isStaff ? "&aYes" : "&cNo";
 
         Text.Builder toBroadcast = Text.builder();
+        String mcUsername = storage.getLastKnownUsername(storage.getUUIDfromDiscordID(event.getMember().getUser().getId()));
         if (!isStaff) {
-            String mcUsername = storage.getLastKnownUsername(storage.getUUIDfromDiscordID(event.getMember().getUser().getId()));
             if (mcUsername != null) {
             toBroadcast.append(
                     Utility.format(PluginConfiguration.Format.discordToServer
@@ -88,64 +88,34 @@ public class DiscordEvents extends ListenerAdapter {
                         ));
             }
         }
+        ArrayList<String> hover = new ArrayList<>();
+        hover.add("&5&nClick me&7 to join &cDirtCraft's &9Discord");
+        if (mcUsername != null) {
+            hover.add("&7MC Username&8: &6" + mcUsername);
+        }
+        hover.add("&7Discord Name&8: &6" + event.getAuthor().getName() + "&8#&7" + event.getAuthor().getDiscriminator());
+        if (event.getMember().getNickname() != null) {
+            hover.add("&7Nickname&8: &6" + event.getMember().getNickname());
+        }
+        hover.add("&7Staff Member&8: &6" + staff);
+
         try {
             List<String> urls = checkURLs(event.getMessage().getContentRaw());
             if (!(urls.size() > 0)) {
                 toBroadcast.onClick(TextActions.openUrl(new URL("http://discord.dirtcraft.gg/")));
-                if (event.getMember().getNickname() == null) {
-                    toBroadcast.onHover(TextActions.showText(
-                            Utility.format(
-                                    "&5&nClick me&7 to join &cDirtCraft's &9Discord" + "\n"
-                                            + "&7Discord Name&8: &6" + event.getAuthor().getName() + "&8#" + event.getAuthor().getDiscriminator() + "\n"
-                                            + "&7Staff Member&8: &6" + staff
-                            )));
-                } else {
-                    toBroadcast.onHover(TextActions.showText(
-                            Utility.format(
-                                    "&5&nClick me&7 to join &cDirtCraft's &9Discord" + "\n"
-                                            + "&7Discord Name&8: &6" + event.getAuthor().getName() + "&8#" + event.getAuthor().getDiscriminator() + "\n"
-                                            + "&7Nickname&8: &6" + event.getMember().getNickname() + "\n"
-                                            + "&7Staff Member&8: &6" + staff
-                            )));
-                }
+
+                toBroadcast.onHover(TextActions.showText(Utility.format(String.join("\n", hover))));
+
             } else {
                 toBroadcast.onClick(TextActions.openUrl(new URL(urls.get(0))));
-                if (event.getMember().getNickname() == null) {
-                    toBroadcast.onHover(TextActions.showText(
-                            Utility.format(
-                                    "&5&nClick me&7 to open the &dlink" + "\n"
-                                            + "&7Discord Name&8: &6" + event.getAuthor().getName() + "&8#" + event.getAuthor().getDiscriminator() + "\n"
-                                            + "&7Staff Member&8: &6" + staff
-                            )));
-                } else {
-                    toBroadcast.onHover(TextActions.showText(
-                            Utility.format(
-                                    "&5&nClick me&7 to open the &dlink" + "\n"
-                                            + "&7Discord Name&8: &6" + event.getAuthor().getName() + "&8#" + event.getAuthor().getDiscriminator() + "\n"
-                                            + "&7Nickname&8: &6" + event.getMember().getNickname() + "\n"
-                                            + "&7Staff Member&8: &6" + staff
-                            )));
-                }
+
+                toBroadcast.onHover(TextActions.showText(Utility.format(String.join("\n", hover))));
             }
         } catch (MalformedURLException exception) {
-            if (event.getMember().getNickname() == null) {
-                toBroadcast.onHover(TextActions.showText(
-                        Utility.format(
-                                "&cMalformed URL, contact administrator!" + "\n"
-                                        + "&7User&8: &6" + event.getAuthor().getName() + "&8#" + event.getAuthor().getAsTag() + "\n"
-                                        + "&7Staff Member&8: &6" + staff
-                        )
-                ));
-            } else {
-                toBroadcast.onHover(TextActions.showText(
-                        Utility.format(
-                                "&cMalformed URL, contact administrator!" + "\n"
-                                        + "&7User&8: &6" + event.getAuthor().getName() + "&8#" + event.getAuthor().getAsTag() + "\n"
-                                        + "&7Nickname&8: &6" + event.getMember().getNickname() + "\n"
-                                        + "&7Staff Member&8: &6" + staff
-                        )
-                ));
-            }
+            hover.add("&cMalformed URL, Contact Administrator");
+
+            toBroadcast.onHover(TextActions.showText(Utility.format(String.join("\n", hover))));
+
             exception.printStackTrace();
         }
 
