@@ -59,32 +59,21 @@ public class DiscordEvents extends ListenerAdapter {
         Text.Builder toBroadcast = Text.builder();
         String mcUsername = storage.getLastKnownUsername(storage.getUUIDfromDiscordID(event.getMember().getUser().getId()));
         if (!isStaff) {
-            String unformattedBroadcast = PluginConfiguration.Format.discordToServer
+
+            toBroadcast.append(Utility.format(PluginConfiguration.Format.discordToServer
                     .replace("{username}", mcUsername != null ? mcUsername : username)
-                    .replace("{message}", TextSerializers.FORMATTING_CODE.stripCodes(message));
-
-            if (mcUsername != null) unformattedBroadcast.replace("»", "&6»");
-
-            toBroadcast.append(Utility.format(unformattedBroadcast));
+                    .replace("{message}", TextSerializers.FORMATTING_CODE.stripCodes(message))
+                    .replace("»", mcUsername != null ? "&6&l»" : "&9&l»")));
 
         } else {
-
-            if (!isOwner) {
-                toBroadcast.append(
-                        Utility.format(PluginConfiguration.Format.discordToServer
-                                .replace("{username}", effectiveName)
-                                .replace("{message}", message)
-                                .replace("»", "&c&l»")
-                        ));
-            } else {
-                toBroadcast.append(
-                        Utility.format(PluginConfiguration.Format.discordToServer
-                                .replace("{username}", effectiveName)
-                                .replace("{message}", message)
-                                .replace("»", "&4&l»")
-                        ));
-            }
+            toBroadcast.append(
+                    Utility.format(PluginConfiguration.Format.discordToServer
+                            .replace("{username}", effectiveName)
+                            .replace("{message}", message)
+                            .replace("»", !isOwner ? "&c&l»" : "&4&l»")
+                    ));
         }
+
         ArrayList<String> hover = new ArrayList<>();
         hover.add("&5&nClick me&7 to join &cDirtCraft's &9Discord");
         if (mcUsername != null) {
