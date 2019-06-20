@@ -64,10 +64,12 @@ public class DiscordEvents extends ListenerAdapter {
                     String mcUsername = storage.getLastKnownUsername(storage.getUUIDfromDiscordID(event.getMember().getUser().getId()));
                     if (!isStaff) {
 
+                        Role donorRole = event.getGuild().getRoleById(PluginConfiguration.Roles.donatorRoleID);
+
                         toBroadcast.append(Utility.format(PluginConfiguration.Format.discordToServer
                                 .replace("{username}", mcUsername != null ? mcUsername : username)
                                 .replace("{message}", TextSerializers.FORMATTING_CODE.stripCodes(message))
-                                .replace("»", mcUsername != null ? "&6&l»" : "&9&l»")));
+                                .replace("»", event.getMember().getRoles().contains(donorRole) ? "&6&l»" : "&9&l»")));
 
                     } else {
                         toBroadcast.append(
