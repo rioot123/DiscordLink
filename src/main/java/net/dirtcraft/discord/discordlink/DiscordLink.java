@@ -65,7 +65,7 @@ public class DiscordLink {
         Utility.setStatus();
         Utility.setTopic();
 
-        getJDA().addEventListener(new DiscordEvents());
+        getJDA().addEventListener(new DiscordEvents(storage));
         Sponge.getEventManager().registerListeners(instance, new SpongeEvents(instance, storage));
     }
 
