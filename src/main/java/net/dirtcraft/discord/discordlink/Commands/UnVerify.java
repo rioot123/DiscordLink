@@ -2,6 +2,7 @@ package net.dirtcraft.discord.discordlink.Commands;
 
 import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.Database.Storage;
+import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Utility;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.core.entities.Guild;
@@ -41,14 +42,14 @@ public class UnVerify implements CommandExecutor {
 
                     String discordID = storage.getDiscordUser(player.getUniqueId());
 
+                    storage.deleteRecord(player.getUniqueId());
+
                     @Nullable
                     User user = SpongeDiscordLib.getJDA().getUserById(discordID);
 
                     player.sendMessage(Utility.format(user != null ?
                             "&7The account &6" + user.getName() + "&8#&7" + user.getDiscriminator() + " has been &cunverified" :
                             "&7Your account has been &cunverified"));
-
-                    storage.deleteRecord(player.getUniqueId());
 
                     if (user != null) {
                         Guild guild = SpongeDiscordLib.getJDA().getGuildById(PluginConfiguration.Main.discordServerID);
@@ -64,7 +65,9 @@ public class UnVerify implements CommandExecutor {
                         }
                     }
 
-                });
+                })
+                .submit(DiscordLink.getInstance());
+
         return CommandResult.success();
     }
 }
