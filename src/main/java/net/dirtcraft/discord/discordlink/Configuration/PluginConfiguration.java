@@ -81,6 +81,9 @@ public class PluginConfiguration {
 
         @Setting(value = "Verified-Role-ID")
         public static String verifiedRoleID = "578447006662524940";
+
+        @Setting(value = "Donator-Role-ID")
+        public static String donatorRoleID = "591145069810155530";
     }
 
 }

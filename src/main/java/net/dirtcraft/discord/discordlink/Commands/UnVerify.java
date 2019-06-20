@@ -43,10 +43,8 @@ public class UnVerify implements CommandExecutor {
 
         storage.deleteRecord(player.getUniqueId());
 
-        @Nullable
-        Guild guild = SpongeDiscordLib.getJDA().getGuildById(PluginConfiguration.Main.discordServerID);
-
-        if (user != null && guild != null) {
+        if (user != null) {
+            Guild guild = SpongeDiscordLib.getJDA().getGuildById(PluginConfiguration.Main.discordServerID);
             Member member = guild.getMemberById(discordID);
             Role verifiedRole = guild.getRoleById(PluginConfiguration.Roles.verifiedRoleID);
 

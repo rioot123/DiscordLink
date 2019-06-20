@@ -76,6 +76,10 @@ public class Verify implements CommandExecutor {
         Role verifiedRole = guild.getRoleById(PluginConfiguration.Roles.verifiedRoleID);
 
         guild.getController().addSingleRoleToMember(guild.getMemberById(discordID), verifiedRole).queue();
+        if (player.hasPermission("discordlink.donator")) {
+            Role donorRole = guild.getRoleById(PluginConfiguration.Roles.donatorRoleID);
+            guild.getController().addSingleRoleToMember(guild.getMemberById(discordID), donorRole).queue();
+        }
 
         return CommandResult.success();
     }
