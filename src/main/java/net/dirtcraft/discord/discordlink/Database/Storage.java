@@ -78,6 +78,6 @@ public class Storage {
     }
 
     private Connection getConnection() {
-        return DirtDatabaseLib.getConnection(null, "tickets", null);
+        return DirtDatabaseLib.getConnection(null, "playerdata", null);
     }
 }
