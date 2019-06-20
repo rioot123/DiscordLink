@@ -59,17 +59,14 @@ public class DiscordEvents extends ListenerAdapter {
         Text.Builder toBroadcast = Text.builder();
         String mcUsername = storage.getLastKnownUsername(storage.getUUIDfromDiscordID(event.getMember().getUser().getId()));
         if (!isStaff) {
-            if (mcUsername != null) {
-            toBroadcast.append(
-                    Utility.format(PluginConfiguration.Format.discordToServer
-                            .replace("{username}", mcUsername)
-                            .replace("{message}", TextSerializers.FORMATTING_CODE.stripCodes(message))));
-            } else {
-                toBroadcast.append(
-                        Utility.format(PluginConfiguration.Format.discordToServer
-                                .replace("{username}", username)
-                                .replace("{message}", TextSerializers.FORMATTING_CODE.stripCodes(message))));
-            }
+            String unformattedBroadcast = PluginConfiguration.Format.discordToServer
+                    .replace("{username}", mcUsername != null ? mcUsername : username)
+                    .replace("{message}", TextSerializers.FORMATTING_CODE.stripCodes(message));
+
+            if (mcUsername != null) unformattedBroadcast.replace("»", "&6»");
+
+            toBroadcast.append(Utility.format(unformattedBroadcast));
+
         } else {
 
             if (!isOwner) {
@@ -77,14 +74,14 @@ public class DiscordEvents extends ListenerAdapter {
                         Utility.format(PluginConfiguration.Format.discordToServer
                                 .replace("{username}", effectiveName)
                                 .replace("{message}", message)
-                                .replace("&9&l»", "&c&l»")
+                                .replace("»", "&c&l»")
                         ));
             } else {
                 toBroadcast.append(
                         Utility.format(PluginConfiguration.Format.discordToServer
                                 .replace("{username}", effectiveName)
                                 .replace("{message}", message)
-                                .replace("&9&l»", "&4&l»")
+                                .replace("»", "&4&l»")
                         ));
             }
         }
