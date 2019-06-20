@@ -76,14 +76,17 @@ public class Verify implements CommandExecutor {
         Guild guild = SpongeDiscordLib.getJDA().getGuildById(PluginConfiguration.Main.discordServerID);
         Role verifiedRole = guild.getRoleById(PluginConfiguration.Roles.verifiedRoleID);
         Role staffRole = guild.getRoleById(PluginConfiguration.Roles.staffRoleID);
+        Role donorRole = guild.getRoleById(PluginConfiguration.Roles.donatorRoleID);
         Member member = guild.getMemberById(discordID);
 
-        guild.getController().addSingleRoleToMember(member, verifiedRole).queue();
+        if (!member.getRoles().contains(verifiedRole)) {
+            guild.getController().addSingleRoleToMember(member, verifiedRole).queue();
+        }
+
         if (!member.getRoles().contains(staffRole)) {
             guild.getController().setNickname(member, player.getName()).queue();
         }
-        if (player.hasPermission("discordlink.donator")) {
-            Role donorRole = guild.getRoleById(PluginConfiguration.Roles.donatorRoleID);
+        if (player.hasPermission("discordlink.donator") && !member.getRoles().contains(donorRole)) {
             guild.getController().addSingleRoleToMember(member, donorRole).queue();
         }
 

@@ -47,10 +47,12 @@ public class UnVerify implements CommandExecutor {
             Guild guild = SpongeDiscordLib.getJDA().getGuildById(PluginConfiguration.Main.discordServerID);
             Member member = guild.getMemberById(discordID);
             Role verifiedRole = guild.getRoleById(PluginConfiguration.Roles.verifiedRoleID);
+            Role donorRole = guild.getRoleById(PluginConfiguration.Roles.donatorRoleID);
 
-            guild.getController().removeSingleRoleFromMember(guild.getMemberById(discordID), verifiedRole).queue();
-            if (player.hasPermission("discordlink.donator")) {
-                Role donorRole = guild.getRoleById(PluginConfiguration.Roles.donatorRoleID);
+            if (member.getRoles().contains(verifiedRole)) {
+                guild.getController().removeSingleRoleFromMember(guild.getMemberById(discordID), verifiedRole).queue();
+            }
+            if (member.getRoles().contains(donorRole)) {
                 guild.getController().removeSingleRoleFromMember(member, donorRole).queue();
             }
         }
