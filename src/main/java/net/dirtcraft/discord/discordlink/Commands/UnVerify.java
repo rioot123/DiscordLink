@@ -48,8 +48,11 @@ public class UnVerify implements CommandExecutor {
             Member member = guild.getMemberById(discordID);
             Role verifiedRole = guild.getRoleById(PluginConfiguration.Roles.verifiedRoleID);
 
-            if (member.getRoles().contains(verifiedRole))
-                guild.getController().removeSingleRoleFromMember(guild.getMemberById(discordID), verifiedRole).queue();
+            guild.getController().removeSingleRoleFromMember(guild.getMemberById(discordID), verifiedRole).queue();
+            if (player.hasPermission("discordlink.donator")) {
+                Role donorRole = guild.getRoleById(PluginConfiguration.Roles.donatorRoleID);
+                guild.getController().removeSingleRoleFromMember(member, donorRole).queue();
+            }
         }
 
 
