@@ -5,6 +5,7 @@ import net.dirtcraft.discord.discordlink.Database.Storage;
 import net.dirtcraft.discord.discordlink.Utility;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.entities.User;
 import org.spongepowered.api.command.CommandException;
@@ -74,11 +75,16 @@ public class Verify implements CommandExecutor {
 
         Guild guild = SpongeDiscordLib.getJDA().getGuildById(PluginConfiguration.Main.discordServerID);
         Role verifiedRole = guild.getRoleById(PluginConfiguration.Roles.verifiedRoleID);
+        Role staffRole = guild.getRoleById(PluginConfiguration.Roles.staffRoleID);
+        Member member = guild.getMemberById(discordID);
 
-        guild.getController().addSingleRoleToMember(guild.getMemberById(discordID), verifiedRole).queue();
+        guild.getController().addSingleRoleToMember(member, verifiedRole).queue();
+        if (!member.getRoles().contains(staffRole)) {
+            guild.getController().setNickname(member, player.getName()).queue();
+        }
         if (player.hasPermission("discordlink.donator")) {
             Role donorRole = guild.getRoleById(PluginConfiguration.Roles.donatorRoleID);
-            guild.getController().addSingleRoleToMember(guild.getMemberById(discordID), donorRole).queue();
+            guild.getController().addSingleRoleToMember(member, donorRole).queue();
         }
 
         return CommandResult.success();

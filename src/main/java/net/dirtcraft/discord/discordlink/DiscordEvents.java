@@ -1,6 +1,7 @@
 package net.dirtcraft.discord.discordlink;
 
 import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
+import net.dirtcraft.discord.discordlink.Database.Storage;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.Role;
@@ -19,6 +20,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class DiscordEvents extends ListenerAdapter {
+
+    private Storage storage;
+
+    public DiscordEvents(Storage storage) {
+        this.storage = storage;
+    }
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
@@ -51,10 +58,18 @@ public class DiscordEvents extends ListenerAdapter {
 
         Text.Builder toBroadcast = Text.builder();
         if (!isStaff) {
+            String mcUsername = storage.getLastKnownUsername(storage.getUUIDfromDiscordID(event.getMember().getUser().getId()));
+            if (mcUsername != null) {
             toBroadcast.append(
                     Utility.format(PluginConfiguration.Format.discordToServer
-                            .replace("{username}", username)
+                            .replace("{username}", mcUsername)
                             .replace("{message}", TextSerializers.FORMATTING_CODE.stripCodes(message))));
+            } else {
+                toBroadcast.append(
+                        Utility.format(PluginConfiguration.Format.discordToServer
+                                .replace("{username}", username)
+                                .replace("{message}", TextSerializers.FORMATTING_CODE.stripCodes(message))));
+            }
         } else {
 
             if (!isOwner) {

@@ -77,6 +77,38 @@ public class Storage {
         }
     }
 
+    @Nullable
+    public String getLastKnownUsername(String uuid) {
+        try (Connection connection = getConnection();
+             PreparedStatement ps = connection.prepareStatement("SELECT Username FROM votedata WHERE UUID = '" + uuid + "'");
+             ResultSet rs = ps.executeQuery()) {
+
+            if (!rs.next()) return null;
+
+            return rs.getString("Username");
+
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+            return null;
+        }
+    }
+
+    @Nullable
+    public String getUUIDfromDiscordID(String discordID) {
+        try (Connection connection = getConnection();
+             PreparedStatement ps = connection.prepareStatement("SELECT uuid FROM verification WHERE discordid = '" + discordID+ "'");
+             ResultSet rs = ps.executeQuery()) {
+
+            if (!rs.next()) return null;
+
+            return rs.getString("uuid");
+
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+            return null;
+        }
+    }
+
     private Connection getConnection() {
         return DirtDatabaseLib.getConnection(null, "playerdata", null);
     }
