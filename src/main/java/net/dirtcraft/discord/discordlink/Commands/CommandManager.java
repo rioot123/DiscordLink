@@ -21,7 +21,7 @@ public class CommandManager {
         return CommandSpec.builder()
                 .description(Text.of("Verifies your Discord account"))
                 .executor(new Verify(storage))
-                .arguments(GenericArguments.string(Text.of("code")))
+                .arguments(GenericArguments.optional(GenericArguments.string(Text.of("code"))))
                 .build();
     }
 
