@@ -27,7 +27,7 @@ import org.spongepowered.api.plugin.PluginContainer;
         dependencies = {
                 @Dependency(id = "sponge-discord-lib", optional = true),
                 @Dependency(id = "ultimatechat", optional = true),
-                @Dependency(id = "dirt-database-lib")
+                @Dependency(id = "dirt-database-lib", optional = true)
         }
 )
 public class DiscordLink {
@@ -53,6 +53,10 @@ public class DiscordLink {
             return;
         }
         if (!Sponge.getPluginManager().isLoaded("sponge-discord-lib")) {
+            logger.error("Sponge-Discord-Lib is not installed! " + container.getName() + " will not load.");
+            return;
+        }
+        if (!Sponge.getPluginManager().isLoaded("dirt-database-lib")) {
             logger.error("Sponge-Discord-Lib is not installed! " + container.getName() + " will not load.");
             return;
         }
