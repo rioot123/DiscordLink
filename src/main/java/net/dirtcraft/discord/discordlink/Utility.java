@@ -92,7 +92,7 @@ public class Utility {
                 .getJDA()
                 .getTextChannelById(SpongeDiscordLib.getGamechatChannelID());
         if (SpongeDiscordLib.getServerName().toLowerCase().contains("pixel")) {
-            String name = SpongeDiscordLib.getServerName().toLowerCase().split(" ")[1];
+            String name = SpongeDiscordLib.getServerName().split(" ")[1];
             String code = SpongeDiscordLib.getServerName().toLowerCase().split(" ")[1];
             switch (code) {
                 case "redstone":
