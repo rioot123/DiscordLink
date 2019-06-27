@@ -91,10 +91,29 @@ public class Utility {
         TextChannel channel = DiscordLink
                 .getJDA()
                 .getTextChannelById(SpongeDiscordLib.getGamechatChannelID());
-        String[] code = channel.getName().split("-");
+        if (SpongeDiscordLib.getServerName().toLowerCase().contains("pixel")) {
+            String name = SpongeDiscordLib.getServerName().toLowerCase().split(" ")[1];
+            String code = SpongeDiscordLib.getServerName().toLowerCase().split(" ")[1];
+            switch (code) {
+                case "redstone":
+                    code = "red";
+                    break;
+                case "glowstone":
+                    code = "glow";
+                    break;
+                default:
+                case "lapiz":
+                    break;
+            }
+            channel.getManager()
+                    .setTopic("**Pixelmon " + name + "** — IP: " + code + ".pixelmon.gg")
+                    .queue();
+            return;
+        }
+        String code = channel.getName().split("-")[1];
 
         channel.getManager()
-                .setTopic("ModPack: **" + SpongeDiscordLib.getServerName() + "** — IP: " + code[1] + ".dirtcraft.gg")
+                .setTopic("ModPack: **" + SpongeDiscordLib.getServerName() + "** — IP: " + code + ".dirtcraft.gg")
                 .queue();
     }
 
