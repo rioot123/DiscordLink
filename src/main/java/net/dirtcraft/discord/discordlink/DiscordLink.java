@@ -57,7 +57,7 @@ public class DiscordLink {
             return;
         }
         if (!Sponge.getPluginManager().isLoaded("dirt-database-lib")) {
-            logger.error("Sponge-Discord-Lib is not installed! " + container.getName() + " will not load.");
+            logger.error("Dirt-Database-Lib is not installed! " + container.getName() + " will not load.");
             return;
         }
 
