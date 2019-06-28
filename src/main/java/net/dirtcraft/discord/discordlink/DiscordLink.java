@@ -3,6 +3,10 @@ package net.dirtcraft.discord.discordlink;
 import com.google.inject.Inject;
 import net.dirtcraft.discord.discordlink.Configuration.ConfigManager;
 import net.dirtcraft.discord.discordlink.Database.Storage;
+import net.dirtcraft.discord.discordlink.Events.DiscordEvents;
+import net.dirtcraft.discord.discordlink.Events.NormalChat;
+import net.dirtcraft.discord.discordlink.Events.SpongeEvents;
+import net.dirtcraft.discord.discordlink.Events.UltimateChat;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.core.JDA;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
@@ -48,10 +52,6 @@ public class DiscordLink {
 
     @Listener (order = Order.LAST)
     public void onPreInit(GamePreInitializationEvent event) {
-        if (!Sponge.getPluginManager().isLoaded("ultimatechat")) {
-            logger.error("UltimateChat is not installed! " + container.getName() + " will not load.");
-            return;
-        }
         if (!Sponge.getPluginManager().isLoaded("sponge-discord-lib")) {
             logger.error("Sponge-Discord-Lib is not installed! " + container.getName() + " will not load.");
             return;
@@ -71,6 +71,11 @@ public class DiscordLink {
 
         getJDA().addEventListener(new DiscordEvents(storage));
         Sponge.getEventManager().registerListeners(instance, new SpongeEvents(instance, storage));
+        if (SpongeDiscordLib.getServerName().toLowerCase().contains("pixel")) {
+            Sponge.getEventManager().registerListeners(instance, new NormalChat());
+        } else {
+            Sponge.getEventManager().registerListeners(instance, new UltimateChat());
+        }
     }
 
     public static JDA getJDA() {

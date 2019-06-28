@@ -1,9 +1,10 @@
-package net.dirtcraft.discord.discordlink;
+package net.dirtcraft.discord.discordlink.Events;
 
-import br.net.fabiozumbi12.UltimateChat.Sponge.API.SendChannelMessageEvent;
 import net.dirtcraft.discord.discordlink.Commands.CommandManager;
 import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.Database.Storage;
+import net.dirtcraft.discord.discordlink.DiscordLink;
+import net.dirtcraft.discord.discordlink.Utility;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 import org.spongepowered.api.entity.living.player.Player;
@@ -51,24 +52,6 @@ public class SpongeEvents {
                         .setDescription(PluginConfiguration.Format.serverStop
                                 .replace("{modpack}", modpack)
                         ).build());
-    }
-
-    @Listener
-    public void onSendChannelMessage(SendChannelMessageEvent event, @Root Object cause) {
-        if (event.getChannel() == null) return;
-        if (!event.getChannel().getName().equalsIgnoreCase("global")) return;
-        if (!(cause instanceof Player)) return;
-        Player player = (Player) cause;
-
-
-        String prefix = TextSerializers.FORMATTING_CODE.stripCodes(player.getOption("prefix").orElse(""));
-        String username = player.getName();
-        String message = TextSerializers.FORMATTING_CODE.stripCodes(event.getMessage().toPlain())
-                .replace("@everyone", "")
-                .replace("@here", "")
-                .replaceAll("<@\\d+>", "");
-
-        Utility.chatToDiscord(prefix, username, message);
     }
 
     @Listener
