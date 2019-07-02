@@ -151,6 +151,6 @@ public class Storage {
     }
 
     private Connection getConnection() {
-        return DirtDatabaseLib.getConnection(null, "playerdata", null);
+        return DirtDatabaseLib.getConnection("playerdata", null);
     }
 }

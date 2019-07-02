@@ -21,7 +21,7 @@
     <orderEntry type="library" name="Gradle: br.net.fabiozumbi12.UltimateChat:UltimateChat-Sponge-56:1.8.9" level="project" />
     <orderEntry type="library" name="Gradle: org.spongepowered:spongeapi:7.2.0-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Gradle: org.spongepowered:spongeapi:javadoc:7.2.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Gradle: com.github.Dirt-Craft:Sponge-Discord-Lib:5ac2ef6725" level="project" />
+    <orderEntry type="library" name="Gradle: com.github.Dirt-Craft:Sponge-Discord-Lib:-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Gradle: net.dv8tion:JDA:3.8.3_463" level="project" />
     <orderEntry type="library" name="Gradle: org.slf4j:slf4j-api:1.7.25" level="project" />
     <orderEntry type="library" name="Gradle: com.google.inject:guice:4.1.0" level="project" />
