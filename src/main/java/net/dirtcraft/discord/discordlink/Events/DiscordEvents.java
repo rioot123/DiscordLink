@@ -17,6 +17,7 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
+import javax.annotation.Nullable;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -65,7 +66,11 @@ public class DiscordEvents extends ListenerAdapter {
                 .async()
                 .execute(() -> {
                     Text.Builder toBroadcast = Text.builder();
+
+                    @Nullable
                     String uuid = storage.getUUIDfromDiscordID(event.getMember().getUser().getId());
+                    if (uuid == null) return;
+
                     String mcUsername = storage.getLastKnownUsername(uuid);
 
                     PunishmentType punishmentType = storage.uuidIsPunished(uuid);
