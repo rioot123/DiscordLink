@@ -76,6 +76,7 @@ public class DiscordEvents extends ListenerAdapter {
                     PunishmentType punishmentType = storage.uuidIsPunished(uuid);
 
                     if (punishmentType != PunishmentType.NONE) {
+                        event.getMessage().delete().queue();
                         Role mutedRole = event.getGuild().getRoleById(PluginConfiguration.Roles.mutedRoleID);
                         event.getGuild().getController().addSingleRoleToMember(event.getMember(), mutedRole).queue();
                         MessageEmbed punishmentEmbed = Utility.embedBuilder()
