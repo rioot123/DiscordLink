@@ -80,8 +80,9 @@ public class DiscordEvents extends ListenerAdapter {
                         event.getGuild().getController().addSingleRoleToMember(event.getMember(), mutedRole).queue();
                         MessageEmbed punishmentEmbed = Utility.embedBuilder()
                                 .setDescription("**" + (mcUsername != null ? mcUsername : uuid) + "** tried talking in <#" + event.getChannel().getId() + "> " +
-                                        "but they are " + (punishmentType == PunishmentType.MUTED ? "muted" : "banned") +
+                                        "but they are " + (punishmentType == PunishmentType.MUTED ? "muted" : "banned") + "!" +
                                         "\nThey've received the <@&" + PluginConfiguration.Roles.mutedRoleID + "> role!")
+                                .addField("__Message__", "```" + event.getMessage().getContentRaw()+ "```", false)
                                 .build();
 
                         event.getGuild().getTextChannelsByName("discord-log", true).get(0).sendMessage(punishmentEmbed).queue();
