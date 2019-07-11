@@ -1,11 +1,13 @@
 package net.dirtcraft.discord.discordlink.Events;
 
 import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
+import net.dirtcraft.discord.discordlink.Data.PunishmentType;
 import net.dirtcraft.discord.discordlink.Database.Storage;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Utility;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
@@ -63,23 +65,43 @@ public class DiscordEvents extends ListenerAdapter {
                 .async()
                 .execute(() -> {
                     Text.Builder toBroadcast = Text.builder();
-                    String mcUsername = storage.getLastKnownUsername(storage.getUUIDfromDiscordID(event.getMember().getUser().getId()));
-                    if (!isStaff) {
+                    String uuid = storage.getUUIDfromDiscordID(event.getMember().getUser().getId());
+                    String mcUsername = storage.getLastKnownUsername(uuid);
 
+                    PunishmentType punishmentType = storage.uuidIsPunished(uuid);
+
+                    if (punishmentType != PunishmentType.NONE) {
+                        Role mutedRole = event.getGuild().getRoleById(PluginConfiguration.Roles.mutedRoleID);
+                        event.getGuild().getController().addSingleRoleToMember(event.getMember(), mutedRole).queue();
+                        MessageEmbed punishmentEmbed = Utility.embedBuilder()
+                                .setDescription("**" + (mcUsername != null ? mcUsername : uuid) + "** tried talking in <#" + event.getChannel().getId() + "> " +
+                                        "but they are " + (punishmentType == PunishmentType.MUTED ? "muted" : "banned") +
+                                        "\nThey've received the <@&" + PluginConfiguration.Roles.mutedRoleID + "> role!")
+                                .build();
+
+                        event.getGuild().getTextChannelsByName("discord-log", true).get(0).sendMessage(punishmentEmbed).queue();
+                        return;
+                    }
+
+                    String discordToServer = PluginConfiguration.Format.discordToServer;
+
+                    if (!isStaff) {
                         Role donorRole = event.getGuild().getRoleById(PluginConfiguration.Roles.donatorRoleID);
 
-                        toBroadcast.append(Utility.format(PluginConfiguration.Format.discordToServer
-                                .replace("{username}", mcUsername != null ? mcUsername : username)
+                        discordToServer = discordToServer.replace("{username}", mcUsername != null ? mcUsername : username)
                                 .replace("{message}", TextSerializers.FORMATTING_CODE.stripCodes(message))
-                                .replace("»", event.getMember().getRoles().contains(donorRole) ? "&6&l»" : "&9&l»")));
+                                .replace("»", event.getMember().getRoles().contains(donorRole) ? "&6&l»" : "&9&l»");
+
+                        toBroadcast.append(Utility.format(discordToServer));
 
                     } else {
-                        toBroadcast.append(
-                                Utility.format(PluginConfiguration.Format.discordToServer
-                                        .replace("{username}", effectiveName)
-                                        .replace("{message}", message)
-                                        .replace("»", !isOwner ? "&c&l»" : "&4&l»")
-                                ));
+
+                        discordToServer = discordToServer.replace("{username}", effectiveName)
+                                .replace("{username}", effectiveName)
+                                .replace("{message}", message)
+                                .replace("»", !isOwner ? "&c&l»" : "&4&l»");
+
+                        toBroadcast.append(Utility.format(discordToServer));
                     }
 
                     ArrayList<String> hover = new ArrayList<>();

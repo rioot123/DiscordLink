@@ -1,5 +1,6 @@
 package net.dirtcraft.discord.discordlink.Database;
 
+import net.dirtcraft.discord.discordlink.Data.PunishmentType;
 import net.dirtcraft.plugin.dirtdatabaselib.DirtDatabaseLib;
 
 import javax.annotation.Nullable;
@@ -148,6 +149,37 @@ public class Storage {
             exception.printStackTrace();
             return null;
         }
+    }
+
+    public PunishmentType uuidIsPunished(String uuid) {
+        try (Connection connection = getPunishementConnection();
+             PreparedStatement banPS = connection.prepareStatement("SELECT uuid FROM litebans_bans WHERE uuid = ? AND active = TRUE");
+            PreparedStatement mutePS = connection.prepareStatement("SELECT uuid FROM litebans_mutes WHERE uuid = ? AND active = TRUE")) {
+
+            banPS.setString(1, uuid);
+            ResultSet banRS = banPS.executeQuery();
+            if (banRS.next()) {
+                banRS.close();
+                return PunishmentType.BANNED;
+            }
+
+            mutePS.setString(1, uuid);
+
+            ResultSet muteRS = mutePS.executeQuery();
+            if (muteRS.next()) {
+                muteRS.close();
+                return PunishmentType.MUTED;
+            }
+
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+        }
+
+        return PunishmentType.NONE;
+    }
+
+    private Connection getPunishementConnection() {
+        return DirtDatabaseLib.getConnection("bans", null);
     }
 
     private Connection getConnection() {
