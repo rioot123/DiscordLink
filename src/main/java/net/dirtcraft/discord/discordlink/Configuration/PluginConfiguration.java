@@ -85,8 +85,8 @@ public class PluginConfiguration {
         @Setting(value = "Donator-Role-ID")
         public static String donatorRoleID = "591145069810155530";
 
-        @Setting(value = "Muted-Role-ID")
-        public static String mutedRoleID = "589777192024670228";
+        //@Setting(value = "Muted-Role-ID")
+        //public static String mutedRoleID = "589777192024670228";
     }
 
 }

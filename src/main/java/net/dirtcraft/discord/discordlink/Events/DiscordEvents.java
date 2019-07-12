@@ -77,12 +77,10 @@ public class DiscordEvents extends ListenerAdapter {
 
                     if (punishmentType != PunishmentType.NONE) {
                         event.getMessage().delete().queue();
-                        Role mutedRole = event.getGuild().getRoleById(PluginConfiguration.Roles.mutedRoleID);
-                        event.getGuild().getController().addSingleRoleToMember(event.getMember(), mutedRole).queue();
                         MessageEmbed punishmentEmbed = Utility.embedBuilder()
-                                .setDescription("**" + (mcUsername != null ? mcUsername : uuid) + "** tried talking in <#" + event.getChannel().getId() + "> " +
+                                .setDescription("`" + (mcUsername != null ? mcUsername : uuid) + "` <@" + event.getAuthor().getId() + "> tried talking in <#" + event.getChannel().getId() + "> " +
                                         "but they are " + (punishmentType == PunishmentType.MUTED ? "muted" : "banned") + "!" +
-                                        "\nThey've received the <@&" + PluginConfiguration.Roles.mutedRoleID + "> role!")
+                                        "\nThis action has been blocked.")
                                 .addField("__Message__", "```" + event.getMessage().getContentRaw()+ "```", false)
                                 .build();
 
