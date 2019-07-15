@@ -1,13 +1,11 @@
 package net.dirtcraft.discord.discordlink.Events;
 
 import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
-import net.dirtcraft.discord.discordlink.Data.PunishmentType;
 import net.dirtcraft.discord.discordlink.Database.Storage;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Utility;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
@@ -17,7 +15,6 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
-import javax.annotation.Nullable;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -66,47 +63,23 @@ public class DiscordEvents extends ListenerAdapter {
                 .async()
                 .execute(() -> {
                     Text.Builder toBroadcast = Text.builder();
-
-                    @Nullable
-                    String uuid = storage.getUUIDfromDiscordID(event.getMember().getUser().getId());
-                    if (uuid == null) return;
-
-                    String mcUsername = storage.getLastKnownUsername(uuid);
-
-                    PunishmentType punishmentType = storage.uuidIsPunished(uuid);
-
-                    if (punishmentType != PunishmentType.NONE) {
-                        event.getMessage().delete().queue();
-                        MessageEmbed punishmentEmbed = Utility.embedBuilder()
-                                .setDescription("`" + (mcUsername != null ? mcUsername : uuid) + "` <@" + event.getAuthor().getId() + "> tried talking in <#" + event.getChannel().getId() + "> " +
-                                        "but they are " + (punishmentType == PunishmentType.MUTED ? "muted" : "banned") + "!" +
-                                        "\nThis action has been blocked.")
-                                .addField("__Message__", "```" + event.getMessage().getContentRaw()+ "```", false)
-                                .build();
-
-                        event.getGuild().getTextChannelsByName("discord-log", true).get(0).sendMessage(punishmentEmbed).queue();
-                        return;
-                    }
-
-                    String discordToServer = PluginConfiguration.Format.discordToServer;
-
+                    String mcUsername = storage.getLastKnownUsername(storage.getUUIDfromDiscordID(event.getMember().getUser().getId()));
                     if (!isStaff) {
+
                         Role donorRole = event.getGuild().getRoleById(PluginConfiguration.Roles.donatorRoleID);
 
-                        discordToServer = discordToServer.replace("{username}", mcUsername != null ? mcUsername : username)
+                        toBroadcast.append(Utility.format(PluginConfiguration.Format.discordToServer
+                                .replace("{username}", mcUsername != null ? mcUsername : username)
                                 .replace("{message}", TextSerializers.FORMATTING_CODE.stripCodes(message))
-                                .replace("»", event.getMember().getRoles().contains(donorRole) ? "&6&l»" : "&9&l»");
-
-                        toBroadcast.append(Utility.format(discordToServer));
+                                .replace("»", event.getMember().getRoles().contains(donorRole) ? "&6&l»" : "&9&l»")));
 
                     } else {
-
-                        discordToServer = discordToServer.replace("{username}", effectiveName)
-                                .replace("{username}", effectiveName)
-                                .replace("{message}", message)
-                                .replace("»", !isOwner ? "&c&l»" : "&4&l»");
-
-                        toBroadcast.append(Utility.format(discordToServer));
+                        toBroadcast.append(
+                                Utility.format(PluginConfiguration.Format.discordToServer
+                                        .replace("{username}", effectiveName)
+                                        .replace("{message}", message)
+                                        .replace("»", !isOwner ? "&c&l»" : "&4&l»")
+                                ));
                     }
 
                     ArrayList<String> hover = new ArrayList<>();
