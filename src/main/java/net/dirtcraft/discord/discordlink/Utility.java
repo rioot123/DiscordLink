@@ -7,6 +7,7 @@ import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.scheduler.Task;
@@ -217,10 +218,10 @@ public class Utility {
 
     public static void emergencyStop(MessageReceivedEvent event){
         Role ownerRole = event.getGuild().getRoleById(PluginConfiguration.Roles.ownerRoleID);
-        Role adminPlusRole = event.getGuild().getRoleById(PluginConfiguration.Roles.dirtyRoleID);
+        Role dirtyRole = event.getGuild().getRoleById(PluginConfiguration.Roles.dirtyRoleID);
         List<Role> roles = event.getMember().getRoles();
-        if (roles.contains(ownerRole) || roles.contains(adminPlusRole)) {
-            Sponge.getServer().shutdown(Text.of("&cAn emergency shutdown has been requested. Sorry for the inconvenience."));
+        if (roles.contains(ownerRole) || roles.contains(dirtyRole)) {
+            FMLCommonHandler.instance().exitJava(-1, true);
         }
     }
 
