@@ -17,6 +17,7 @@ import java.awt.*;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class Utility {
@@ -211,6 +212,15 @@ public class Utility {
             }
         } else {
             return false;
+        }
+    }
+
+    public static void emergencyStop(MessageReceivedEvent event){
+        Role ownerRole = event.getGuild().getRoleById(PluginConfiguration.Roles.ownerRoleID);
+        Role adminPlusRole = event.getGuild().getRoleById(PluginConfiguration.Roles.dirtyRoleID);
+        List<Role> roles = event.getMember().getRoles();
+        if (roles.contains(ownerRole) || roles.contains(adminPlusRole)) {
+            Sponge.getServer().shutdown(Text.of("&cAn emergency shutdown has been requested. Sorry for the inconvenience."));
         }
     }
 

@@ -40,13 +40,19 @@ public class DiscordEvents extends ListenerAdapter {
         String effectiveName = TextSerializers.FORMATTING_CODE.stripCodes(event.getMember().getEffectiveName());
 
         String message = event.getMessage().getContentDisplay();
+        String rawMessage = event.getMessage().getContentRaw();
 
-        if (event.getMessage().getContentRaw().startsWith(PluginConfiguration.Main.botPrefix + "list")) {
+        if (rawMessage.startsWith(PluginConfiguration.Main.botPrefix + "list")) {
             Utility.listCommand(event);
             return;
         }
 
-        if (event.getMessage().getContentRaw().startsWith(PluginConfiguration.Main.consolePrefix)) {
+        if (rawMessage.startsWith(PluginConfiguration.Main.botPrefix + "e-stop")) {
+            Utility.emergencyStop(event);
+            return;
+        }
+
+        if (rawMessage.startsWith(PluginConfiguration.Main.consolePrefix)) {
             Utility.toConsole(event);
             return;
         }
