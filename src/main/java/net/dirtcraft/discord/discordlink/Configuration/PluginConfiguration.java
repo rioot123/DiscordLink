@@ -73,8 +73,8 @@ public class PluginConfiguration {
         @Setting(value = "Owner-Role-ID")
         public static String ownerRoleID = "307551061156298762";
 
-        @Setting(value = "Admin-Plus-Role-ID")
-        public static String adminPlusRoleID = "591732856443895808";
+        @Setting(value = "Dirty-Role-ID")
+        public static String dirtyRoleID = "591732856443895808";
 
         @Setting(value = "Admin-Role-ID")
         public static String adminRoleID = "531631265443479562";
