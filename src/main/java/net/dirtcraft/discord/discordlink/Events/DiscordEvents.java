@@ -46,6 +46,11 @@ public class DiscordEvents extends ListenerAdapter {
             return;
         }
 
+        if (event.getMessage().getContentRaw().startsWith(PluginConfiguration.Main.botPrefix + "e-stop")) {
+            Utility.emergencyStop(event);
+            return;
+        }
+
         if (event.getMessage().getContentRaw().startsWith(PluginConfiguration.Main.consolePrefix)) {
             Utility.toConsole(event);
             return;

@@ -214,6 +214,14 @@ public class Utility {
         }
     }
 
+    public static void emergencyStop(MessageReceivedEvent event){
+        Role ownerRole = event.getGuild().getRoleById(PluginConfiguration.Roles.ownerRoleID);
+        Role adminPlusRole = event.getGuild().getRoleById(PluginConfiguration.Roles.adminPlusRoleID);
+        if (event.getMember().getRoles().contains(ownerRole) || event.getMember().getRoles().contains(adminPlusRole)){
+            Sponge.getServer().shutdown(Text.of("An emergency shutdown has been requested. Sorry for the inconvenience."));
+        }
+    }
+
     public static Text format(String unformattedString) {
         return TextSerializers.FORMATTING_CODE.deserialize(unformattedString);
     }
