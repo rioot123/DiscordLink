@@ -2,6 +2,7 @@ package net.dirtcraft.discord.discordlink;
 
 import io.github.nucleuspowered.nucleus.api.NucleusAPI;
 import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
+import net.dirtcraft.discord.discordlink.Database.Storage;
 import net.dirtcraft.discord.spongediscordlib.DiscordUtil;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -10,15 +11,18 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.serializer.TextSerializers;
+import org.spongepowered.api.world.storage.WorldProperties;
 
 import java.awt.*;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.*;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 public class Utility {
@@ -166,15 +170,7 @@ public class Utility {
                 .split(" ");
 
         if (!consoleCheck(event)) {
-            event.getMessage().delete().queue();
-            Utility.autoRemove(5, "message", "<@" + event.getAuthor().getId() + ">, you do **not** have permission to use this command!", null);
-            DiscordLink.getJDA()
-                    .getTextChannelsByName("command-log", true).get(0)
-                    .sendMessage(Utility.embedBuilder()
-                            .addField("__Tried Executing Command__", event.getMessage().getContentDisplay(), false)
-                            .setFooter(event.getAuthor().getAsTag(), event.getAuthor().getAvatarUrl())
-                            .build())
-                    .queue();
+            sendPermissionErrorMessage(event);
             return;
         }
 
@@ -216,13 +212,86 @@ public class Utility {
         }
     }
 
-    public static void emergencyStop(MessageReceivedEvent event){
+    public static void emergencyStop(MessageReceivedEvent event, boolean hardExit){
         Role ownerRole = event.getGuild().getRoleById(PluginConfiguration.Roles.ownerRoleID);
         Role dirtyRole = event.getGuild().getRoleById(PluginConfiguration.Roles.dirtyRoleID);
         List<Role> roles = event.getMember().getRoles();
         if (roles.contains(ownerRole) || roles.contains(dirtyRole)) {
-            FMLCommonHandler.instance().exitJava(-1, true);
+            FMLCommonHandler.instance().exitJava(-1, hardExit);
+            sendResponse(event, "Emergency shutdown has been executed. Please wait.", 15);
+        } else {
+            sendPermissionErrorMessage(event);
         }
+    }
+
+    public static void unstuck(MessageReceivedEvent event, Storage dbHelper) {
+        Role verifiedRole = event.getGuild().getRoleById(PluginConfiguration.Roles.verifiedRoleID);
+        List<Role> roles = event.getMember().getRoles();
+        if (!roles.contains(verifiedRole)) {
+            sendPermissionErrorMessage(event);
+            return;
+        }
+        CompletableFuture.runAsync(() -> {
+
+            final Optional<UserStorageService> userStorage = Sponge.getGame().getServiceManager().provide(UserStorageService.class);
+            if (!userStorage.isPresent()) {
+                sendResponse(event, "Could not execute the command. Please try again later or contact support for further assistance. (Err.1)");
+                return;
+            }
+
+            final Optional<WorldProperties> optionalWorld = Sponge.getServer().getDefaultWorld();
+            if (!optionalWorld.isPresent()) {
+                sendResponse(event, "Could not execute the command. Please try again later or contact support for further assistance. (Err.2)");
+                return;
+            }
+
+            final String uuid = dbHelper.getUUIDfromDiscordID(event.getAuthor().getId());
+            if (uuid == null) {
+                sendResponse(event, "Could not execute the command as we could not find your UUID. Please try again later or contact support for further assistance.");
+                return;
+            }
+
+            final Optional<User> optionalUser = userStorage.get().get(UUID.fromString(uuid));
+            if (!optionalUser.isPresent()) {
+                sendResponse(event, "Could not execute the command as we could not find your minecraft account. Please try again later or contact support for further assistance.");
+                return;
+            }
+
+            final User user = optionalUser.get();
+            final WorldProperties spawn = optionalWorld.get();
+
+            if (user.getPlayer().isPresent()) {
+                Task.builder().execute(()->{
+                    user.getPlayer().get().transferToWorld(spawn.getUniqueId(), spawn.getSpawnPosition().toDouble());
+                }).submit(DiscordLink.getInstance());
+            } else {
+                Task.builder().execute(()->{
+                    user.setLocation(spawn.getSpawnPosition().toDouble(), spawn.getUniqueId());
+                }).submit(DiscordLink.getInstance());
+            }
+            sendResponse(event, "Successfully moved " + user.getName() +  " to spawn.", 15);
+        });
+    }
+
+    private static void sendResponse(MessageReceivedEvent event, String error){
+        sendResponse(event, error, 30);
+    }
+
+    private static void sendResponse(MessageReceivedEvent event, String error, int delay){
+        event.getMessage().delete().queue();
+        Utility.autoRemove(delay, "message", "<@" + event.getAuthor().getId() + ">, " + error, null);
+    }
+
+    private static void sendPermissionErrorMessage(MessageReceivedEvent event){
+        event.getMessage().delete().queue();
+        Utility.autoRemove(5, "message", "<@" + event.getAuthor().getId() + ">, you do **not** have permission to use this command!", null);
+        DiscordLink.getJDA()
+                .getTextChannelsByName("command-log", true).get(0)
+                .sendMessage(Utility.embedBuilder()
+                        .addField("__Tried Executing Command__", event.getMessage().getContentDisplay(), false)
+                        .setFooter(event.getAuthor().getAsTag(), event.getAuthor().getAvatarUrl())
+                        .build())
+                .queue();
     }
 
     public static Text format(String unformattedString) {
