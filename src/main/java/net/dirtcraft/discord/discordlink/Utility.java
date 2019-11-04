@@ -165,16 +165,14 @@ public class Utility {
     }
 
     public static void toConsole(MessageReceivedEvent event) {
-        String[] args = event.getMessage().getContentRaw()
-                .replace(PluginConfiguration.Main.consolePrefix, "")
-                .split(" ");
-
         if (!consoleCheck(event)) {
             sendPermissionErrorMessage(event);
             return;
         }
 
-        String command = String.join(" ", args);
+        String command = event.getMessage().getContentRaw()
+                .substring(PluginConfiguration.Main.consolePrefix.length()); // remove the prefix.
+
         Task.builder()
                 .execute(() ->
                         Sponge.getCommandManager().process(new ConsoleManager(Sponge.getServer().getConsole(), event.getMember(), command), command))
