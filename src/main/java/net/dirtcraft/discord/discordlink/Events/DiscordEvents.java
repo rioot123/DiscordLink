@@ -48,7 +48,17 @@ public class DiscordEvents extends ListenerAdapter {
         }
 
         if (rawMessage.startsWith(PluginConfiguration.Main.botPrefix + "e-stop")) {
-            Utility.emergencyStop(event);
+            Utility.emergencyStop(event, false);
+            return;
+        }
+
+        if (rawMessage.startsWith(PluginConfiguration.Main.botPrefix + "e-stop -h")) {
+            Utility.emergencyStop(event, true);
+            return;
+        }
+
+        if (rawMessage.startsWith(PluginConfiguration.Main.botPrefix + "unstuck")) {
+            Utility.unstuck(event, storage);
             return;
         }
 

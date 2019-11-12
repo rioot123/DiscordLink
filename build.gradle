@@ -14,6 +14,7 @@ repositories {
 }
 
 dependencies {
+    compile fileTree(dir: 'libraries', include: '*.jar')
     compile 'org.spongepowered:spongeapi:7.1.0-SNAPSHOT'
     compile 'br.net.fabiozumbi12.UltimateChat:UltimateChat-Sponge-7:1.8.9'
     implementation 'com.github.NucleusPowered:Nucleus:1.11.0'
