@@ -1,28 +1,19 @@
 package net.dirtcraft.discord.discordlink;
 
-import io.github.nucleuspowered.nucleus.api.NucleusAPI;
+import net.dirtcraft.discord.discordlink.Commands.Sources.ConsoleManager;
 import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
-import net.dirtcraft.discord.discordlink.Database.Storage;
 import net.dirtcraft.discord.spongediscordlib.DiscordUtil;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.serializer.TextSerializers;
-import org.spongepowered.api.world.storage.WorldProperties;
 
 import java.awt.*;
 import java.time.Instant;
-import java.util.*;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 public class Utility {
@@ -58,13 +49,25 @@ public class Utility {
                         .getTextChannelById(SpongeDiscordLib.getGamechatChannelID())
                         .sendMessage(message)
                         .queue();
-            break;
+                break;
             case "embed":
                 DiscordLink
                         .getJDA()
                         .getTextChannelById(SpongeDiscordLib.getGamechatChannelID())
                         .sendMessage(embed)
                         .queue();
+                break;
+        }
+    }
+
+    public static void messageToUser(User user, String type, String message, MessageEmbed embed) {
+        switch (type.toLowerCase()) {
+            default:
+            case "message":
+                user.openPrivateChannel().queue(dm-> dm.sendMessage(message).queue());
+                break;
+            case "embed":
+                user.openPrivateChannel().queue(dm-> dm.sendMessage(embed).queue());
                 break;
         }
     }
@@ -138,7 +141,7 @@ public class Utility {
 
         Task.builder()
                 .execute(() ->
-                        Sponge.getCommandManager().process(new ConsoleManager(Sponge.getServer().getConsole(), event.getMember(), command), command))
+                        Sponge.getCommandManager().process(new ConsoleManager(event.getMember(), command), command))
                 .submit(DiscordLink.getInstance());
     }
 
