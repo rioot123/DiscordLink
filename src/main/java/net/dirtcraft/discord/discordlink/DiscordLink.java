@@ -86,4 +86,8 @@ public class DiscordLink {
         return instance;
     }
 
+    public Storage getStorage(){
+        return storage;
+    }
+
 }

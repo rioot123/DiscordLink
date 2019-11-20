@@ -5,6 +5,7 @@ import net.dirtcraft.discord.discordlink.Database.Storage;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Utility;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
+import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -42,24 +43,9 @@ public class DiscordEvents extends ListenerAdapter {
         String message = event.getMessage().getContentDisplay();
         String rawMessage = event.getMessage().getContentRaw();
 
-        if (rawMessage.startsWith(PluginConfiguration.Main.botPrefix + "list")) {
-            Utility.listCommand(event);
-            return;
-        }
-
-        if (rawMessage.startsWith(PluginConfiguration.Main.botPrefix + "e-stop")) {
-            Utility.emergencyStop(event, false);
-            return;
-        }
-
-        if (rawMessage.startsWith(PluginConfiguration.Main.botPrefix + "e-stop -h")) {
-            Utility.emergencyStop(event, true);
-            return;
-        }
-
-        if (rawMessage.startsWith(PluginConfiguration.Main.botPrefix + "unstuck")) {
-            Utility.unstuck(event, storage);
-            return;
+        if (rawMessage.startsWith(PluginConfiguration.Main.botPrefix)) {
+            String[] command = event.getMessage().getContentRaw().split(" ");
+            Member member = event.getMember();
         }
 
         if (rawMessage.startsWith(PluginConfiguration.Main.consolePrefix)) {
