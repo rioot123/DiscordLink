@@ -1,8 +1,8 @@
 package net.dirtcraft.discord.discordlink;
 
 import com.google.inject.Inject;
-import net.dirtcraft.discord.discordlink.Commands.CommandManager;
-import net.dirtcraft.discord.discordlink.Commands.Discord.DiscordCommand;
+import net.dirtcraft.discord.discordlink.Commands.Sponge.CommandManager;
+import net.dirtcraft.discord.discordlink.Commands.DiscordCommand;
 import net.dirtcraft.discord.discordlink.Configuration.ConfigManager;
 import net.dirtcraft.discord.discordlink.Database.Storage;
 import net.dirtcraft.discord.discordlink.Events.DiscordEvents;
@@ -11,6 +11,7 @@ import net.dirtcraft.discord.discordlink.Events.SpongeEvents;
 import net.dirtcraft.discord.discordlink.Events.UltimateChat;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.core.JDA;
+import net.dv8tion.jda.core.entities.Guild;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import org.slf4j.Logger;
@@ -40,6 +41,8 @@ import java.util.HashMap;
         }
 )
 public class DiscordLink {
+
+    private static CommandManager commandManager;
 
     @Inject
     @DefaultConfig(sharedRoot = false)
@@ -74,7 +77,7 @@ public class DiscordLink {
         Utility.setTopic();
 
         final HashMap<String, DiscordCommand> commandMap = new HashMap<>();
-        new CommandManager(this, storage, commandMap);
+        commandManager = new CommandManager(this, storage, commandMap);
         getJDA().addEventListener(new DiscordEvents(storage, commandMap));
         Sponge.getEventManager().registerListeners(instance, new SpongeEvents(instance, storage));
         if (SpongeDiscordLib.getServerName().toLowerCase().contains("pixel")) {
@@ -93,8 +96,16 @@ public class DiscordLink {
         return SpongeDiscordLib.getJDA();
     }
 
+    public static Guild getGuild(){
+        return SpongeDiscordLib.getJDA().getTextChannelById(SpongeDiscordLib.getGamechatChannelID()).getGuild();
+    }
+
     public static DiscordLink getInstance() {
         return instance;
+    }
+
+    public static CommandManager getCommandManager(){
+        return commandManager;
     }
 
     public Storage getStorage(){

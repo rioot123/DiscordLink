@@ -139,9 +139,9 @@ public class Utility {
         }
 
         String command = event.getMessage().getContentRaw()
-                .substring(PluginConfiguration.Main.consolePrefix.length()); // remove the prefix.
+                .substring(silent? PluginConfiguration.Main.silentConsolePrefix.length() : PluginConfiguration.Main.consolePrefix.length()); // remove the prefix.
 
-        WrappedConsole commandSender = silent? new GamechatSender(event.getMember(), command) : new PrivateSender(event.getMember(), command);
+        WrappedConsole commandSender = silent? new PrivateSender(event.getMember(), command) : new GamechatSender(event.getMember(), command);
 
         Task.builder()
                 .execute(() ->

@@ -90,6 +90,9 @@ public class PluginConfiguration {
 
         @Setting(value = "Donator-Role-ID")
         public static String donatorRoleID = "591145069810155530";
+
+        @Setting(value = "Nitro-Role-ID")
+        public static String nitroRoleID = "581195961813172225";
     }
 
 }

@@ -1,6 +1,5 @@
 package net.dirtcraft.discord.discordlink.Events;
 
-import net.dirtcraft.discord.discordlink.Commands.CommandManager;
 import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.Database.Storage;
 import net.dirtcraft.discord.discordlink.DiscordLink;
@@ -10,7 +9,6 @@ import net.dv8tion.jda.core.entities.MessageEmbed;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.filter.cause.Root;
-import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;

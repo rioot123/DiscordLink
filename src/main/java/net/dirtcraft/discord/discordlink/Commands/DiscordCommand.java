@@ -1,36 +1,40 @@
-package net.dirtcraft.discord.discordlink.Commands.Discord;
+package net.dirtcraft.discord.discordlink.Commands;
 
 import com.google.common.collect.Lists;
+import net.dirtcraft.discord.discordlink.API.DiscordRoles;
+import net.dirtcraft.discord.discordlink.API.PlayerDiscord;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Exceptions.DiscordCommandException;
 import net.dirtcraft.discord.discordlink.Utility;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class DiscordCommand {
-    private final List<Long> allowedRoles;
+    private final List<DiscordRoles> allowedRoles;
     private final DiscordCommandExecutor executor;
 
-    DiscordCommand(List<Long> allowed, DiscordCommandExecutor executor){
+    DiscordCommand(List<DiscordRoles> allowed, DiscordCommandExecutor executor){
         this.allowedRoles = allowed;
         this.executor = executor;
+    }
+
+    public boolean hasPermission(PlayerDiscord member){
+        return allowedRoles.stream().allMatch(member::hasPermission);
     }
 
     public static Builder builder(){
         return new Builder();
     }
 
-    public final void process(Member member, String[] command, MessageReceivedEvent event){
-        if (allowedRoles.isEmpty() || member.getRoles().stream().anyMatch(role -> allowedRoles.contains(role.getIdLong()))) {
+    public final void process(PlayerDiscord member, String[] command, MessageReceivedEvent event){
+        if (allowedRoles.stream().allMatch(member::hasPermission)) {
             try {
                 executor.execute(member, command, event);
             } catch (DiscordCommandException e){
                 event.getMessage().delete().queue();
-                Utility.autoRemove(5, "message", !("<@" + event.getAuthor().getId() + ">, " + e.getMessage()).equals("") ? e.getMessage() : "an error occurred while executing the command.", null);
+                Utility.autoRemove(5, "message", "<@" + event.getAuthor().getId() + ">, " + (e.getMessage()!=null? e.getMessage() : "an error occurred while executing the command."), null);
                 DiscordLink.getJDA()
                         .getTextChannelsByName("command-log", true).get(0)
                         .sendMessage(Utility.embedBuilder()
@@ -54,18 +58,12 @@ public class DiscordCommand {
     }
 
     public static class Builder{
-        private List<Long> allowedRoles;
+        private List<DiscordRoles> allowedRoles;
         private DiscordCommandExecutor executor;
 
         private Builder(){}
 
-        public final Builder setRequiredRoles(Role... roles){
-            allowedRoles = new ArrayList<>();
-            for (Role role : roles) allowedRoles.add(role.getIdLong());
-            return this;
-        }
-
-        public final Builder setRequiredRoles(Long... roles){
+        public final Builder setRequiredRoles(DiscordRoles... roles){
             allowedRoles = Lists.newArrayList(roles);
             return this;
         }

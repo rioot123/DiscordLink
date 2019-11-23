@@ -1,4 +1,4 @@
-package net.dirtcraft.discord.discordlink.Commands;
+package net.dirtcraft.discord.discordlink.Commands.Sponge;
 
 import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.Database.Storage;

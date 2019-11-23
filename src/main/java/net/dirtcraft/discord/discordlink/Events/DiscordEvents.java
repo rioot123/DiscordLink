@@ -1,20 +1,18 @@
 package net.dirtcraft.discord.discordlink.Events;
 
-import net.dirtcraft.discord.discordlink.Commands.Discord.DiscordCommand;
+import net.dirtcraft.discord.discordlink.API.PlayerDiscord;
+import net.dirtcraft.discord.discordlink.Commands.DiscordCommand;
 import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.Database.Storage;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Utility;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
-import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.serializer.TextSerializers;
@@ -44,6 +42,7 @@ public class DiscordEvents extends ListenerAdapter {
         if (event.getAuthor().isBot() || event.getAuthor().isFake()) return;
         if (hasAttachment(event)) return;
 
+        PlayerDiscord discordProfile = new PlayerDiscord(event.getMember());
         String username = TextSerializers.FORMATTING_CODE.stripCodes(event.getAuthor().getName());
         String effectiveName = TextSerializers.FORMATTING_CODE.stripCodes(event.getMember().getEffectiveName());
 
@@ -55,10 +54,9 @@ public class DiscordEvents extends ListenerAdapter {
                     .substring(PluginConfiguration.Main.botPrefix.length())
                     .toLowerCase()
                     .split(" ");
-            final Member member = event.getMember();
             if (args.length != 0) {
                 DiscordCommand command = commandMap.get(args[0]);
-                if (command != null) command.process(member, args, event);
+                if (command != null) command.process(discordProfile, args, event);
             }
             return;
         }

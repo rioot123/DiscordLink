@@ -1,10 +1,8 @@
-package net.dirtcraft.discord.discordlink.Commands;
+package net.dirtcraft.discord.discordlink.Commands.Sponge;
 
-import net.dirtcraft.discord.discordlink.Commands.Discord.DiscordCommand;
-import net.dirtcraft.discord.discordlink.Commands.Discord.PlayerList;
-import net.dirtcraft.discord.discordlink.Commands.Discord.StopServer;
-import net.dirtcraft.discord.discordlink.Commands.Discord.Unstuck;
-import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
+import net.dirtcraft.discord.discordlink.API.DiscordRoles;
+import net.dirtcraft.discord.discordlink.Commands.Discord.*;
+import net.dirtcraft.discord.discordlink.Commands.DiscordCommand;
 import net.dirtcraft.discord.discordlink.Database.Storage;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import org.spongepowered.api.Sponge;
@@ -13,6 +11,8 @@ import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.text.Text;
 
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 public class CommandManager {
 
@@ -25,22 +25,33 @@ public class CommandManager {
         Sponge.getCommandManager().register(main, this.verify(), "verify", "link");
         Sponge.getCommandManager().register(main, this.unverify(), "unverify", "unlink");
 
+        DiscordCommand help = DiscordCommand.builder()
+                .setCommandExecutor(new Help())
+                .build();
+
         DiscordCommand list = DiscordCommand.builder()
                 .setCommandExecutor(new PlayerList())
                 .build();
 
         DiscordCommand stop = DiscordCommand.builder()
                 .setCommandExecutor(new StopServer())
-                .setRequiredRoles(Long.parseLong(PluginConfiguration.Roles.dirtyRoleID))
+                .setRequiredRoles(DiscordRoles.DIRTY)
                 .build();
 
         DiscordCommand unstuck = DiscordCommand.builder()
                 .setCommandExecutor(new Unstuck())
-                .setRequiredRoles(Long.parseLong(PluginConfiguration.Roles.verifiedRoleID))
+                .setRequiredRoles(DiscordRoles.VERIFIED)
                 .build();
 
+        DiscordCommand seen = DiscordCommand.builder()
+                .setCommandExecutor(new SilentSeen())
+                .setRequiredRoles(DiscordRoles.STAFF)
+                .build();
+
+        register(help, "help");
         register(list, "list");
-        register(stop, "stop");
+        register(stop, "stop", "halt");
+        register(seen, "seen");
         register(unstuck, "unstuck", "spawn");
     }
 
@@ -48,6 +59,15 @@ public class CommandManager {
         for (String name : alias) {
             commandMap.put(name, command);
         }
+    }
+
+    public Map<String, DiscordCommand> getCommandMap(){
+        Map<String, DiscordCommand> result = new HashMap<>();
+        commandMap.forEach((alias, cmd) -> {
+            if (result.containsValue(cmd)) return;
+            result.put(alias, cmd);
+        });
+        return result;
     }
 
     public CommandSpec verify() {

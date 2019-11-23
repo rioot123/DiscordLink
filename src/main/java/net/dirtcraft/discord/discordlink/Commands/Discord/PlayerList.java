@@ -1,11 +1,12 @@
 package net.dirtcraft.discord.discordlink.Commands.Discord;
 
 import io.github.nucleuspowered.nucleus.api.NucleusAPI;
+import net.dirtcraft.discord.discordlink.API.PlayerDiscord;
+import net.dirtcraft.discord.discordlink.Commands.DiscordCommandExecutor;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Utility;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
@@ -13,9 +14,9 @@ import org.spongepowered.api.entity.living.player.Player;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class PlayerList implements DiscordCommandExecutor{
+public class PlayerList implements DiscordCommandExecutor {
     @Override
-    public void execute(Member member, String[] command, MessageReceivedEvent event) {
+    public void execute(PlayerDiscord member, String[] command, MessageReceivedEvent event) {
         Collection<Player> players = Sponge.getServer().getOnlinePlayers();
 
         ArrayList<String> playerNames = new ArrayList<>();

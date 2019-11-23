@@ -1,9 +1,10 @@
 package net.dirtcraft.discord.discordlink.Commands.Discord;
 
+import net.dirtcraft.discord.discordlink.API.PlayerDiscord;
+import net.dirtcraft.discord.discordlink.Commands.DiscordCommandExecutor;
 import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Utility;
-import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import org.spongepowered.api.Sponge;
@@ -19,7 +20,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class Unstuck implements DiscordCommandExecutor {
     @Override
-    public void execute(Member member, String[] command, MessageReceivedEvent event) {
+    public void execute(PlayerDiscord member, String[] command, MessageReceivedEvent event) {
         Role verifiedRole = event.getGuild().getRoleById(PluginConfiguration.Roles.verifiedRoleID);
         List<Role> roles = event.getMember().getRoles();
         if (!roles.contains(verifiedRole)) {
