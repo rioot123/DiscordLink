@@ -19,6 +19,9 @@ public class PluginConfiguration {
     @ConfigSerializable
     public static class Main {
 
+        @Setting(value = "Silent-Console-Prefix", comment = "Prefix to use private console command")
+        public static String silentConsolePrefix = "#/";
+
         @Setting(value = "Console-Prefix", comment = "Prefix to use console command")
         public static String consolePrefix = "/";
 

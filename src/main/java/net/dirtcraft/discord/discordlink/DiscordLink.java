@@ -1,6 +1,8 @@
 package net.dirtcraft.discord.discordlink;
 
 import com.google.inject.Inject;
+import net.dirtcraft.discord.discordlink.Commands.CommandManager;
+import net.dirtcraft.discord.discordlink.Commands.Discord.DiscordCommand;
 import net.dirtcraft.discord.discordlink.Configuration.ConfigManager;
 import net.dirtcraft.discord.discordlink.Database.Storage;
 import net.dirtcraft.discord.discordlink.Events.DiscordEvents;
@@ -16,10 +18,13 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
+import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.plugin.Dependency;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
+
+import java.util.HashMap;
 
 @Plugin(
         id = "discord-link",
@@ -65,17 +70,23 @@ public class DiscordLink {
 
         this.configManager = new ConfigManager(loader);
         this.storage = new Storage();
-
         Utility.setStatus();
         Utility.setTopic();
 
-        getJDA().addEventListener(new DiscordEvents(storage));
+        final HashMap<String, DiscordCommand> commandMap = new HashMap<>();
+        new CommandManager(this, storage, commandMap);
+        getJDA().addEventListener(new DiscordEvents(storage, commandMap));
         Sponge.getEventManager().registerListeners(instance, new SpongeEvents(instance, storage));
         if (SpongeDiscordLib.getServerName().toLowerCase().contains("pixel")) {
             Sponge.getEventManager().registerListeners(instance, new NormalChat());
         } else {
             Sponge.getEventManager().registerListeners(instance, new UltimateChat());
         }
+    }
+
+    @Listener
+    public void onGameInit(GameInitializationEvent event) {
+
     }
 
     public static JDA getJDA() {

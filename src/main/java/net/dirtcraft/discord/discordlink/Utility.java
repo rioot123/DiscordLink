@@ -1,6 +1,8 @@
 package net.dirtcraft.discord.discordlink;
 
-import net.dirtcraft.discord.discordlink.Commands.Sources.ConsoleManager;
+import net.dirtcraft.discord.discordlink.Commands.Sources.GamechatSender;
+import net.dirtcraft.discord.discordlink.Commands.Sources.PrivateSender;
+import net.dirtcraft.discord.discordlink.Commands.Sources.WrappedConsole;
 import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
 import net.dirtcraft.discord.spongediscordlib.DiscordUtil;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
@@ -130,7 +132,7 @@ public class Utility {
         DiscordUtil.setStatus(Game.GameType.STREAMING, SpongeDiscordLib.getServerName(), "https://www.twitch.tv/dirtcraft/");
     }
 
-    public static void toConsole(MessageReceivedEvent event) {
+    public static void toConsole(MessageReceivedEvent event, boolean silent) {
         if (!consoleCheck(event)) {
             sendPermissionErrorMessage(event);
             return;
@@ -139,9 +141,11 @@ public class Utility {
         String command = event.getMessage().getContentRaw()
                 .substring(PluginConfiguration.Main.consolePrefix.length()); // remove the prefix.
 
+        WrappedConsole commandSender = silent? new GamechatSender(event.getMember(), command) : new PrivateSender(event.getMember(), command);
+
         Task.builder()
                 .execute(() ->
-                        Sponge.getCommandManager().process(new ConsoleManager(event.getMember(), command), command))
+                        Sponge.getCommandManager().process(commandSender, command))
                 .submit(DiscordLink.getInstance());
     }
 

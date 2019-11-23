@@ -31,11 +31,6 @@ public class SpongeEvents {
     private final String modpack = SpongeDiscordLib.getServerName();
 
     @Listener
-    public void onGameInit(GameInitializationEvent event) {
-        new CommandManager(main, storage);
-    }
-
-    @Listener
     public void onServerStarted(GameStartedServerEvent event) {
         Utility.messageToChannel("embed", null,
                 Utility.embedBuilder()

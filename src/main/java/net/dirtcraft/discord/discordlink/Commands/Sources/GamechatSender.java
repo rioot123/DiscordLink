@@ -4,11 +4,11 @@ import net.dirtcraft.discord.discordlink.Utility;
 import net.dv8tion.jda.core.entities.Member;
 import org.spongepowered.api.text.Text;
 
-public class SilentCommandManager extends WrappedConsole {
+public class GamechatSender extends WrappedConsole {
     private Member member;
     private String command;
 
-    public SilentCommandManager(Member member, String command) {
+    public GamechatSender(Member member, String command) {
         this.member = member;
         this.command = command;
     }
@@ -17,7 +17,7 @@ public class SilentCommandManager extends WrappedConsole {
     public void sendMessage(Text message) {
         String plain = message.toPlain();
         if ("".equals(plain) || plain.trim().isEmpty()) return;
-        Utility.messageToUser(member.getUser(), "embed", null,
+        Utility.messageToChannel("embed", null,
                 Utility.embedBuilder().addField("__Command__ \"**/" + command.toLowerCase() + "**\" __Sent__", plain, false)
                         .setFooter("Sent By: " + member.getUser().getAsTag(), member.getUser().getAvatarUrl())
                         .build());

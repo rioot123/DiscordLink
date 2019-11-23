@@ -1,5 +1,6 @@
 package net.dirtcraft.discord.discordlink.Events;
 
+import net.dirtcraft.discord.discordlink.Commands.Discord.DiscordCommand;
 import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.Database.Storage;
 import net.dirtcraft.discord.discordlink.DiscordLink;
@@ -11,7 +12,9 @@ import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.serializer.TextSerializers;
@@ -19,16 +22,20 @@ import org.spongepowered.api.text.serializer.TextSerializers;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class DiscordEvents extends ListenerAdapter {
 
-    private Storage storage;
+    private final HashMap<String, DiscordCommand> commandMap;
 
-    public DiscordEvents(Storage storage) {
+    private final Storage storage;
+
+    public DiscordEvents(Storage storage, HashMap<String, DiscordCommand> commandMap) {
         this.storage = storage;
+        this.commandMap = commandMap;
     }
 
     @Override
@@ -44,12 +51,25 @@ public class DiscordEvents extends ListenerAdapter {
         String rawMessage = event.getMessage().getContentRaw();
 
         if (rawMessage.startsWith(PluginConfiguration.Main.botPrefix)) {
-            String[] command = event.getMessage().getContentRaw().split(" ");
-            Member member = event.getMember();
+            final String[] args = event.getMessage().getContentRaw()
+                    .substring(PluginConfiguration.Main.botPrefix.length())
+                    .toLowerCase()
+                    .split(" ");
+            final Member member = event.getMember();
+            if (args.length != 0) {
+                DiscordCommand command = commandMap.get(args[0]);
+                if (command != null) command.process(member, args, event);
+            }
+            return;
         }
 
         if (rawMessage.startsWith(PluginConfiguration.Main.consolePrefix)) {
-            Utility.toConsole(event);
+            Utility.toConsole(event, false);
+            return;
+        }
+
+        if (rawMessage.startsWith(PluginConfiguration.Main.silentConsolePrefix)) {
+            Utility.toConsole(event, true);
             return;
         }
 

@@ -1,4 +1,4 @@
-package net.dirtcraft.discord.discordlink.Commands.Discord;
+package net.dirtcraft.discord.discordlink.Exceptions;
 
 public class DiscordCommandException extends Exception {
 }
