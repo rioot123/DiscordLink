@@ -32,7 +32,8 @@ import java.util.HashMap;
         name = "Discord Link",
         description = "Handles gamechats on the DirtCraft Discord.",
         authors = {
-                "juliann"
+                "juliann",
+                "ShinyAfro"
         },
         dependencies = {
                 @Dependency(id = "sponge-discord-lib", optional = true),
