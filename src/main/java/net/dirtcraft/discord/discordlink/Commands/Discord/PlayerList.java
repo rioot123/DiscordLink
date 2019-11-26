@@ -1,7 +1,7 @@
 package net.dirtcraft.discord.discordlink.Commands.Discord;
 
 import io.github.nucleuspowered.nucleus.api.NucleusAPI;
-import net.dirtcraft.discord.discordlink.API.PlayerDiscord;
+import net.dirtcraft.discord.discordlink.API.DiscordSource;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommandExecutor;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Utility;
@@ -16,7 +16,7 @@ import java.util.Collection;
 
 public class PlayerList implements DiscordCommandExecutor {
     @Override
-    public void execute(PlayerDiscord member, String[] command, MessageReceivedEvent event) {
+    public void execute(DiscordSource member, String[] command, MessageReceivedEvent event) {
         Collection<Player> players = Sponge.getServer().getOnlinePlayers();
 
         ArrayList<String> playerNames = new ArrayList<>();

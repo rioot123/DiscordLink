@@ -1,5 +1,6 @@
 package net.dirtcraft.discord.discordlink.Events;
 
+import net.dirtcraft.discord.discordlink.API.GameChat;
 import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.Database.Storage;
 import net.dirtcraft.discord.discordlink.DiscordLink;
@@ -30,7 +31,7 @@ public class SpongeEvents {
 
     @Listener
     public void onServerStarted(GameStartedServerEvent event) {
-        Utility.messageToChannel("embed", null,
+        GameChat.sendMessage(
                 Utility.embedBuilder()
                 .setColor(Color.GREEN)
                 .setDescription(PluginConfiguration.Format.serverStart
@@ -40,7 +41,7 @@ public class SpongeEvents {
 
     @Listener
     public void onServerStopping(GameStoppingServerEvent event) {
-        Utility.messageToChannel("embed", null,
+        GameChat.sendMessage(
                 Utility.embedBuilder()
                         .setDescription(PluginConfiguration.Format.serverStop
                                 .replace("{modpack}", modpack)
@@ -52,10 +53,10 @@ public class SpongeEvents {
         if (player.hasPlayedBefore()) {
             String prefix = TextSerializers.FORMATTING_CODE.stripCodes(player.getOption("prefix").orElse(""));
 
-            Utility.messageToChannel("message", PluginConfiguration.Format.playerJoin
+            GameChat.sendMessage(PluginConfiguration.Format.playerJoin
                     .replace("{username}", player.getName())
-                    .replace("{prefix}", prefix),
-                    null);
+                    .replace("{prefix}", prefix)
+            );
         } else {
             MessageEmbed embed = Utility
                     .embedBuilder()
@@ -63,7 +64,7 @@ public class SpongeEvents {
                             .replace("{username}", player.getName()))
                     .build();
 
-            Utility.messageToChannel("embed", null, embed);
+            GameChat.sendMessage(embed);
         }
     }
 
@@ -71,10 +72,10 @@ public class SpongeEvents {
     public void onPlayerDisconnect(ClientConnectionEvent.Disconnect event, @Root Player player) {
         String prefix = TextSerializers.FORMATTING_CODE.stripCodes(player.getOption("prefix").orElse(""));
 
-        Utility.messageToChannel("message", PluginConfiguration.Format.playerDisconnect
+        GameChat.sendMessage(PluginConfiguration.Format.playerDisconnect
                         .replace("{username}", player.getName())
-                        .replace("{prefix}", prefix),
-                null);
+                        .replace("{prefix}", prefix)
+                );
     }
 
 }

@@ -1,5 +1,7 @@
 package net.dirtcraft.discord.discordlink;
 
+import net.dirtcraft.discord.discordlink.API.DiscordSource;
+import net.dirtcraft.discord.discordlink.API.GameChat;
 import net.dirtcraft.discord.discordlink.Commands.Sources.GamechatSender;
 import net.dirtcraft.discord.discordlink.Commands.Sources.PrivateSender;
 import net.dirtcraft.discord.discordlink.Commands.Sources.WrappedConsole;
@@ -7,7 +9,9 @@ import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
 import net.dirtcraft.discord.spongediscordlib.DiscordUtil;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.entities.*;
+import net.dv8tion.jda.core.entities.Game;
+import net.dv8tion.jda.core.entities.Role;
+import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.scheduler.Task;
@@ -16,7 +20,6 @@ import org.spongepowered.api.text.serializer.TextSerializers;
 
 import java.awt.*;
 import java.time.Instant;
-import java.util.concurrent.TimeUnit;
 
 public class Utility {
 
@@ -28,74 +31,6 @@ public class Utility {
             embed.setTimestamp(Instant.now());
         }
         return embed;
-    }
-
-    public static void chatToDiscord(String prefix, String playerName, String message) {
-        DiscordLink
-                .getJDA()
-                .getTextChannelById(SpongeDiscordLib.getGamechatChannelID())
-                .sendMessage(
-                        PluginConfiguration.Format.serverToDiscord
-                                .replace("{prefix}", prefix)
-                                .replace("{username}", playerName)
-                                .replace("{message}", message))
-                .queue();
-    }
-
-    public static void messageToChannel(String type, String message, MessageEmbed embed) {
-        switch (type.toLowerCase()) {
-            default:
-            case "message":
-                DiscordLink
-                        .getJDA()
-                        .getTextChannelById(SpongeDiscordLib.getGamechatChannelID())
-                        .sendMessage(message)
-                        .queue();
-                break;
-            case "embed":
-                DiscordLink
-                        .getJDA()
-                        .getTextChannelById(SpongeDiscordLib.getGamechatChannelID())
-                        .sendMessage(embed)
-                        .queue();
-                break;
-        }
-    }
-
-    public static void messageToUser(User user, String type, String message, MessageEmbed embed) {
-        switch (type.toLowerCase()) {
-            default:
-            case "message":
-                user.openPrivateChannel().queue(dm-> dm.sendMessage(message).queue());
-                break;
-            case "embed":
-                user.openPrivateChannel().queue(dm-> dm.sendMessage(embed).queue());
-                break;
-        }
-    }
-
-    public static void autoRemove(int delaySeconds, String type, String message, MessageEmbed embed) {
-        switch (type.toLowerCase()) {
-            default:
-            case "message":
-                DiscordLink
-                        .getJDA()
-                        .getTextChannelById(SpongeDiscordLib.getGamechatChannelID())
-                        .sendMessage(message)
-                        .queue(msg -> {
-                            msg.delete().queueAfter(delaySeconds, TimeUnit.SECONDS);
-                        });
-                break;
-            case "embed":
-                DiscordLink
-                        .getJDA()
-                        .getTextChannelById(SpongeDiscordLib.getGamechatChannelID())
-                        .sendMessage(embed)
-                        .queue(msg -> {
-                            msg.delete().queueAfter(delaySeconds, TimeUnit.SECONDS);
-                        });
-                break;
-        }
     }
 
     public static void setTopic() {
@@ -133,6 +68,7 @@ public class Utility {
     }
 
     public static void toConsole(MessageReceivedEvent event, boolean silent) {
+        final DiscordSource discordSource = new DiscordSource(event.getMember());
         if (!consoleCheck(event)) {
             sendPermissionErrorMessage(event);
             return;
@@ -141,7 +77,7 @@ public class Utility {
         String command = event.getMessage().getContentRaw()
                 .substring(silent? PluginConfiguration.Main.silentConsolePrefix.length() : PluginConfiguration.Main.consolePrefix.length()); // remove the prefix.
 
-        WrappedConsole commandSender = silent? new PrivateSender(event.getMember(), command) : new GamechatSender(event.getMember(), command);
+        WrappedConsole commandSender = silent? new PrivateSender(discordSource, command) : new GamechatSender(discordSource, command);
 
         Task.builder()
                 .execute(() ->
@@ -186,12 +122,12 @@ public class Utility {
 
     public static void sendResponse(MessageReceivedEvent event, String error, int delay){
         event.getMessage().delete().queue();
-        Utility.autoRemove(delay, "message", "<@" + event.getAuthor().getId() + ">, " + error, null);
+        GameChat.sendMessage("<@" + event.getAuthor().getId() + ">, " + error, delay);
     }
 
     public static void sendPermissionErrorMessage(MessageReceivedEvent event){
         event.getMessage().delete().queue();
-        Utility.autoRemove(5, "message", "<@" + event.getAuthor().getId() + ">, you do **not** have permission to use this command!", null);
+        GameChat.sendMessage("<@" + event.getAuthor().getId() + ">, you do **not** have permission to use this command!", 5);
         DiscordLink.getJDA()
                 .getTextChannelsByName("command-log", true).get(0)
                 .sendMessage(Utility.embedBuilder()

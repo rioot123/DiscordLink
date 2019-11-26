@@ -11,7 +11,6 @@ import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.text.Text;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 public class CommandManager {

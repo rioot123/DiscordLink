@@ -1,14 +1,15 @@
 package net.dirtcraft.discord.discordlink.Commands.Sources;
 
+import net.dirtcraft.discord.discordlink.API.DiscordSource;
+import net.dirtcraft.discord.discordlink.API.GameChat;
 import net.dirtcraft.discord.discordlink.Utility;
-import net.dv8tion.jda.core.entities.Member;
 import org.spongepowered.api.text.Text;
 
 public class GamechatSender extends WrappedConsole {
-    private Member member;
+    private DiscordSource member;
     private String command;
 
-    public GamechatSender(Member member, String command) {
+    public GamechatSender(DiscordSource member, String command) {
         this.member = member;
         this.command = command;
     }
@@ -17,7 +18,7 @@ public class GamechatSender extends WrappedConsole {
     public void sendMessage(Text message) {
         String plain = message.toPlain();
         if ("".equals(plain) || plain.trim().isEmpty()) return;
-        Utility.messageToChannel("embed", null,
+        GameChat.sendMessage(
                 Utility.embedBuilder().addField("__Command__ \"**/" + command.toLowerCase() + "**\" __Sent__", plain, false)
                         .setFooter("Sent By: " + member.getUser().getAsTag(), member.getUser().getAvatarUrl())
                         .build());

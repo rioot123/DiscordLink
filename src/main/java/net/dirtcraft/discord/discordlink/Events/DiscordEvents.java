@@ -1,6 +1,6 @@
 package net.dirtcraft.discord.discordlink.Events;
 
-import net.dirtcraft.discord.discordlink.API.PlayerDiscord;
+import net.dirtcraft.discord.discordlink.API.DiscordSource;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommand;
 import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.Database.Storage;
@@ -42,7 +42,7 @@ public class DiscordEvents extends ListenerAdapter {
         if (event.getAuthor().isBot() || event.getAuthor().isFake()) return;
         if (hasAttachment(event)) return;
 
-        PlayerDiscord discordProfile = new PlayerDiscord(event.getMember());
+        DiscordSource discordProfile = new DiscordSource(event.getMember());
         String username = TextSerializers.FORMATTING_CODE.stripCodes(event.getAuthor().getName());
         String effectiveName = TextSerializers.FORMATTING_CODE.stripCodes(event.getMember().getEffectiveName());
 

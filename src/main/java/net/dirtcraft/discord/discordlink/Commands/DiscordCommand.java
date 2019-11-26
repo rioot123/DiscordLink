@@ -2,7 +2,8 @@ package net.dirtcraft.discord.discordlink.Commands;
 
 import com.google.common.collect.Lists;
 import net.dirtcraft.discord.discordlink.API.DiscordRoles;
-import net.dirtcraft.discord.discordlink.API.PlayerDiscord;
+import net.dirtcraft.discord.discordlink.API.DiscordSource;
+import net.dirtcraft.discord.discordlink.API.GameChat;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Exceptions.DiscordCommandException;
 import net.dirtcraft.discord.discordlink.Utility;
@@ -20,7 +21,7 @@ public class DiscordCommand {
         this.executor = executor;
     }
 
-    public boolean hasPermission(PlayerDiscord member){
+    public boolean hasPermission(DiscordSource member){
         return allowedRoles.stream().allMatch(member::hasPermission);
     }
 
@@ -28,13 +29,13 @@ public class DiscordCommand {
         return new Builder();
     }
 
-    public final void process(PlayerDiscord member, String[] command, MessageReceivedEvent event){
+    public final void process(DiscordSource member, String[] command, MessageReceivedEvent event){
         if (allowedRoles.stream().allMatch(member::hasPermission)) {
             try {
                 executor.execute(member, command, event);
             } catch (DiscordCommandException e){
                 event.getMessage().delete().queue();
-                Utility.autoRemove(5, "message", "<@" + event.getAuthor().getId() + ">, " + (e.getMessage()!=null? e.getMessage() : "an error occurred while executing the command."), null);
+                GameChat.sendMessage("<@" + event.getAuthor().getId() + ">, " + (e.getMessage()!=null? e.getMessage() : "an error occurred while executing the command."), 5);
                 DiscordLink.getJDA()
                         .getTextChannelsByName("command-log", true).get(0)
                         .sendMessage(Utility.embedBuilder()
@@ -46,7 +47,7 @@ public class DiscordCommand {
         }
         else {
             event.getMessage().delete().queue();
-            Utility.autoRemove(5, "message", "<@" + event.getAuthor().getId() + ">, you do **not** have permission to use this command!", null);
+            GameChat.sendMessage("<@" + event.getAuthor().getId() + ">, you do **not** have permission to use this command!", 5);
             DiscordLink.getJDA()
                     .getTextChannelsByName("command-log", true).get(0)
                     .sendMessage(Utility.embedBuilder()

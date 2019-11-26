@@ -19,30 +19,30 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class PlayerDiscord implements Member {
+public class DiscordSource implements Member {
     private final Member member;
     private staffRoles staffRank;
     private boolean verified;
     private boolean donor;
     private boolean nitro;
 
-    public static Optional<PlayerDiscord> fromPlayer(Player player){
+    public static Optional<DiscordSource> fromPlayer(Player player){
         String memberID =  DiscordLink.getInstance().getStorage().getDiscordUser(player.getUniqueId());
         if (memberID == null) return Optional.empty();
         final Guild guild = DiscordLink.getGuild();
-        final PlayerDiscord profile = new PlayerDiscord(guild.getMemberById(memberID));
+        final DiscordSource profile = new DiscordSource(guild.getMemberById(memberID));
         return Optional.of(profile);
     }
 
-    public static Optional<PlayerDiscord> fromPlayerId(UUID player){
+    public static Optional<DiscordSource> fromPlayerId(UUID player){
         String memberID =  DiscordLink.getInstance().getStorage().getDiscordUser(player);
         if (memberID == null) return Optional.empty();
         final Guild guild = DiscordLink.getGuild();
-        final PlayerDiscord profile = new PlayerDiscord(guild.getMemberById(memberID));
+        final DiscordSource profile = new DiscordSource(guild.getMemberById(memberID));
         return Optional.of(profile);
     }
 
-    public PlayerDiscord(Member member){
+    public DiscordSource(Member member){
         this.member = member;
         this.staffRank = staffRoles.NONE;
         member.getRoles().forEach(role -> {
@@ -59,9 +59,6 @@ public class PlayerDiscord implements Member {
     public Optional<Player> getPlayer(){
         final String playerId = DiscordLink.getInstance().getStorage().getUUIDfromDiscordID(member.getUser().getId());
         if (playerId == null) return Optional.empty();
-
-        System.out.println(playerId);
-
         final UUID uuid = UUID.fromString(playerId);
         return Sponge.getServer().getPlayer(uuid);
     }

@@ -1,7 +1,7 @@
 package net.dirtcraft.discord.discordlink;
 
 import com.google.inject.Inject;
-import net.dirtcraft.discord.discordlink.Commands.Sponge.CommandManager;
+import net.dirtcraft.discord.discordlink.Commands.CommandManager;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommand;
 import net.dirtcraft.discord.discordlink.Configuration.ConfigManager;
 import net.dirtcraft.discord.discordlink.Database.Storage;
