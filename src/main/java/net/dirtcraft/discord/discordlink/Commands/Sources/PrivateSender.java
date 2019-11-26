@@ -27,7 +27,10 @@ public class PrivateSender extends WrappedConsole {
                 member.sendMessage(">>> " + output.toString());
                 output = new StringBuilder();
             }
-            else output.append(messagePlain);
+            else {
+                output.append(messagePlain);
+                output.append("\n");
+            }
         }
         if (output.length() > 0) member.sendMessage(">>> " + output.toString());
     }
@@ -41,7 +44,10 @@ public class PrivateSender extends WrappedConsole {
                 member.sendMessage(">>> " + output.toString());
                 output = new StringBuilder();
             }
-            else output.append(messagePlain);
+            else {
+                output.append(messagePlain);
+                output.append("\n");
+            }
         }
         if (output.length() > 0) member.sendMessage(">>> " + output.toString());
     }
