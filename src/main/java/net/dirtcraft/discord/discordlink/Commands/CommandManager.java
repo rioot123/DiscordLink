@@ -48,11 +48,17 @@ public class CommandManager {
                 .setRequiredRoles(DiscordRoles.STAFF)
                 .build();
 
+        DiscordCommand username = DiscordCommand.builder()
+                .setCommandExecutor(new Username())
+                .setRequiredRoles(DiscordRoles.STAFF)
+                .build();
+
         register(help, "help");
         register(list, "list");
         register(stop, "stop", "halt");
         register(seen, "seen");
         register(unstuck, "unstuck", "spawn");
+        register(username, "username");
     }
 
     public void register(DiscordCommand command, String... alias){

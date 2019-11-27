@@ -34,6 +34,14 @@ public class DiscordSource implements Member {
         return Optional.of(profile);
     }
 
+    public static Optional<DiscordSource> fromPlayer(org.spongepowered.api.entity.living.player.User player){
+        String memberID =  DiscordLink.getInstance().getStorage().getDiscordUser(player.getUniqueId());
+        if (memberID == null) return Optional.empty();
+        final Guild guild = DiscordLink.getGuild();
+        final DiscordSource profile = new DiscordSource(guild.getMemberById(memberID));
+        return Optional.of(profile);
+    }
+
     public static Optional<DiscordSource> fromPlayerId(UUID player){
         String memberID =  DiscordLink.getInstance().getStorage().getDiscordUser(player);
         if (memberID == null) return Optional.empty();
