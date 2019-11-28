@@ -1,5 +1,6 @@
 package net.dirtcraft.discord.discordlink;
 
+import com.google.common.collect.Lists;
 import net.dirtcraft.discord.discordlink.API.DiscordSource;
 import net.dirtcraft.discord.discordlink.API.GameChat;
 import net.dirtcraft.discord.discordlink.Commands.Sources.GamechatSender;
@@ -14,12 +15,19 @@ import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
 import java.awt.*;
 import java.time.Instant;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.regex.Pattern;
 
 public class Utility {
 
@@ -139,5 +147,30 @@ public class Utility {
 
     public static Text format(String unformattedString) {
         return TextSerializers.FORMATTING_CODE.deserialize(unformattedString);
+    }
+
+    public static Collection<Player> getSpongePlayer(String name){
+        Pattern pattern = Pattern.compile("(\\d{8}-?\\d{4}-?\\d{4}-?\\d{4}-?\\d{12})");
+        if (name.startsWith("@a")){
+            return Sponge.getServer().getOnlinePlayers();
+        } else if ((name.length() == 32 || name.length() == 36) && pattern.matcher(name).matches()){
+            UUID uuid = UUID.fromString(name);
+            Optional<Player> optPlayer = Sponge.getServer().getPlayer(uuid);
+            return optPlayer.map(Lists::newArrayList).orElseGet(Lists::newArrayList);
+        } else {
+            Optional<Player> optPlayer = Sponge.getServer().getPlayer(name);
+            return optPlayer.map(Lists::newArrayList).orElseGet(Lists::newArrayList);
+        }
+    }
+
+    public static Optional<User> getSpongeUser(String nameOrUUID){
+        final UserStorageService userStorageService = Sponge.getServiceManager().provideUnchecked(UserStorageService.class);
+        Pattern pattern = Pattern.compile("(\\d{8}-?\\d{4}-?\\d{4}-?\\d{4}-?\\d{12})");
+        if ((nameOrUUID.length() == 32 || nameOrUUID.length() == 36) && pattern.matcher(nameOrUUID).matches()){
+            UUID uuid = UUID.fromString(nameOrUUID);
+            return userStorageService.get(uuid);
+        } else {
+            return userStorageService.get(nameOrUUID);
+        }
     }
 }

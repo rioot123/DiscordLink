@@ -16,7 +16,7 @@ import java.util.Collection;
 
 public class PlayerList implements DiscordCommandExecutor {
     @Override
-    public void execute(DiscordSource member, String[] command, MessageReceivedEvent event) {
+    public void execute(DiscordSource source, String[] args, MessageReceivedEvent event) {
         Collection<Player> players = Sponge.getServer().getOnlinePlayers();
 
         ArrayList<String> playerNames = new ArrayList<>();
@@ -42,7 +42,7 @@ public class PlayerList implements DiscordCommandExecutor {
         } else {
             embed.setDescription("There are no players playing **" + SpongeDiscordLib.getServerName() + "**!");
         }
-        embed.setFooter("Requested By: " + member.getUser().getAsTag(), event.getAuthor().getAvatarUrl());
+        embed.setFooter("Requested By: " + source.getUser().getAsTag(), event.getAuthor().getAvatarUrl());
 
         DiscordLink
                 .getJDA()

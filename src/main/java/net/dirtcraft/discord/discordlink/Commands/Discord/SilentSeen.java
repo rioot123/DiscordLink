@@ -14,17 +14,17 @@ import java.util.Optional;
 
 public class SilentSeen implements DiscordCommandExecutor {
     @Override
-    public void execute(DiscordSource member, String[] args, MessageReceivedEvent event) throws DiscordCommandException {
+    public void execute(DiscordSource source, String[] args, MessageReceivedEvent event) throws DiscordCommandException {
         String target;
         if (args.length < 2){
-            Optional<User> optUser = member.getSpongeUser();
+            Optional<User> optUser = source.getSpongeUser();
             if (!optUser.isPresent()) throw new DiscordCommandException("You must be verified in order to not specify a player!");
             else target = optUser.get().getName();
         } else {
             target = args[1];
         }
         String command = "seen " + target;
-        PrivateSender sender = new PrivateSender(member, command);
+        PrivateSender sender = new PrivateSender(source, command);
         Task.builder()
                 .execute(() -> Sponge.getCommandManager().process(sender, command))
                 .submit(DiscordLink.getInstance());

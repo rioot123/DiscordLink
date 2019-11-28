@@ -12,7 +12,7 @@ import java.util.List;
 
 public class StopServer implements DiscordCommandExecutor {
     @Override
-    public void execute(DiscordSource member, String[] args, MessageReceivedEvent event) {
+    public void execute(DiscordSource source, String[] args, MessageReceivedEvent event) {
         Role ownerRole = event.getGuild().getRoleById(PluginConfiguration.Roles.ownerRoleID);
         Role dirtyRole = event.getGuild().getRoleById(PluginConfiguration.Roles.dirtyRoleID);
         boolean hooks = args.length >= 2 && args[1].equals("-s");

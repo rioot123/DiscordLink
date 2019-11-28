@@ -10,10 +10,10 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
 public class Help implements DiscordCommandExecutor {
     @Override
-    public void execute(DiscordSource member, String[] command, MessageReceivedEvent event) throws DiscordCommandException {
+    public void execute(DiscordSource source, String[] args, MessageReceivedEvent event) throws DiscordCommandException {
         StringBuilder result = new StringBuilder("The following commands are available:\n");
         DiscordLink.getCommandManager().getCommandMap().forEach((alias, cmd)->{
-            if (!member.hasPermission(cmd)) return;
+            if (!source.hasPermission(cmd)) return;
             result.append(" **-** ")
                     .append(PluginConfiguration.Main.botPrefix)
                     .append(alias)

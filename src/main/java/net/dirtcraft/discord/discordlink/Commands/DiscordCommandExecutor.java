@@ -5,5 +5,5 @@ import net.dirtcraft.discord.discordlink.Exceptions.DiscordCommandException;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
 public interface DiscordCommandExecutor {
-    void execute(DiscordSource member, String[] command, MessageReceivedEvent event) throws DiscordCommandException;
+    void execute(DiscordSource source, String[] args, MessageReceivedEvent event) throws DiscordCommandException;
 }

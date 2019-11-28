@@ -30,26 +30,37 @@ public class CommandManager {
                 .build();
 
         DiscordCommand list = DiscordCommand.builder()
+                .setDescription("Shows a list of all players online.")
                 .setCommandExecutor(new PlayerList())
                 .build();
 
         DiscordCommand stop = DiscordCommand.builder()
+                .setDescription("Stops the server.")
                 .setCommandExecutor(new StopServer())
                 .setRequiredRoles(DiscordRoles.DIRTY)
                 .build();
 
         DiscordCommand unstuck = DiscordCommand.builder()
+                .setDescription("Teleports you to spawn if you are verified.")
                 .setCommandExecutor(new Unstuck())
                 .setRequiredRoles(DiscordRoles.VERIFIED)
                 .build();
 
         DiscordCommand seen = DiscordCommand.builder()
+                .setDescription("Sends you a DM with a players info.")
                 .setCommandExecutor(new SilentSeen())
                 .setRequiredRoles(DiscordRoles.STAFF)
                 .build();
 
         DiscordCommand username = DiscordCommand.builder()
+                .setDescription("Reveals a verified players minecraft username.")
                 .setCommandExecutor(new Username())
+                .setRequiredRoles(DiscordRoles.STAFF)
+                .build();
+
+        DiscordCommand discord = DiscordCommand.builder()
+                .setDescription("Reveals a verified players discord username.")
+                .setCommandExecutor(new Discord())
                 .setRequiredRoles(DiscordRoles.STAFF)
                 .build();
 
@@ -59,6 +70,7 @@ public class CommandManager {
         register(seen, "seen");
         register(unstuck, "unstuck", "spawn");
         register(username, "username");
+        register(discord, "discord");
     }
 
     public void register(DiscordCommand command, String... alias){

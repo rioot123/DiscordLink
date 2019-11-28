@@ -20,7 +20,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class Unstuck implements DiscordCommandExecutor {
     @Override
-    public void execute(DiscordSource member, String[] command, MessageReceivedEvent event) {
+    public void execute(DiscordSource source, String[] args, MessageReceivedEvent event) {
         Role verifiedRole = event.getGuild().getRoleById(PluginConfiguration.Roles.verifiedRoleID);
         List<Role> roles = event.getMember().getRoles();
         if (!roles.contains(verifiedRole)) {
