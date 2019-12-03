@@ -64,6 +64,12 @@ public class CommandManager {
                 .setRequiredRoles(DiscordRoles.STAFF)
                 .build();
 
+        DiscordCommand ranks = DiscordCommand.builder()
+                .setDescription("Reveals a players ranks.")
+                .setCommandExecutor(new Rank())
+                .setRequiredRoles(DiscordRoles.STAFF)
+                .build();
+
         register(help, "help");
         register(list, "list");
         register(stop, "stop", "halt");
@@ -71,6 +77,7 @@ public class CommandManager {
         register(unstuck, "unstuck", "spawn");
         register(username, "username");
         register(discord, "discord");
+        register(ranks, "ranks");
     }
 
     public void register(DiscordCommand command, String... alias){
