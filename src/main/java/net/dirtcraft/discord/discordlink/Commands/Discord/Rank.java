@@ -22,9 +22,7 @@ public class Rank implements DiscordCommandExecutor {
     public void execute(DiscordSource source, String[] args, MessageReceivedEvent event) throws DiscordCommandException {
         Optional<User> optUser = args.length == 1? source.getSpongeUser() : Utility.getSpongeUser(args[1]);
         Optional<ProviderRegistration<LuckPerms>> provider = Sponge.getServiceManager().getRegistration(LuckPerms.class);
-        System.out.println("x");
         if (!provider.isPresent() || !optUser.isPresent()) return;
-        System.out.println("x");
         LuckPerms api = provider.get().getProvider();
 
         UserManager userManager = api.getUserManager();
