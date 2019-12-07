@@ -20,7 +20,7 @@ dependencies {
     compile 'br.net.fabiozumbi12.UltimateChat:UltimateChat-Sponge-7:1.8.9'
     implementation 'com.github.NucleusPowered:Nucleus:1.11.0'
     implementation 'com.github.Dirt-Craft:Dirt-Database-Lib:-SNAPSHOT'
-    implementation 'com.github.Dirt-Craft:Sponge-Discord-Lib:-SNAPSHOT'
+    compile 'com.github.Dirt-Craft:Sponge-Discord-Lib:-SNAPSHOT'
 }
 
 sponge.plugin.id = pluginId
