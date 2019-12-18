@@ -34,9 +34,15 @@ public class CommandManager {
                 .setCommandExecutor(new PlayerList())
                 .build();
 
+        DiscordCommand halt = DiscordCommand.builder()
+                .setDescription("Stops the server abruptly.")
+                .setCommandExecutor(new StopServer(false))
+                .setRequiredRoles(DiscordRoles.DIRTY)
+                .build();
+
         DiscordCommand stop = DiscordCommand.builder()
-                .setDescription("Stops the server.")
-                .setCommandExecutor(new StopServer())
+                .setDescription("Stops the server gracefully.")
+                .setCommandExecutor(new StopServer(true))
                 .setRequiredRoles(DiscordRoles.DIRTY)
                 .build();
 
@@ -72,7 +78,8 @@ public class CommandManager {
 
         register(help, "help");
         register(list, "list");
-        register(stop, "stop", "halt");
+        register(stop, "stop");
+        register(halt, "halt");
         register(seen, "seen");
         register(unstuck, "unstuck", "spawn");
         register(username, "username");
