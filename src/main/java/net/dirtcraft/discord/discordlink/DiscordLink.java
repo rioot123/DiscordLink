@@ -1,6 +1,8 @@
 package net.dirtcraft.discord.discordlink;
 
 import com.google.inject.Inject;
+import net.dirtcraft.discord.discordlink.Commands.CommandManager;
+import net.dirtcraft.discord.discordlink.Commands.DiscordCommand;
 import net.dirtcraft.discord.discordlink.Configuration.ConfigManager;
 import net.dirtcraft.discord.discordlink.Database.Storage;
 import net.dirtcraft.discord.discordlink.Events.DiscordEvents;
@@ -9,6 +11,7 @@ import net.dirtcraft.discord.discordlink.Events.SpongeEvents;
 import net.dirtcraft.discord.discordlink.Events.UltimateChat;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.core.JDA;
+import net.dv8tion.jda.core.entities.Guild;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import org.slf4j.Logger;
@@ -16,17 +19,21 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
+import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.plugin.Dependency;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
+
+import java.util.HashMap;
 
 @Plugin(
         id = "discord-link",
         name = "Discord Link",
         description = "Handles gamechats on the DirtCraft Discord.",
         authors = {
-                "juliann"
+                "juliann",
+                "ShinyAfro"
         },
         dependencies = {
                 @Dependency(id = "sponge-discord-lib", optional = true),
@@ -35,6 +42,8 @@ import org.spongepowered.api.plugin.PluginContainer;
         }
 )
 public class DiscordLink {
+
+    private static CommandManager commandManager;
 
     @Inject
     @DefaultConfig(sharedRoot = false)
@@ -65,11 +74,12 @@ public class DiscordLink {
 
         this.configManager = new ConfigManager(loader);
         this.storage = new Storage();
-
         Utility.setStatus();
         Utility.setTopic();
 
-        getJDA().addEventListener(new DiscordEvents(storage));
+        final HashMap<String, DiscordCommand> commandMap = new HashMap<>();
+        commandManager = new CommandManager(this, storage, commandMap);
+        getJDA().addEventListener(new DiscordEvents(storage, commandMap));
         Sponge.getEventManager().registerListeners(instance, new SpongeEvents(instance, storage));
         if (SpongeDiscordLib.getServerName().toLowerCase().contains("pixel")) {
             Sponge.getEventManager().registerListeners(instance, new NormalChat());
@@ -78,12 +88,29 @@ public class DiscordLink {
         }
     }
 
+    @Listener
+    public void onGameInit(GameInitializationEvent event) {
+
+    }
+
     public static JDA getJDA() {
         return SpongeDiscordLib.getJDA();
     }
 
+    public static Guild getGuild(){
+        return SpongeDiscordLib.getJDA().getTextChannelById(SpongeDiscordLib.getGamechatChannelID()).getGuild();
+    }
+
     public static DiscordLink getInstance() {
         return instance;
+    }
+
+    public static CommandManager getCommandManager(){
+        return commandManager;
+    }
+
+    public Storage getStorage(){
+        return storage;
     }
 
 }

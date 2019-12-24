@@ -15,11 +15,12 @@ repositories {
 
 dependencies {
     compile fileTree(dir: 'libraries', include: '*.jar')
+    compile 'net.luckperms:api:5.0'
     compile 'org.spongepowered:spongeapi:7.1.0-SNAPSHOT'
     compile 'br.net.fabiozumbi12.UltimateChat:UltimateChat-Sponge-7:1.8.9'
     implementation 'com.github.NucleusPowered:Nucleus:1.11.0'
     implementation 'com.github.Dirt-Craft:Dirt-Database-Lib:-SNAPSHOT'
-    implementation 'com.github.Dirt-Craft:Sponge-Discord-Lib:-SNAPSHOT'
+    compile 'com.github.Dirt-Craft:Sponge-Discord-Lib:-SNAPSHOT'
 }
 
 sponge.plugin.id = pluginId

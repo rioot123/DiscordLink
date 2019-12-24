@@ -1,6 +1,6 @@
-package net.dirtcraft.discord.discordlink;
+package net.dirtcraft.discord.discordlink.Commands.Sources;
 
-import net.dv8tion.jda.core.entities.Member;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.SubjectCollection;
@@ -14,26 +14,32 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-public class ConsoleManager implements CommandSource {
+public abstract class WrappedConsole implements CommandSource {
 
     private CommandSource actualSource;
-    private Member member;
-    private String command;
 
-    public ConsoleManager(CommandSource actualSource, Member member, String command) {
-        this.actualSource = actualSource;
-        this.member = member;
-        this.command = command;
+    WrappedConsole(){
+        actualSource = Sponge.getServer().getConsole();
     }
 
     @Override
     public void sendMessage(Text message) {
-        String plain = message.toPlain();
-        if ("".equals(plain) || plain.trim().isEmpty()) return;
-        Utility.messageToChannel("embed", null,
-                Utility.embedBuilder().addField("__Command__ \"**/" + command.toLowerCase() + "**\" __Sent__", plain, false)
-                        .setFooter("Sent By: " + member.getUser().getAsTag(), member.getUser().getAvatarUrl())
-                        .build());
+        actualSource.sendMessage(message);
+    }
+
+    @Override
+    public void sendMessages(Iterable<Text> messages) {
+        actualSource.sendMessages(messages);
+    }
+
+    @Override
+    public void sendMessages(Text... messages) {
+        actualSource.sendMessages(messages);
+    }
+
+    @Override
+    public String getName() {
+        return this.actualSource.getName();
     }
 
     @Override
@@ -44,25 +50,6 @@ public class ConsoleManager implements CommandSource {
     @Override
     public SubjectReference asSubjectReference() {
         return this.actualSource.asSubjectReference();
-    }
-
-    @Override
-    public void sendMessages(Iterable<Text> messages) {
-        Text output = null;
-        for (Text message : messages) {
-            if(output == null) output = message;
-            else output = output.concat(Text.of("\n")).concat(message);
-        }
-        if (output != null) this.sendMessage(output);
-    }
-    @Override
-    public void sendMessages(Text... messages) {
-        this.actualSource.sendMessages(messages);
-    }
-
-    @Override
-    public String getName() {
-        return this.actualSource.getName();
     }
 
     @Override

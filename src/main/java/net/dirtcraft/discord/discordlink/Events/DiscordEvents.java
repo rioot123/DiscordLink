@@ -1,5 +1,7 @@
 package net.dirtcraft.discord.discordlink.Events;
 
+import net.dirtcraft.discord.discordlink.API.DiscordSource;
+import net.dirtcraft.discord.discordlink.Commands.DiscordCommand;
 import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.Database.Storage;
 import net.dirtcraft.discord.discordlink.DiscordLink;
@@ -18,16 +20,20 @@ import org.spongepowered.api.text.serializer.TextSerializers;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class DiscordEvents extends ListenerAdapter {
 
-    private Storage storage;
+    private final HashMap<String, DiscordCommand> commandMap;
 
-    public DiscordEvents(Storage storage) {
+    private final Storage storage;
+
+    public DiscordEvents(Storage storage, HashMap<String, DiscordCommand> commandMap) {
         this.storage = storage;
+        this.commandMap = commandMap;
     }
 
     @Override
@@ -36,34 +42,32 @@ public class DiscordEvents extends ListenerAdapter {
         if (event.getAuthor().isBot() || event.getAuthor().isFake()) return;
         if (hasAttachment(event)) return;
 
+        DiscordSource discordProfile = new DiscordSource(event.getMember());
         String username = TextSerializers.FORMATTING_CODE.stripCodes(event.getAuthor().getName());
         String effectiveName = TextSerializers.FORMATTING_CODE.stripCodes(event.getMember().getEffectiveName());
 
         String message = event.getMessage().getContentDisplay();
         String rawMessage = event.getMessage().getContentRaw();
 
-        if (rawMessage.startsWith(PluginConfiguration.Main.botPrefix + "list")) {
-            Utility.listCommand(event);
-            return;
-        }
-
-        if (rawMessage.startsWith(PluginConfiguration.Main.botPrefix + "e-stop")) {
-            Utility.emergencyStop(event, false);
-            return;
-        }
-
-        if (rawMessage.startsWith(PluginConfiguration.Main.botPrefix + "e-stop -h")) {
-            Utility.emergencyStop(event, true);
-            return;
-        }
-
-        if (rawMessage.startsWith(PluginConfiguration.Main.botPrefix + "unstuck")) {
-            Utility.unstuck(event, storage);
+        if (rawMessage.startsWith(PluginConfiguration.Main.botPrefix)) {
+            final String[] args = event.getMessage().getContentRaw()
+                    .substring(PluginConfiguration.Main.botPrefix.length())
+                    .toLowerCase()
+                    .split(" ");
+            if (args.length != 0) {
+                DiscordCommand command = commandMap.get(args[0]);
+                if (command != null) command.process(discordProfile, args, event);
+            }
             return;
         }
 
         if (rawMessage.startsWith(PluginConfiguration.Main.consolePrefix)) {
-            Utility.toConsole(event);
+            Utility.toConsole(event, false);
+            return;
+        }
+
+        if (rawMessage.startsWith(PluginConfiguration.Main.silentConsolePrefix)) {
+            Utility.toConsole(event, true);
             return;
         }
 

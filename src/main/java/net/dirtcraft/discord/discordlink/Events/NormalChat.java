@@ -1,6 +1,6 @@
 package net.dirtcraft.discord.discordlink.Events;
 
-import net.dirtcraft.discord.discordlink.Utility;
+import net.dirtcraft.discord.discordlink.API.GameChat;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.filter.cause.Root;
@@ -21,7 +21,7 @@ public class NormalChat {
                 .replace("@here", "")
                 .replaceAll("<@\\d+>", "");
 
-        Utility.chatToDiscord(prefix, username, message);
+        GameChat.sendPlayerMessage(prefix, username, message);
     }
 
 }

@@ -1,14 +1,19 @@
 package net.dirtcraft.discord.discordlink;
 
-import io.github.nucleuspowered.nucleus.api.NucleusAPI;
+import com.google.common.collect.Lists;
+import net.dirtcraft.discord.discordlink.API.DiscordSource;
+import net.dirtcraft.discord.discordlink.API.GameChat;
+import net.dirtcraft.discord.discordlink.Commands.Sources.GamechatSender;
+import net.dirtcraft.discord.discordlink.Commands.Sources.PrivateSender;
+import net.dirtcraft.discord.discordlink.Commands.Sources.WrappedConsole;
 import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
-import net.dirtcraft.discord.discordlink.Database.Storage;
 import net.dirtcraft.discord.spongediscordlib.DiscordUtil;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.entities.*;
+import net.dv8tion.jda.core.entities.Game;
+import net.dv8tion.jda.core.entities.Role;
+import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
@@ -16,14 +21,13 @@ import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.serializer.TextSerializers;
-import org.spongepowered.api.world.storage.WorldProperties;
 
 import java.awt.*;
 import java.time.Instant;
-import java.util.*;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.regex.Pattern;
 
 public class Utility {
 
@@ -35,62 +39,6 @@ public class Utility {
             embed.setTimestamp(Instant.now());
         }
         return embed;
-    }
-
-    public static void chatToDiscord(String prefix, String playerName, String message) {
-        DiscordLink
-                .getJDA()
-                .getTextChannelById(SpongeDiscordLib.getGamechatChannelID())
-                .sendMessage(
-                        PluginConfiguration.Format.serverToDiscord
-                                .replace("{prefix}", prefix)
-                                .replace("{username}", playerName)
-                                .replace("{message}", message))
-                .queue();
-    }
-
-    public static void messageToChannel(String type, String message, MessageEmbed embed) {
-        switch (type.toLowerCase()) {
-            default:
-            case "message":
-                DiscordLink
-                        .getJDA()
-                        .getTextChannelById(SpongeDiscordLib.getGamechatChannelID())
-                        .sendMessage(message)
-                        .queue();
-            break;
-            case "embed":
-                DiscordLink
-                        .getJDA()
-                        .getTextChannelById(SpongeDiscordLib.getGamechatChannelID())
-                        .sendMessage(embed)
-                        .queue();
-                break;
-        }
-    }
-
-    public static void autoRemove(int delaySeconds, String type, String message, MessageEmbed embed) {
-        switch (type.toLowerCase()) {
-            default:
-            case "message":
-                DiscordLink
-                        .getJDA()
-                        .getTextChannelById(SpongeDiscordLib.getGamechatChannelID())
-                        .sendMessage(message)
-                        .queue(msg -> {
-                            msg.delete().queueAfter(delaySeconds, TimeUnit.SECONDS);
-                        });
-                break;
-            case "embed":
-                DiscordLink
-                        .getJDA()
-                        .getTextChannelById(SpongeDiscordLib.getGamechatChannelID())
-                        .sendMessage(embed)
-                        .queue(msg -> {
-                            msg.delete().queueAfter(delaySeconds, TimeUnit.SECONDS);
-                        });
-                break;
-        }
     }
 
     public static void setTopic() {
@@ -127,55 +75,21 @@ public class Utility {
         DiscordUtil.setStatus(Game.GameType.STREAMING, SpongeDiscordLib.getServerName(), "https://www.twitch.tv/dirtcraft/");
     }
 
-    public static void listCommand(MessageReceivedEvent event) {
-        Member member = event.getMember();
-
-        Collection<Player> players = Sponge.getServer().getOnlinePlayers();
-
-        ArrayList<String> playerNames = new ArrayList<>();
-        players.forEach(online -> {
-            if (NucleusAPI.getAFKService().isPresent()) {
-                if (NucleusAPI.getAFKService().get().isAFK(online)) {
-                    playerNames.add(online.getName() + " " + "—" + " " + "**AFK**");
-                } else {
-                    playerNames.add(online.getName());
-                }
-            } else {
-                playerNames.add(online.getName());
-            }
-        });
-
-        playerNames.sort(String::compareToIgnoreCase);
-
-        EmbedBuilder embed = Utility.embedBuilder();
-        if (players.size() > 1) {
-            embed.addField("__**" + players.size() + "** players online__", String.join("\n", playerNames), false);
-        } else if (players.size() == 1) {
-            embed.addField("__**" + players.size() + "** player online__", String.join("\n", playerNames), false);
-        } else {
-            embed.setDescription("There are no players playing **" + SpongeDiscordLib.getServerName() + "**!");
-        }
-                embed.setFooter("Requested By: " + member.getUser().getAsTag(), event.getAuthor().getAvatarUrl());
-
-        DiscordLink
-                .getJDA()
-                .getTextChannelById(SpongeDiscordLib.getGamechatChannelID())
-                .sendMessage(embed.build())
-                .queue();
-    }
-
-    public static void toConsole(MessageReceivedEvent event) {
+    public static void toConsole(MessageReceivedEvent event, boolean silent) {
+        final DiscordSource discordSource = new DiscordSource(event.getMember());
         if (!consoleCheck(event)) {
             sendPermissionErrorMessage(event);
             return;
         }
 
         String command = event.getMessage().getContentRaw()
-                .substring(PluginConfiguration.Main.consolePrefix.length()); // remove the prefix.
+                .substring(silent? PluginConfiguration.Main.silentConsolePrefix.length() : PluginConfiguration.Main.consolePrefix.length()); // remove the prefix.
+
+        WrappedConsole commandSender = silent? new PrivateSender(discordSource, command) : new GamechatSender(discordSource, command);
 
         Task.builder()
                 .execute(() ->
-                        Sponge.getCommandManager().process(new ConsoleManager(Sponge.getServer().getConsole(), event.getMember(), command), command))
+                        Sponge.getCommandManager().process(commandSender, command))
                 .submit(DiscordLink.getInstance());
     }
 
@@ -210,79 +124,18 @@ public class Utility {
         }
     }
 
-    public static void emergencyStop(MessageReceivedEvent event, boolean hardExit){
-        Role ownerRole = event.getGuild().getRoleById(PluginConfiguration.Roles.ownerRoleID);
-        Role dirtyRole = event.getGuild().getRoleById(PluginConfiguration.Roles.dirtyRoleID);
-        List<Role> roles = event.getMember().getRoles();
-        if (roles.contains(ownerRole) || roles.contains(dirtyRole)) {
-            FMLCommonHandler.instance().exitJava(-1, hardExit);
-            sendResponse(event, "Emergency shutdown has been executed. Please wait.", 15);
-        } else {
-            sendPermissionErrorMessage(event);
-        }
-    }
-
-    public static void unstuck(MessageReceivedEvent event, Storage dbHelper) {
-        Role verifiedRole = event.getGuild().getRoleById(PluginConfiguration.Roles.verifiedRoleID);
-        List<Role> roles = event.getMember().getRoles();
-        if (!roles.contains(verifiedRole)) {
-            sendPermissionErrorMessage(event);
-            return;
-        }
-        CompletableFuture.runAsync(() -> {
-
-            final Optional<UserStorageService> userStorage = Sponge.getGame().getServiceManager().provide(UserStorageService.class);
-            if (!userStorage.isPresent()) {
-                sendResponse(event, "Could not execute the command. Please try again later or contact support for further assistance. (Err.1)");
-                return;
-            }
-
-            final Optional<WorldProperties> optionalWorld = Sponge.getServer().getDefaultWorld();
-            if (!optionalWorld.isPresent()) {
-                sendResponse(event, "Could not execute the command. Please try again later or contact support for further assistance. (Err.2)");
-                return;
-            }
-
-            final String uuid = dbHelper.getUUIDfromDiscordID(event.getAuthor().getId());
-            if (uuid == null) {
-                sendResponse(event, "Could not execute the command as we could not find your UUID. Please try again later or contact support for further assistance.");
-                return;
-            }
-
-            final Optional<User> optionalUser = userStorage.get().get(UUID.fromString(uuid));
-            if (!optionalUser.isPresent()) {
-                sendResponse(event, "Could not execute the command as we could not find your minecraft account. Please try again later or contact support for further assistance.");
-                return;
-            }
-
-            final User user = optionalUser.get();
-            final WorldProperties spawn = optionalWorld.get();
-
-            if (user.getPlayer().isPresent()) {
-                Task.builder().execute(()->{
-                    user.getPlayer().get().transferToWorld(spawn.getUniqueId(), spawn.getSpawnPosition().toDouble());
-                }).submit(DiscordLink.getInstance());
-            } else {
-                Task.builder().execute(()->{
-                    user.setLocation(spawn.getSpawnPosition().toDouble(), spawn.getUniqueId());
-                }).submit(DiscordLink.getInstance());
-            }
-            sendResponse(event, "Successfully moved " + user.getName() +  " to spawn.", 15);
-        });
-    }
-
-    private static void sendResponse(MessageReceivedEvent event, String error){
+    public static void sendResponse(MessageReceivedEvent event, String error){
         sendResponse(event, error, 30);
     }
 
-    private static void sendResponse(MessageReceivedEvent event, String error, int delay){
+    public static void sendResponse(MessageReceivedEvent event, String error, int delay){
         event.getMessage().delete().queue();
-        Utility.autoRemove(delay, "message", "<@" + event.getAuthor().getId() + ">, " + error, null);
+        GameChat.sendMessage("<@" + event.getAuthor().getId() + ">, " + error, delay);
     }
 
-    private static void sendPermissionErrorMessage(MessageReceivedEvent event){
+    public static void sendPermissionErrorMessage(MessageReceivedEvent event){
         event.getMessage().delete().queue();
-        Utility.autoRemove(5, "message", "<@" + event.getAuthor().getId() + ">, you do **not** have permission to use this command!", null);
+        GameChat.sendMessage("<@" + event.getAuthor().getId() + ">, you do **not** have permission to use this command!", 5);
         DiscordLink.getJDA()
                 .getTextChannelsByName("command-log", true).get(0)
                 .sendMessage(Utility.embedBuilder()
@@ -294,5 +147,30 @@ public class Utility {
 
     public static Text format(String unformattedString) {
         return TextSerializers.FORMATTING_CODE.deserialize(unformattedString);
+    }
+
+    public static Collection<Player> getSpongePlayer(String name){
+        Pattern pattern = Pattern.compile("(\\d{8}-?\\d{4}-?\\d{4}-?\\d{4}-?\\d{12})");
+        if (name.startsWith("@a")){
+            return Sponge.getServer().getOnlinePlayers();
+        } else if ((name.length() == 32 || name.length() == 36) && pattern.matcher(name).matches()){
+            UUID uuid = UUID.fromString(name);
+            Optional<Player> optPlayer = Sponge.getServer().getPlayer(uuid);
+            return optPlayer.map(Lists::newArrayList).orElseGet(Lists::newArrayList);
+        } else {
+            Optional<Player> optPlayer = Sponge.getServer().getPlayer(name);
+            return optPlayer.map(Lists::newArrayList).orElseGet(Lists::newArrayList);
+        }
+    }
+
+    public static Optional<User> getSpongeUser(String nameOrUUID){
+        final UserStorageService userStorageService = Sponge.getServiceManager().provideUnchecked(UserStorageService.class);
+        Pattern pattern = Pattern.compile("(\\d{8}-?\\d{4}-?\\d{4}-?\\d{4}-?\\d{12})");
+        if ((nameOrUUID.length() == 32 || nameOrUUID.length() == 36) && pattern.matcher(nameOrUUID).matches()){
+            UUID uuid = UUID.fromString(nameOrUUID);
+            return userStorageService.get(uuid);
+        } else {
+            return userStorageService.get(nameOrUUID);
+        }
     }
 }
