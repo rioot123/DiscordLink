@@ -56,7 +56,7 @@ public class DiscordSource implements Member {
         member.getRoles().forEach(role -> {
             JDA jda = member.getJDA();
             for (staffRoles staffRank : staffRoles.values()){
-                if (staffRank != staffRoles.NONE && member.getRoles().contains(jda.getRoleById(staffRank.getID())) && this.staffRank.ordinal() < staffRank.ordinal()) this.staffRank = staffRank;
+                if (staffRank != staffRoles.NONE && member.getRoles().contains(jda.getRoleById(staffRank.getID())) && this.staffRank.ordinal() > staffRank.ordinal()) this.staffRank = staffRank;
             }
             if (member.getRoles().contains(jda.getRoleById(PluginConfiguration.Roles.verifiedRoleID))) verified = true;
             if (member.getRoles().contains(jda.getRoleById(PluginConfiguration.Roles.donatorRoleID))) donor = true;
@@ -81,19 +81,19 @@ public class DiscordSource implements Member {
     }
 
     public boolean isOwner() {
-        return staffRank.ordinal() >= staffRoles.OWNER.ordinal();
+        return staffRank.ordinal() <= staffRoles.OWNER.ordinal();
     }
 
     public boolean isDirty() {
-        return staffRank.ordinal() >= staffRoles.DIRTY.ordinal();
+        return staffRank.ordinal() <= staffRoles.DIRTY.ordinal();
     }
 
     public boolean isAdmin() {
-        return staffRank.ordinal() >= staffRoles.ADMIN.ordinal();
+        return staffRank.ordinal() <= staffRoles.ADMIN.ordinal();
     }
 
     public boolean isStaff() {
-        return staffRank.ordinal() >= staffRoles.STAFF.ordinal();
+        return staffRank.ordinal() <= staffRoles.STAFF.ordinal();
     }
 
     public boolean isVerified() {
