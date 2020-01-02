@@ -104,7 +104,7 @@ public class PluginConfiguration {
 
     @ConfigSerializable
     public static class Command {
-        @Setting(value = "Admin-Command-Blacklist.")
+        @Setting(value = "Admin-Command-Blacklist", comment = "A list of commands admins are not allowed to use.")
         public static List<String> blacklist = Arrays.asList(
                 "luckperms",
                 "perm",
@@ -120,7 +120,8 @@ public class PluginConfiguration {
                 "tempmute",
                 "mute",
                 "kick",
-                "whitelist"
+                "whitelist",
+                "minecraft:"
         );
     }
 
