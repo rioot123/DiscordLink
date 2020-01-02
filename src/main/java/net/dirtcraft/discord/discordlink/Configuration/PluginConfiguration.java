@@ -1,7 +1,12 @@
 package net.dirtcraft.discord.discordlink.Configuration;
 
+import com.google.common.collect.Lists;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @ConfigSerializable
 public class PluginConfiguration {
@@ -13,6 +18,8 @@ public class PluginConfiguration {
     private PluginConfiguration.Embed embed = new PluginConfiguration.Embed();
     @Setting(value = "Roles")
     private PluginConfiguration.Roles roles = new PluginConfiguration.Roles();
+    @Setting(value = "Commands")
+    private PluginConfiguration.Command command = new PluginConfiguration.Command();
 
 
 
@@ -93,6 +100,28 @@ public class PluginConfiguration {
 
         @Setting(value = "Nitro-Role-ID")
         public static String nitroRoleID = "581195961813172225";
+    }
+
+    @ConfigSerializable
+    public static class Command {
+        @Setting(value = "Admin-Command-Blacklist.")
+        public static List<String> blacklist = Arrays.asList(
+                "luckperms",
+                "perm",
+                "permissions",
+                "perm",
+                "lp",
+                "execute",
+                "ban",
+                "ipban",
+                "tempban",
+                "nameban",
+                "nameunban",
+                "tempmute",
+                "mute",
+                "kick",
+                "whitelist"
+        );
     }
 
 }
