@@ -121,7 +121,8 @@ public class PluginConfiguration {
                 "mute",
                 "kick",
                 "whitelist",
-                "minecraft:"
+                "minecraft:",
+                "sponge"
         );
     }
 
