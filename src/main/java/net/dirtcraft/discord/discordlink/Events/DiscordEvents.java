@@ -42,12 +42,12 @@ public class DiscordEvents extends ListenerAdapter {
         if (event.getAuthor().isBot() || event.getAuthor().isFake()) return;
         if (hasAttachment(event)) return;
 
-        DiscordSource discordProfile = new DiscordSource(event.getMember());
-        String username = TextSerializers.FORMATTING_CODE.stripCodes(event.getAuthor().getName());
-        String effectiveName = TextSerializers.FORMATTING_CODE.stripCodes(event.getMember().getEffectiveName());
+        final DiscordSource sender = new DiscordSource(event.getMember());
+        final String username = TextSerializers.FORMATTING_CODE.stripCodes(event.getAuthor().getName());
+        final String effectiveName = TextSerializers.FORMATTING_CODE.stripCodes(event.getMember().getEffectiveName());
 
-        String message = event.getMessage().getContentDisplay();
-        String rawMessage = event.getMessage().getContentRaw();
+        final String message = event.getMessage().getContentDisplay();
+        final String rawMessage = event.getMessage().getContentRaw();
 
         if (rawMessage.startsWith(PluginConfiguration.Main.botPrefix)) {
             final String[] args = event.getMessage().getContentRaw()
@@ -56,35 +56,23 @@ public class DiscordEvents extends ListenerAdapter {
                     .split(" ");
             if (args.length != 0) {
                 DiscordCommand command = commandMap.get(args[0]);
-                if (command != null) command.process(discordProfile, args, event);
+                if (command != null) command.process(sender, args, event);
             }
             return;
-        }
-
-        if (rawMessage.startsWith(PluginConfiguration.Main.consolePrefix)) {
-            Utility.toConsole(event, false);
+        } else if (rawMessage.startsWith(PluginConfiguration.Main.consolePrefix)) {
+            Utility.toConsole(event, sender,false);
+            return;
+        } else if (rawMessage.startsWith(PluginConfiguration.Main.silentConsolePrefix)) {
+            Utility.toConsole(event, sender, true);
             return;
         }
-
-        if (rawMessage.startsWith(PluginConfiguration.Main.silentConsolePrefix)) {
-            Utility.toConsole(event, true);
-            return;
-        }
-
-        Role staffRole = event.getGuild().getRoleById(PluginConfiguration.Roles.staffRoleID);
-        Role ownerRole = event.getGuild().getRoleById(PluginConfiguration.Roles.ownerRoleID);
-
-        boolean isStaff = event.getMember().getRoles().contains(staffRole);
-        boolean isOwner = event.getMember().getRoles().contains(ownerRole);
-
-        String staff = isStaff ? "&aYes" : "&cNo";
 
         Task.builder()
                 .async()
                 .execute(() -> {
                     Text.Builder toBroadcast = Text.builder();
                     String mcUsername = storage.getLastKnownUsername(storage.getUUIDfromDiscordID(event.getMember().getUser().getId()));
-                    if (!isStaff) {
+                    if (!sender.isStaff()) {
 
                         Role donorRole = event.getGuild().getRoleById(PluginConfiguration.Roles.donatorRoleID);
 
@@ -98,7 +86,7 @@ public class DiscordEvents extends ListenerAdapter {
                                 Utility.format(PluginConfiguration.Format.discordToServer
                                         .replace("{username}", effectiveName)
                                         .replace("{message}", message)
-                                        .replace("»", !isOwner ? "&c&l»" : "&4&l»")
+                                        .replace("»", !sender.isOwner() ? "&c&l»" : "&4&l»")
                                 ));
                     }
 
@@ -111,7 +99,7 @@ public class DiscordEvents extends ListenerAdapter {
                     if (event.getMember().getNickname() != null) {
                         hover.add("&7Nickname&8: &6" + event.getMember().getNickname());
                     }
-                    hover.add("&7Staff Member&8: &6" + staff);
+                    hover.add("&7Staff Member&8: &6" + (sender.isStaff() ? "&aYes" : "&cNo"));
 
                     try {
                         List<String> urls = checkURLs(event.getMessage().getContentRaw());

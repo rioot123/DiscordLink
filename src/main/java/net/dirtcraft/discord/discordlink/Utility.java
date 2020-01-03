@@ -24,9 +24,8 @@ import org.spongepowered.api.text.serializer.TextSerializers;
 
 import java.awt.*;
 import java.time.Instant;
-import java.util.Collection;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.List;
 import java.util.regex.Pattern;
 
 public class Utility {
@@ -75,53 +74,18 @@ public class Utility {
         DiscordUtil.setStatus(Game.GameType.STREAMING, SpongeDiscordLib.getServerName(), "https://www.twitch.tv/dirtcraft/");
     }
 
-    public static void toConsole(MessageReceivedEvent event, boolean silent) {
-        final DiscordSource discordSource = new DiscordSource(event.getMember());
-        if (!consoleCheck(event)) {
+    public static void toConsole(MessageReceivedEvent event, DiscordSource sender, boolean silent) {
+        final int prefixLength = silent ? PluginConfiguration.Main.silentConsolePrefix.length() : PluginConfiguration.Main.consolePrefix.length();
+        final String command = event.getMessage().getContentRaw().substring(prefixLength);
+        final List<String> blacklist = PluginConfiguration.Command.blacklist;
+        if (!(sender.isDirty() || sender.isAdmin() && blacklist.stream().noneMatch(command::startsWith))) {
             sendPermissionErrorMessage(event);
             return;
         }
-
-        String command = event.getMessage().getContentRaw()
-                .substring(silent? PluginConfiguration.Main.silentConsolePrefix.length() : PluginConfiguration.Main.consolePrefix.length()); // remove the prefix.
-
-        WrappedConsole commandSender = silent? new PrivateSender(discordSource, command) : new GamechatSender(discordSource, command);
-
+        final WrappedConsole commandSender = silent ? new PrivateSender(sender, command) : new GamechatSender(sender, command);
         Task.builder()
-                .execute(() ->
-                        Sponge.getCommandManager().process(commandSender, command))
+                .execute(() -> Sponge.getCommandManager().process(commandSender, command))
                 .submit(DiscordLink.getInstance());
-    }
-
-    private static boolean consoleCheck(MessageReceivedEvent event) {
-        Role adminRole = event.getGuild().getRoleById(PluginConfiguration.Roles.adminRoleID);
-        Role ownerRole = event.getGuild().getRoleById(PluginConfiguration.Roles.ownerRoleID);
-
-        if (event.getMember().getRoles().contains(ownerRole)) {
-            return true;
-        } else if (event.getMember().getRoles().contains(adminRole)) {
-            if (event.getMessage().getContentRaw().toLowerCase().startsWith(PluginConfiguration.Main.consolePrefix + "luckperms") ||
-                    event.getMessage().getContentRaw().toLowerCase().startsWith(PluginConfiguration.Main.consolePrefix + "perm") ||
-                    event.getMessage().getContentRaw().toLowerCase().startsWith(PluginConfiguration.Main.consolePrefix + "permissions") ||
-                    event.getMessage().getContentRaw().toLowerCase().startsWith(PluginConfiguration.Main.consolePrefix + "perm") ||
-                    event.getMessage().getContentRaw().toLowerCase().startsWith(PluginConfiguration.Main.consolePrefix + "lp") ||
-                    event.getMessage().getContentRaw().toLowerCase().startsWith(PluginConfiguration.Main.consolePrefix + "execute") ||
-                    event.getMessage().getContentRaw().toLowerCase().startsWith(PluginConfiguration.Main.consolePrefix + "ban") ||
-                    event.getMessage().getContentRaw().toLowerCase().startsWith(PluginConfiguration.Main.consolePrefix + "ipban") ||
-                    event.getMessage().getContentRaw().toLowerCase().startsWith(PluginConfiguration.Main.consolePrefix + "tempban") ||
-                    event.getMessage().getContentRaw().toLowerCase().startsWith(PluginConfiguration.Main.consolePrefix + "nameban") ||
-                    event.getMessage().getContentRaw().toLowerCase().startsWith(PluginConfiguration.Main.consolePrefix + "nameunban") ||
-                    event.getMessage().getContentRaw().toLowerCase().startsWith(PluginConfiguration.Main.consolePrefix + "tempmute") ||
-                    event.getMessage().getContentRaw().toLowerCase().startsWith(PluginConfiguration.Main.consolePrefix + "mute") ||
-                    event.getMessage().getContentRaw().toLowerCase().startsWith(PluginConfiguration.Main.consolePrefix + "kick") ||
-                    event.getMessage().getContentRaw().toLowerCase().startsWith(PluginConfiguration.Main.consolePrefix + "whitelist")) {
-                return false;
-            } else {
-                return true;
-            }
-        } else {
-            return false;
-        }
     }
 
     public static void sendResponse(MessageReceivedEvent event, String error){
