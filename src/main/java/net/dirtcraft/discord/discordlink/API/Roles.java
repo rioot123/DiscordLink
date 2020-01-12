@@ -2,9 +2,10 @@ package net.dirtcraft.discord.discordlink.API;
 
 import net.dv8tion.jda.core.entities.Role;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import static net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration.Roles.*;
 
 import javax.annotation.Nullable;
+
+import static net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration.Roles.*;
 
 public enum Roles {
     OWNER   (ownerRoleID,   true, 'c',"Owner"           ),

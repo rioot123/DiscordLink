@@ -1,9 +1,9 @@
 package net.dirtcraft.discord.discordlink.Commands;
 
 import com.google.common.collect.Lists;
-import net.dirtcraft.discord.discordlink.API.Roles;
-import net.dirtcraft.discord.discordlink.API.GuildMember;
 import net.dirtcraft.discord.discordlink.API.GameChat;
+import net.dirtcraft.discord.discordlink.API.GuildMember;
+import net.dirtcraft.discord.discordlink.API.Roles;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Exceptions.DiscordPermissionException;
 import net.dirtcraft.discord.discordlink.Utility;

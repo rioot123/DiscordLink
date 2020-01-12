@@ -1,7 +1,7 @@
 package net.dirtcraft.discord.discordlink.Commands.Sources;
 
-import net.dirtcraft.discord.discordlink.API.GuildMember;
 import net.dirtcraft.discord.discordlink.API.GameChat;
+import net.dirtcraft.discord.discordlink.API.GuildMember;
 import net.dirtcraft.discord.discordlink.Utility;
 import org.spongepowered.api.text.Text;
 

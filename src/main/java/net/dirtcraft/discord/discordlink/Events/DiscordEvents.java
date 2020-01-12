@@ -1,7 +1,7 @@
 package net.dirtcraft.discord.discordlink.Events;
 
-import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.API.GameChat;
+import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommand;
 import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.DiscordLink;
@@ -16,11 +16,12 @@ import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.text.serializer.TextSerializers;
-import static net.dirtcraft.discord.discordlink.Utility.*;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
+
+import static net.dirtcraft.discord.discordlink.Utility.*;
 
 
 public class DiscordEvents extends ListenerAdapter {

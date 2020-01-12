@@ -1,10 +1,8 @@
 package net.dirtcraft.discord.discordlink.Configuration;
 
-import com.google.common.collect.Lists;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
