@@ -14,9 +14,10 @@ import java.util.regex.Pattern;
 public class Username implements DiscordCommandExecutor {
     @Override
     public void execute(GuildMember source, String[] args, MessageReceivedEvent event) throws DiscordCommandException {
+        System.out.println(args[1]);
         if (args.length < 2) throw new DiscordCommandException("Invalid Discord ID");
         final String discordID = args[1];
-        Pattern pattern = Pattern.compile("<?@?(\\d+)>?");
+        Pattern pattern = Pattern.compile("<?@?!?(\\d+)>?");
         Matcher matcher = pattern.matcher(discordID);
         if (!matcher.matches() || GameChat.getGuild().getMemberById(matcher.group(1)) == null) throw new DiscordCommandException("Invalid Discord ID");
 
