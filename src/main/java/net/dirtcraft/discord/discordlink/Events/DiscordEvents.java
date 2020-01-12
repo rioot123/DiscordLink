@@ -73,8 +73,7 @@ public class DiscordEvents extends ListenerAdapter {
         final Text.Builder toBroadcast = Text.builder();
         final String username;
 
-        if (sender.isStaff()) username = sender.getHighestRank().getStyle() + sender.getEffectiveName().replaceAll(STRIP_CODE_REGEX, "");
-        else if (mcUsername == null) username = sender.getEffectiveName().replaceAll(STRIP_CODE_REGEX, "");
+        if (sender.isStaff() || mcUsername == null) username = sender.getHighestRank().getStyle() + sender.getEffectiveName().replaceAll(STRIP_CODE_REGEX, "");
         else username = sender.getNameStyle() + mcUsername;
 
 
