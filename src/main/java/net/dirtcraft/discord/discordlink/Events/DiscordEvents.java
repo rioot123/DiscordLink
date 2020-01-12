@@ -1,50 +1,43 @@
 package net.dirtcraft.discord.discordlink.Events;
 
-import net.dirtcraft.discord.discordlink.API.DiscordSource;
+import net.dirtcraft.discord.discordlink.API.MessageSource;
+import net.dirtcraft.discord.discordlink.API.GameChat;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommand;
 import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
-import net.dirtcraft.discord.discordlink.Database.Storage;
 import net.dirtcraft.discord.discordlink.DiscordLink;
-import net.dirtcraft.discord.discordlink.Utility;
-import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
+import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.text.serializer.TextSerializers;
+import static net.dirtcraft.discord.discordlink.Utility.*;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.*;
+
 
 public class DiscordEvents extends ListenerAdapter {
 
     private final HashMap<String, DiscordCommand> commandMap;
 
-    private final Storage storage;
-
-    public DiscordEvents(Storage storage, HashMap<String, DiscordCommand> commandMap) {
-        this.storage = storage;
+    public DiscordEvents(HashMap<String, DiscordCommand> commandMap) {
         this.commandMap = commandMap;
     }
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
-        if (!event.getChannel().getId().equals(SpongeDiscordLib.getGamechatChannelID())) return;
+        if (!event.getChannel().equals(GameChat.getChannel())) return;
         if (event.getAuthor().isBot() || event.getAuthor().isFake()) return;
         if (hasAttachment(event)) return;
 
-        final DiscordSource sender = new DiscordSource(event.getMember());
-        final String username = TextSerializers.FORMATTING_CODE.stripCodes(event.getAuthor().getName());
-        final String effectiveName = TextSerializers.FORMATTING_CODE.stripCodes(event.getMember().getEffectiveName());
+        final MessageSource sender = new MessageSource(event);
 
         final String message = event.getMessage().getContentDisplay();
         final String rawMessage = event.getMessage().getContentRaw();
@@ -60,88 +53,91 @@ public class DiscordEvents extends ListenerAdapter {
             }
             return;
         } else if (rawMessage.startsWith(PluginConfiguration.Main.consolePrefix)) {
-            Utility.toConsole(event, sender,false);
+            toConsole(event, sender,false);
             return;
         } else if (rawMessage.startsWith(PluginConfiguration.Main.silentConsolePrefix)) {
-            Utility.toConsole(event, sender, true);
+            toConsole(event, sender, true);
             return;
         }
 
         Task.builder()
                 .async()
-                .execute(() -> {
-                    Text.Builder toBroadcast = Text.builder();
-                    String mcUsername = storage.getLastKnownUsername(storage.getUUIDfromDiscordID(event.getMember().getUser().getId()));
-                    if (!sender.isStaff()) {
-
-                        Role donorRole = event.getGuild().getRoleById(PluginConfiguration.Roles.donatorRoleID);
-
-                        toBroadcast.append(Utility.format(PluginConfiguration.Format.discordToServer
-                                .replace("{username}", mcUsername != null ? mcUsername : username)
-                                .replace("{message}", TextSerializers.FORMATTING_CODE.stripCodes(message))
-                                .replace("»", event.getMember().getRoles().contains(donorRole) ? "&6&l»" : "&9&l»")));
-
-                    } else {
-                        toBroadcast.append(
-                                Utility.format(PluginConfiguration.Format.discordToServer
-                                        .replace("{username}", effectiveName)
-                                        .replace("{message}", message)
-                                        .replace("»", !sender.isOwner() ? "&c&l»" : "&4&l»")
-                                ));
-                    }
-
-                    ArrayList<String> hover = new ArrayList<>();
-                    hover.add("&5&nClick me&7 to join &cDirtCraft's &9Discord");
-                    if (mcUsername != null) {
-                        hover.add("&7MC Username&8: &6" + mcUsername);
-                    }
-                    hover.add("&7Discord Name&8: &6" + event.getAuthor().getName() + "&8#&7" + event.getAuthor().getDiscriminator());
-                    if (event.getMember().getNickname() != null) {
-                        hover.add("&7Nickname&8: &6" + event.getMember().getNickname());
-                    }
-                    hover.add("&7Staff Member&8: &6" + (sender.isStaff() ? "&aYes" : "&cNo"));
-
-                    try {
-                        List<String> urls = checkURLs(event.getMessage().getContentRaw());
-                        if (!(urls.size() > 0)) {
-                            toBroadcast.onClick(TextActions.openUrl(new URL("http://discord.dirtcraft.gg/")));
-
-                            toBroadcast.onHover(TextActions.showText(Utility.format(String.join("\n", hover))));
-
-                        } else {
-                            toBroadcast.onClick(TextActions.openUrl(new URL(urls.get(0))));
-
-                            toBroadcast.onHover(TextActions.showText(Utility.format(String.join("\n", hover))));
-                        }
-                    } catch (MalformedURLException exception) {
-                        hover.add("&cMalformed URL, Contact Administrator");
-
-                        toBroadcast.onHover(TextActions.showText(Utility.format(String.join("\n", hover))));
-
-                        exception.printStackTrace();
-                    }
-
-                    Sponge.getServer().getBroadcastChannel().send(toBroadcast.build());
-
-                })
+                .execute(() -> discordToMc(sender, message))
                 .submit(DiscordLink.getInstance());
-
     }
 
-    public static List<String> checkURLs(String text)
-    {
-        List<String> containedUrls = new ArrayList<>();
-        String urlRegex = "((https?|ftp|gopher|telnet|file):((//)|(\\\\))+[\\w\\d:#@%/;$()~_?\\+-=\\\\\\.&]*)";
-        Pattern pattern = Pattern.compile(urlRegex, Pattern.CASE_INSENSITIVE);
-        Matcher urlMatcher = pattern.matcher(text);
+    private static void discordToMc(MessageSource sender, String message){
+        final Optional<User> optUser = sender.getSpongeUser();
+        final String mcUsername = optUser.map(User::getName).orElse(null);
+        final Text.Builder toBroadcast = Text.builder();
+        final String username;
 
-        while (urlMatcher.find())
-        {
-            containedUrls.add(text.substring(urlMatcher.start(0),
-                    urlMatcher.end(0)));
+        if (sender.isStaff()) username = sender.getHighestRank().getStyle() + sender.getEffectiveName().replaceAll(STRIP_CODE_REGEX, "");
+        else if (mcUsername == null) username = sender.getEffectiveName().replaceAll(STRIP_CODE_REGEX, "");
+        else username = sender.getNameStyle() + mcUsername;
+
+
+        String[] messageElements = PluginConfiguration.Format.discordToServer
+                .replace("{username}", username)
+                .replace("»", sender.getChevron())
+                .split("\\{message}");
+
+        if (messageElements.length == 0) return;
+        toBroadcast.append(formatNonContentElements(sender, mcUsername, messageElements[0]));
+        toBroadcast.append(formatContentElement(sender.isStaff(), message));
+        if (messageElements.length > 1) toBroadcast.append(formatNonContentElements(sender, mcUsername, messageElements[1]));
+
+        Sponge.getServer().getBroadcastChannel().send(toBroadcast.build());
+    }
+
+    private static Collection<Text> formatContentElement(boolean isStaff, String message){
+        final List<Text> text = new ArrayList<>();
+        final StringBuilder sb = new StringBuilder();
+        Arrays.stream(message.split(" ")).forEach(s->{
+            if (s.toLowerCase().matches(URL_DETECT_REGEX)){
+                s+=" ";
+                Text.Builder url = Text.builder(s);
+                try{
+                    url.color(TextColors.BLUE);
+                    url.style(TextStyles.UNDERLINE, TextStyles.ITALIC);
+                    url.onClick(TextActions.openUrl(new URL(s)));
+                    url.onHover(TextActions.showText(Text.of("§aClick to open link")));
+                } catch (MalformedURLException e){
+                    url.color(TextColors.BLUE);
+                    url.style(TextStyles.UNDERLINE, TextStyles.ITALIC);
+                    url.onHover(TextActions.showText(Text.of("§cMalformed URL")));
+                }
+                text.add(Text.of(sb.toString()));
+                text.add(url.build());
+                sb.setLength(0);
+            } else {
+                s+=" ";
+                String element = isStaff? s.replaceAll(STRIP_CODE_REGEX, "§$1") : s.replaceAll(STRIP_CODE_REGEX,"");
+                sb.append(element);
+            }
+        });
+        if (sb.length() != 0){
+            sb.setLength(sb.length()-1);
+            text.add(Text.of(sb.toString()));
         }
+        return text;
+    }
 
-        return containedUrls;
+    private static Text formatNonContentElements(MessageSource sender, String mcUsername, String element){
+        Text.Builder text = Text.builder().append(TextSerializers.FORMATTING_CODE.deserialize(element));
+        List<String> tooltip = new ArrayList<>();
+
+        tooltip.add("&5&nClick me&7 to join &cDirtCraft's &9Discord");
+        if (mcUsername != null) tooltip.add("&7MC Username&8: &6" + mcUsername);
+        tooltip.add("&7Discord Name&8: &6" + sender.getUser().getName() + "&8#&7" + sender.getUser().getDiscriminator());
+        tooltip.add("§7Rank§8: §6" + sender.getHighestRank().getName());
+        tooltip.add("§7Staff Member§8: §6" + (sender.isStaff() ? "§aYes" : "§cNo"));
+
+        text.onHover(TextActions.showText(format(String.join("\n", tooltip))));
+        try{
+            text.onClick(TextActions.openUrl(new URL("https://dirtcraft.net")));
+        } catch (MalformedURLException ignored){}
+        return text.toText();
     }
 
     private boolean hasAttachment(MessageReceivedEvent event) {

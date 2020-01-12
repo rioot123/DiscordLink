@@ -1,6 +1,6 @@
 package net.dirtcraft.discord.discordlink.Commands.Discord;
 
-import net.dirtcraft.discord.discordlink.API.DiscordSource;
+import net.dirtcraft.discord.discordlink.API.GuildMember;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommandExecutor;
 import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.DiscordLink;
@@ -20,7 +20,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class Unstuck implements DiscordCommandExecutor {
     @Override
-    public void execute(DiscordSource source, String[] args, MessageReceivedEvent event) {
+    public void execute(GuildMember source, String[] args, MessageReceivedEvent event) {
         Role verifiedRole = event.getGuild().getRoleById(PluginConfiguration.Roles.verifiedRoleID);
         List<Role> roles = event.getMember().getRoles();
         if (!roles.contains(verifiedRole)) {

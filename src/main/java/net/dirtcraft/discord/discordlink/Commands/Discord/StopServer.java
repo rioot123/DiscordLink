@@ -1,6 +1,6 @@
 package net.dirtcraft.discord.discordlink.Commands.Discord;
 
-import net.dirtcraft.discord.discordlink.API.DiscordSource;
+import net.dirtcraft.discord.discordlink.API.GuildMember;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommandExecutor;
 import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.Utility;
@@ -21,7 +21,7 @@ public class StopServer implements DiscordCommandExecutor {
     }
 
     @Override
-    public void execute(DiscordSource source, String[] args, MessageReceivedEvent event) {
+    public void execute(GuildMember source, String[] args, MessageReceivedEvent event) {
         Role ownerRole = event.getGuild().getRoleById(PluginConfiguration.Roles.ownerRoleID);
         Role dirtyRole = event.getGuild().getRoleById(PluginConfiguration.Roles.dirtyRoleID);
         boolean gracefulExit = this.gracefulExit != null ? this.gracefulExit : args.length >= 2 && args[1].equals("-s");

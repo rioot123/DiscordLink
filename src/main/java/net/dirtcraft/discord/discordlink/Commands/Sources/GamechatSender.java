@@ -1,15 +1,15 @@
 package net.dirtcraft.discord.discordlink.Commands.Sources;
 
-import net.dirtcraft.discord.discordlink.API.DiscordSource;
+import net.dirtcraft.discord.discordlink.API.GuildMember;
 import net.dirtcraft.discord.discordlink.API.GameChat;
 import net.dirtcraft.discord.discordlink.Utility;
 import org.spongepowered.api.text.Text;
 
 public class GamechatSender extends WrappedConsole {
-    private DiscordSource member;
+    private GuildMember member;
     private String command;
 
-    public GamechatSender(DiscordSource member, String command) {
+    public GamechatSender(GuildMember member, String command) {
         this.member = member;
         this.command = command;
     }

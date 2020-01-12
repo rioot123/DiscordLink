@@ -1,7 +1,8 @@
 package net.dirtcraft.discord.discordlink;
 
 import com.google.common.collect.Lists;
-import net.dirtcraft.discord.discordlink.API.DiscordSource;
+import net.dirtcraft.discord.discordlink.API.GuildMember;
+import net.dirtcraft.discord.discordlink.API.Roles;
 import net.dirtcraft.discord.discordlink.API.GameChat;
 import net.dirtcraft.discord.discordlink.Commands.Sources.GamechatSender;
 import net.dirtcraft.discord.discordlink.Commands.Sources.PrivateSender;
@@ -11,7 +12,6 @@ import net.dirtcraft.discord.spongediscordlib.DiscordUtil;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Game;
-import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import org.spongepowered.api.Sponge;
@@ -29,6 +29,9 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 public class Utility {
+
+    public static final String STRIP_CODE_REGEX = "[§&]([0-9a-fA-FrlonmkRLONMK])";
+    public static final String URL_DETECT_REGEX = "((https?|ftp|gopher|telnet|file):((//)|(\\\\))+[\\w\\d:#@%/;$()~_?\\+-=\\\\\\.&]*)";
 
     public static EmbedBuilder embedBuilder() {
         EmbedBuilder embed = new EmbedBuilder();
@@ -74,11 +77,11 @@ public class Utility {
         DiscordUtil.setStatus(Game.GameType.STREAMING, SpongeDiscordLib.getServerName(), "https://www.twitch.tv/dirtcraft/");
     }
 
-    public static void toConsole(MessageReceivedEvent event, DiscordSource sender, boolean silent) {
+    public static void toConsole(MessageReceivedEvent event, GuildMember sender, boolean silent) {
         final int prefixLength = silent ? PluginConfiguration.Main.silentConsolePrefix.length() : PluginConfiguration.Main.consolePrefix.length();
         final String command = event.getMessage().getContentRaw().substring(prefixLength);
         final List<String> blacklist = PluginConfiguration.Command.blacklist;
-        if (!(sender.isDirty() || sender.isAdmin() && blacklist.stream().noneMatch(command::startsWith))) {
+        if (!(sender.hasRole(Roles.DIRTY) || sender.hasRole(Roles.ADMIN) && blacklist.stream().noneMatch(command::startsWith))) {
             sendPermissionErrorMessage(event);
             return;
         }
@@ -136,5 +139,13 @@ public class Utility {
         } else {
             return userStorageService.get(nameOrUUID);
         }
+    }
+
+    public static String sanitiseMinecraftText(String s){
+        return s.replaceAll(STRIP_CODE_REGEX, "")
+                .replace("@everyone", "")
+                .replace("@here", "")
+                .replaceAll("([_*~`>|\\\\])", "\\\\$1")
+                .replaceAll("<@\\d+>", "");
     }
 }
