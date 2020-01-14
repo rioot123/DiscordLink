@@ -1,10 +1,8 @@
 package net.dirtcraft.discord.discordlink.Configuration;
 
-import com.google.common.collect.Lists;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -88,6 +86,9 @@ public class PluginConfiguration {
 
         @Setting(value = "Admin-Role-ID")
         public static String adminRoleID = "531631265443479562";
+
+        @Setting(value = "Moderator-Role-ID")
+        public static String modRoleID = "332701183477284867";
 
         @Setting(value = "Staff-Role-ID")
         public static String staffRoleID = "549039481450397699";

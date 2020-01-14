@@ -1,12 +1,12 @@
 package net.dirtcraft.discord.discordlink.Commands.Sources;
 
-import net.dirtcraft.discord.discordlink.API.DiscordSource;
+import net.dirtcraft.discord.discordlink.API.GuildMember;
 import org.spongepowered.api.text.Text;
 
 public class PrivateSender extends WrappedConsole {
-    private final DiscordSource member;
+    private final GuildMember member;
 
-    public PrivateSender(DiscordSource member, String command) {
+    public PrivateSender(GuildMember member, String command) {
         this.member = member;
         member.sendMessage("Command sent: " + command + "\n");
     }

@@ -1,7 +1,7 @@
 package net.dirtcraft.discord.discordlink.Commands.Discord;
 
-import net.dirtcraft.discord.discordlink.API.DiscordSource;
 import net.dirtcraft.discord.discordlink.API.GameChat;
+import net.dirtcraft.discord.discordlink.API.GuildMember;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommandExecutor;
 import net.dirtcraft.discord.discordlink.Exceptions.DiscordCommandException;
 import net.dirtcraft.discord.discordlink.Utility;
@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 
 public class Rank implements DiscordCommandExecutor {
     @Override
-    public void execute(DiscordSource source, String[] args, MessageReceivedEvent event) throws DiscordCommandException {
+    public void execute(GuildMember source, String[] args, MessageReceivedEvent event) throws DiscordCommandException {
         Optional<User> optUser = args.length == 1? source.getSpongeUser() : Utility.getSpongeUser(args[1]);
         Optional<ProviderRegistration<LuckPerms>> provider = Sponge.getServiceManager().getRegistration(LuckPerms.class);
         if (!provider.isPresent() || !optUser.isPresent()) return;

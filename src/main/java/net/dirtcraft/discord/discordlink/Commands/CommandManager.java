@@ -1,6 +1,6 @@
 package net.dirtcraft.discord.discordlink.Commands;
 
-import net.dirtcraft.discord.discordlink.API.DiscordRoles;
+import net.dirtcraft.discord.discordlink.API.Roles;
 import net.dirtcraft.discord.discordlink.Commands.Discord.*;
 import net.dirtcraft.discord.discordlink.Commands.Sponge.UnVerify;
 import net.dirtcraft.discord.discordlink.Commands.Sponge.Verify;
@@ -37,43 +37,43 @@ public class CommandManager {
         DiscordCommand halt = DiscordCommand.builder()
                 .setDescription("Stops the server abruptly.")
                 .setCommandExecutor(new StopServer(false))
-                .setRequiredRoles(DiscordRoles.DIRTY)
+                .setRequiredRoles(Roles.DIRTY)
                 .build();
 
         DiscordCommand stop = DiscordCommand.builder()
                 .setDescription("Stops the server gracefully.")
                 .setCommandExecutor(new StopServer(true))
-                .setRequiredRoles(DiscordRoles.DIRTY)
+                .setRequiredRoles(Roles.DIRTY)
                 .build();
 
         DiscordCommand unstuck = DiscordCommand.builder()
                 .setDescription("Teleports you to spawn if you are verified.")
                 .setCommandExecutor(new Unstuck())
-                .setRequiredRoles(DiscordRoles.VERIFIED)
+                .setRequiredRoles(Roles.VERIFIED)
                 .build();
 
         DiscordCommand seen = DiscordCommand.builder()
                 .setDescription("Sends you a DM with a players info.")
                 .setCommandExecutor(new SilentSeen())
-                .setRequiredRoles(DiscordRoles.STAFF)
+                .setRequiredRoles(Roles.STAFF)
                 .build();
 
         DiscordCommand username = DiscordCommand.builder()
                 .setDescription("Reveals a verified players minecraft username.")
                 .setCommandExecutor(new Username())
-                .setRequiredRoles(DiscordRoles.STAFF)
+                .setRequiredRoles(Roles.STAFF)
                 .build();
 
         DiscordCommand discord = DiscordCommand.builder()
                 .setDescription("Reveals a verified players discord username.")
                 .setCommandExecutor(new Discord())
-                .setRequiredRoles(DiscordRoles.STAFF)
+                .setRequiredRoles(Roles.STAFF)
                 .build();
 
         DiscordCommand ranks = DiscordCommand.builder()
                 .setDescription("Reveals a players ranks.")
                 .setCommandExecutor(new Rank())
-                .setRequiredRoles(DiscordRoles.STAFF)
+                .setRequiredRoles(Roles.STAFF)
                 .build();
 
         register(help, "help");

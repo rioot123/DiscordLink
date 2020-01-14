@@ -48,7 +48,6 @@ public class DiscordLink {
     @Inject
     @DefaultConfig(sharedRoot = false)
     private ConfigurationLoader<CommentedConfigurationNode> loader;
-    private ConfigManager configManager;
 
     @Inject
     private Logger logger;
@@ -72,14 +71,14 @@ public class DiscordLink {
 
         instance = this;
 
-        this.configManager = new ConfigManager(loader);
+        ConfigManager configManager = new ConfigManager(loader);
         this.storage = new Storage();
         Utility.setStatus();
         Utility.setTopic();
 
         final HashMap<String, DiscordCommand> commandMap = new HashMap<>();
         commandManager = new CommandManager(this, storage, commandMap);
-        getJDA().addEventListener(new DiscordEvents(storage, commandMap));
+        getJDA().addEventListener(new DiscordEvents(commandMap));
         Sponge.getEventManager().registerListeners(instance, new SpongeEvents(instance, storage));
         if (SpongeDiscordLib.getServerName().toLowerCase().contains("pixel")) {
             Sponge.getEventManager().registerListeners(instance, new NormalChat());

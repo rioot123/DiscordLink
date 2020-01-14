@@ -1,9 +1,9 @@
 package net.dirtcraft.discord.discordlink.Commands;
 
 import com.google.common.collect.Lists;
-import net.dirtcraft.discord.discordlink.API.DiscordRoles;
-import net.dirtcraft.discord.discordlink.API.DiscordSource;
 import net.dirtcraft.discord.discordlink.API.GameChat;
+import net.dirtcraft.discord.discordlink.API.GuildMember;
+import net.dirtcraft.discord.discordlink.API.Roles;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Exceptions.DiscordPermissionException;
 import net.dirtcraft.discord.discordlink.Utility;
@@ -13,11 +13,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DiscordCommand {
-    private final List<DiscordRoles> allowedRoles;
+    private final List<Roles> allowedRoles;
     private final String description;
     private final DiscordCommandExecutor executor;
 
-    private DiscordCommand(List<DiscordRoles> allowed, DiscordCommandExecutor executor, String description){
+    private DiscordCommand(List<Roles> allowed, DiscordCommandExecutor executor, String description){
         this.allowedRoles = allowed;
         this.executor = executor;
         this.description = description;
@@ -48,16 +48,16 @@ public class DiscordCommand {
                 .queue();
     }
 
-    public boolean hasPermission(DiscordSource member){
-        return allowedRoles.stream().allMatch(member::hasPermission);
+    public boolean hasPermission(GuildMember member){
+        return allowedRoles.stream().allMatch(member::hasRole);
     }
 
     public static Builder builder(){
         return new Builder();
     }
 
-    public final void process(DiscordSource member, String[] command, MessageReceivedEvent event) {
-        if (!allowedRoles.stream().allMatch(member::hasPermission)) {
+    public final void process(GuildMember member, String[] command, MessageReceivedEvent event) {
+        if (!allowedRoles.stream().allMatch(member::hasRole)) {
             sendPermissionError(event);
             return;
         }
@@ -68,18 +68,16 @@ public class DiscordCommand {
         } catch (Exception e) {
             sendCommandError(event, e.getMessage() != null ? e.getMessage() : "an error occurred while executing the command.");
         }
-
-
     }
 
     public static class Builder{
-        private List<DiscordRoles> allowedRoles;
+        private List<Roles> allowedRoles;
         private DiscordCommandExecutor executor;
         private String description;
 
         private Builder(){}
 
-        public final Builder setRequiredRoles(DiscordRoles... roles){
+        public final Builder setRequiredRoles(Roles... roles){
             allowedRoles = Lists.newArrayList(roles);
             return this;
         }

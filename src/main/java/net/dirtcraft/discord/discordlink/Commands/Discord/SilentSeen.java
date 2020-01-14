@@ -1,6 +1,6 @@
 package net.dirtcraft.discord.discordlink.Commands.Discord;
 
-import net.dirtcraft.discord.discordlink.API.DiscordSource;
+import net.dirtcraft.discord.discordlink.API.GuildMember;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommandExecutor;
 import net.dirtcraft.discord.discordlink.Commands.Sources.PrivateSender;
 import net.dirtcraft.discord.discordlink.DiscordLink;
@@ -14,7 +14,7 @@ import java.util.Optional;
 
 public class SilentSeen implements DiscordCommandExecutor {
     @Override
-    public void execute(DiscordSource source, String[] args, MessageReceivedEvent event) throws DiscordCommandException {
+    public void execute(GuildMember source, String[] args, MessageReceivedEvent event) throws DiscordCommandException {
         String target;
         if (args.length < 2){
             Optional<User> optUser = source.getSpongeUser();

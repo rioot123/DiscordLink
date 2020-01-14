@@ -2,6 +2,7 @@ package net.dirtcraft.discord.discordlink.Events;
 
 import br.net.fabiozumbi12.UltimateChat.Sponge.API.SendChannelMessageEvent;
 import net.dirtcraft.discord.discordlink.API.GameChat;
+import net.dirtcraft.discord.discordlink.Utility;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.filter.cause.Root;
@@ -19,10 +20,7 @@ public class UltimateChat {
 
         String prefix = TextSerializers.FORMATTING_CODE.stripCodes(player.getOption("prefix").orElse(""));
         String username = player.getName();
-        String message = TextSerializers.FORMATTING_CODE.stripCodes(event.getMessage().toPlain())
-                .replace("@everyone", "")
-                .replace("@here", "")
-                .replaceAll("<@\\d+>", "");
+        String message = TextSerializers.FORMATTING_CODE.stripCodes(Utility.sanitiseMinecraftText(event.getMessage().toPlain()));
 
         GameChat.sendPlayerMessage(prefix, username, message);
     }
