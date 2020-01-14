@@ -9,7 +9,7 @@ import static net.dirtcraft.discord.discordlink.Configuration.PluginConfiguratio
 
 public enum Roles {
     OWNER   (ownerRoleID,   true, 'c',"Owner"           ),
-    DIRTY   (dirtyRoleID,   true, 'f',"Manager"         ),
+    DIRTY   (dirtyRoleID,   true, 'e',"Manager"         ),
     ADMIN   (adminRoleID,   true, '4',"Admin"           ),
     MOD     (modRoleID  ,   true, 'b',"Moderator"       ),
     STAFF   (staffRoleID,   true, '5',"Helper"          ),
@@ -43,7 +43,7 @@ public enum Roles {
     }
 
     @NonNull public String getStyle(){
-        return "§"+color + (this.isStaff? "§l" : "");
+        return this.isStaff ? "§" + color + "§l" : "§7";
     }
 
     @NonNull public String getChevron(){
