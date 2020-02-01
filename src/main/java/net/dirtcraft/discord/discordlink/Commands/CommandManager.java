@@ -37,13 +37,13 @@ public class CommandManager {
         DiscordCommand halt = DiscordCommand.builder()
                 .setDescription("Stops the server abruptly.")
                 .setCommandExecutor(new StopServer(false))
-                .setRequiredRoles(Roles.DIRTY)
+                .setRequiredRoles(Roles.ADMIN)
                 .build();
 
         DiscordCommand stop = DiscordCommand.builder()
                 .setDescription("Stops the server gracefully.")
                 .setCommandExecutor(new StopServer(true))
-                .setRequiredRoles(Roles.DIRTY)
+                .setRequiredRoles(Roles.ADMIN)
                 .build();
 
         DiscordCommand unstuck = DiscordCommand.builder()
