@@ -60,6 +60,7 @@ public class DiscordLink {
 
     @Listener (order = Order.LAST)
     public void onPreInit(GamePreInitializationEvent event) {
+
         if (!Sponge.getPluginManager().isLoaded("sponge-discord-lib")) {
             logger.error("Sponge-Discord-Lib is not installed! " + container.getName() + " will not load.");
             return;

@@ -76,6 +76,12 @@ public class CommandManager {
                 .setRequiredRoles(Roles.STAFF)
                 .build();
 
+        DiscordCommand unverify = DiscordCommand.builder()
+                .setDescription("Unverifies your account.")
+                .setCommandExecutor(new Unlink())
+                .setRequiredRoles(Roles.VERIFIED)
+                .build();
+
         register(help, "help");
         register(list, "list");
         register(stop, "stop");
@@ -85,6 +91,7 @@ public class CommandManager {
         register(username, "username");
         register(discord, "discord");
         register(ranks, "ranks");
+        register(unverify, "unverify", "unlink");
     }
 
     public void register(DiscordCommand command, String... alias){

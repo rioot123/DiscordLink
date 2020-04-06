@@ -80,6 +80,18 @@ public class Storage {
         }
     }
 
+    public void deleteRecord(String discordId) {
+        try (Connection connection = getConnection();
+             PreparedStatement ps = connection.prepareStatement("DELETE FROM verification WHERE discordid = ?")) {
+            ps.setString(1, discordId);
+
+            ps.executeUpdate();
+
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+        }
+    }
+
     @Nullable
     public String getDiscordUser(UUID uuid) {
         try (Connection connection = getConnection();

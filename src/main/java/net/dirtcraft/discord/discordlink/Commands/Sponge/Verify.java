@@ -9,6 +9,7 @@ import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.core.exceptions.HierarchyException;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -21,6 +22,7 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 
 import javax.annotation.Nullable;
+import javax.rmi.CORBA.Util;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -96,12 +98,15 @@ public class Verify implements CommandExecutor {
                         if (!member.getRoles().contains(verifiedRole)) {
                             guild.getController().addSingleRoleToMember(member, verifiedRole).queue();
                         }
-
-                        if (!member.getRoles().contains(staffRole)) {
-                            guild.getController().setNickname(member, player.getName()).queue();
-                        }
                         if (player.hasPermission("discordlink.donator") && !member.getRoles().contains(donorRole)) {
                             guild.getController().addSingleRoleToMember(member, donorRole).queue();
+                        }
+                        if (!member.getRoles().contains(staffRole)) {
+                            try {
+                                guild.getController().setNickname(member, player.getName()).queue();
+                            } catch (HierarchyException e){
+                                player.sendMessage(Utility.format("&cCould not modify discord name as your role exceeds the bots power level."));
+                            }
                         }
                     })
                     .submit(DiscordLink.getInstance());
