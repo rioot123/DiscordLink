@@ -12,7 +12,7 @@ repositories {
     maven { url = "https://raw.github.com/FabioZumbi12/UltimateChat/mvn-repo/" }
     maven {
         url 'https://jitpack.io'
-        credentials { username authToken }
+        //credentials { username authToken }
     }
 }
 
