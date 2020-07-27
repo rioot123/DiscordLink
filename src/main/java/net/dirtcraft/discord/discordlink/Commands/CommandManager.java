@@ -76,10 +76,15 @@ public class CommandManager {
                 .setRequiredRoles(Roles.STAFF)
                 .build();
 
+        DiscordCommand sync = DiscordCommand.builder()
+                .setDescription("Runs LP Sync to re-sync the perms")
+                .setCommandExecutor(new IngameCommand("lp sync"))
+                .setRequiredRoles(Roles.ADMIN)
+                .build();
+
         DiscordCommand unverify = DiscordCommand.builder()
                 .setDescription("Unverifies your account.")
                 .setCommandExecutor(new Unlink())
-                .setRequiredRoles(Roles.VERIFIED)
                 .build();
 
         register(help, "help");
@@ -91,6 +96,7 @@ public class CommandManager {
         register(username, "username");
         register(discord, "discord");
         register(ranks, "ranks");
+        register(sync, "sync");
         register(unverify, "unverify", "unlink");
     }
 
