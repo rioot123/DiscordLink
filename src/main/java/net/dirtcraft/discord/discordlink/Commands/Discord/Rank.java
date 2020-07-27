@@ -3,6 +3,7 @@ package net.dirtcraft.discord.discordlink.Commands.Discord;
 import me.lucko.luckperms.LuckPerms;
 import me.lucko.luckperms.api.LuckPermsApi;
 import me.lucko.luckperms.api.Node;
+import me.lucko.luckperms.api.context.ContextSet;
 import me.lucko.luckperms.api.manager.UserManager;
 import net.dirtcraft.discord.discordlink.API.GameChat;
 import net.dirtcraft.discord.discordlink.API.GuildMember;
@@ -17,9 +18,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Rank implements DiscordCommandExecutor {
+    private ContextSet contexts = LuckPerms.getApi()
+            .getContextManager()
+            .getStaticContexts()
+            .getContexts();
+            //.getAnyValue("server");
+
     @Override
     public void execute(GuildMember source, String[] args, MessageReceivedEvent event) throws DiscordCommandException {
         Optional<User> optUser = args.length == 1? source.getSpongeUser() : Utility.getSpongeUser(args[1]);
@@ -28,8 +34,9 @@ public class Rank implements DiscordCommandExecutor {
         CompletableFuture<me.lucko.luckperms.api.User> userFuture = userManager.loadUser(optUser.get().getUniqueId());
         userFuture.whenComplete((user, throwable)->{
             List<String> perms = user.getAllNodes().stream()
-                    .map(Node::getPermission)
-                    .filter(n-> n.startsWith("group."))
+                    .filter(Node::isGroupNode)
+                    .filter(n->n.getFullContexts().isSatisfiedBy(contexts))
+                    .map(n->n.getPermission() + (n.appliesGlobally()? " [G]" : ""))
                     .map(n->n.substring(6))
                     .collect(Collectors.toList());
             GameChat.sendEmbed(optUser.get().getName() + "'s Groups:", String.join("\n", perms));
