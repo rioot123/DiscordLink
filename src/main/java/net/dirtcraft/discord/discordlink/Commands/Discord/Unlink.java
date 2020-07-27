@@ -27,7 +27,6 @@ public class Unlink implements DiscordCommandExecutor {
         Storage storage = DiscordLink.getInstance().getStorage();
         MessageSource author = new MessageSource(event);
         if (args.length == 1){
-            System.out.println(args[0]);
             DiscordLink.getInstance().getStorage().deleteRecord(source.getUser().getId());
             Role verifiedRole = guild.getRoleById(PluginConfiguration.Roles.verifiedRoleID);
             Role donorRole = guild.getRoleById(PluginConfiguration.Roles.donatorRoleID);
