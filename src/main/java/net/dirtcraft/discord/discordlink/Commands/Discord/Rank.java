@@ -2,6 +2,7 @@ package net.dirtcraft.discord.discordlink.Commands.Discord;
 
 import me.lucko.luckperms.LuckPerms;
 import me.lucko.luckperms.api.LuckPermsApi;
+import me.lucko.luckperms.api.Node;
 import me.lucko.luckperms.api.manager.UserManager;
 import net.dirtcraft.discord.discordlink.API.GameChat;
 import net.dirtcraft.discord.discordlink.API.GuildMember;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Rank implements DiscordCommandExecutor {
     @Override
@@ -26,8 +28,9 @@ public class Rank implements DiscordCommandExecutor {
         CompletableFuture<me.lucko.luckperms.api.User> userFuture = userManager.loadUser(optUser.get().getUniqueId());
         userFuture.whenComplete((user, throwable)->{
             List<String> perms = user.getAllNodes().stream()
-                    .filter(n->n.toString().startsWith("group."))
-                    .map(n->n.toString().substring(6))
+                    .map(Node::getPermission)
+                    .filter(n-> n.startsWith("group."))
+                    .map(n->n.substring(6))
                     .collect(Collectors.toList());
             GameChat.sendEmbed(optUser.get().getName() + "'s Groups:", String.join("\n", perms));
         });
