@@ -15,6 +15,7 @@ import net.luckperms.api.context.ImmutableContextSet;
 import net.luckperms.api.model.group.Group;
 import net.luckperms.api.model.user.UserManager;
 import net.luckperms.api.query.Flag;
+import net.luckperms.api.query.OptionKey;
 import net.luckperms.api.query.QueryMode;
 import net.luckperms.api.query.QueryOptions;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -76,6 +77,10 @@ public abstract class Rank implements DiscordCommandExecutor {
         private QueryOptions queryOptions = QueryOptions.builder(QueryMode.CONTEXTUAL)
                 .context(contexts)
                 .flag(Flag.RESOLVE_INHERITANCE, false)
+                .flag(Flag.INCLUDE_NODES_WITHOUT_SERVER_CONTEXT, true)
+                .flag(Flag.INCLUDE_NODES_WITHOUT_WORLD_CONTEXT, true)
+                .flag(Flag.APPLY_INHERITANCE_NODES_WITHOUT_SERVER_CONTEXT, true)
+                .flag(Flag.APPLY_INHERITANCE_NODES_WITHOUT_WORLD_CONTEXT, true)
                 .build();
 
         @Override
