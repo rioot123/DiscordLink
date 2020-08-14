@@ -72,15 +72,10 @@ public abstract class Rank implements DiscordCommandExecutor {
     }
 
     public static class Api5 extends Rank {
-        private LuckPerms api = LuckPermsProvider.get();
-        private ImmutableContextSet contexts = api.getContextManager().getStaticContext();
-        private QueryOptions queryOptions = QueryOptions.builder(QueryMode.CONTEXTUAL)
-                .context(contexts)
+        private final LuckPerms api = LuckPermsProvider.get();
+        private final ImmutableContextSet contexts = api.getContextManager().getStaticContext();
+        private final QueryOptions queryOptions = QueryOptions.contextual(contexts).toBuilder()
                 .flag(Flag.RESOLVE_INHERITANCE, false)
-                .flag(Flag.INCLUDE_NODES_WITHOUT_SERVER_CONTEXT, true)
-                .flag(Flag.INCLUDE_NODES_WITHOUT_WORLD_CONTEXT, true)
-                .flag(Flag.APPLY_INHERITANCE_NODES_WITHOUT_SERVER_CONTEXT, true)
-                .flag(Flag.APPLY_INHERITANCE_NODES_WITHOUT_WORLD_CONTEXT, true)
                 .build();
 
         @Override
