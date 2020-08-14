@@ -74,9 +74,7 @@ public abstract class Rank implements DiscordCommandExecutor {
     public static class Api5 extends Rank {
         private final LuckPerms api = LuckPermsProvider.get();
         private final ImmutableContextSet contexts = api.getContextManager().getStaticContext();
-        private final QueryOptions queryOptions = QueryOptions.contextual(contexts).toBuilder()
-                .flag(Flag.RESOLVE_INHERITANCE, false)
-                .build();
+        private final QueryOptions queryOptions = QueryOptions.contextual(contexts);
 
         @Override
         public void execute(GuildMember source, String[] args, MessageReceivedEvent event) throws DiscordCommandException {
