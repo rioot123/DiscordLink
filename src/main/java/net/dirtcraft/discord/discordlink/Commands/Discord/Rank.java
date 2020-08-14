@@ -14,6 +14,8 @@ import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.context.ImmutableContextSet;
 import net.luckperms.api.model.group.Group;
 import net.luckperms.api.model.user.UserManager;
+import net.luckperms.api.query.Flag;
+import net.luckperms.api.query.QueryMode;
 import net.luckperms.api.query.QueryOptions;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.entity.living.player.User;
@@ -71,16 +73,25 @@ public abstract class Rank implements DiscordCommandExecutor {
     public static class Api5 extends Rank {
         private LuckPerms api = LuckPermsProvider.get();
         private ImmutableContextSet contexts = api.getContextManager().getStaticContext();
+        private QueryOptions queryOptions = QueryOptions.builder(QueryMode.CONTEXTUAL)
+                .context(contexts)
+                .flag(Flag.RESOLVE_INHERITANCE, false)
+                .build();
 
         @Override
         public void execute(GuildMember source, String[] args, MessageReceivedEvent event) throws DiscordCommandException {
             Optional<User> optUser = args.length == 1 ? source.getSpongeUser() : Utility.getSpongeUser(args[1]);
-            if (!optUser.isPresent()) return;
+            if (!optUser.isPresent()) {
+                String response = args.length == 1? "You are not correctly verified, or have not played on this server." : "Invalid user. Either the user does not exist or they have never played on this server.";
+                GameChat.sendMessage(response, 30);
+                event.getMessage().delete().queue();
+                return;
+            }
 
             UserManager userManager = api.getUserManager();
             CompletableFuture<net.luckperms.api.model.user.User> userFuture = userManager.loadUser(optUser.get().getUniqueId());
             userFuture.whenComplete((user, throwable) -> {
-                String perms = user.getInheritedGroups(QueryOptions.contextual(contexts)).stream()
+                String perms = user.getInheritedGroups(queryOptions).stream()
                         .map(Group::getName)
                         .collect(Collectors.joining("\n"));
                 GameChat.sendEmbed(optUser.get().getName() + "'s Groups:", perms);
