@@ -1,5 +1,6 @@
 package net.dirtcraft.discord.discordlink.Commands.Sources;
 
+import net.dirtcraft.dirtlocker.API.ConsoleLock.SecuredSource;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.context.Context;
@@ -14,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-public abstract class WrappedConsole implements CommandSource {
+public abstract class WrappedConsole implements CommandSource, SecuredSource {
 
     private CommandSource actualSource;
 
@@ -130,6 +131,11 @@ public abstract class WrappedConsole implements CommandSource {
     @Override
     public Set<Context> getActiveContexts() {
         return this.actualSource.getActiveContexts();
+    }
+
+    @Override
+    public String getSecureSourceIdentifier(){
+        return "DiscordLink";
     }
 
 }
