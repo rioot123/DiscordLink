@@ -12,11 +12,8 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.context.ImmutableContextSet;
-import net.luckperms.api.model.group.Group;
 import net.luckperms.api.model.user.UserManager;
-import net.luckperms.api.query.Flag;
-import net.luckperms.api.query.OptionKey;
-import net.luckperms.api.query.QueryMode;
+import net.luckperms.api.node.NodeType;
 import net.luckperms.api.query.QueryOptions;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.entity.living.player.User;
@@ -74,7 +71,6 @@ public abstract class Rank implements DiscordCommandExecutor {
     public static class Api5 extends Rank {
         private final LuckPerms api = LuckPermsProvider.get();
         private final ImmutableContextSet contexts = api.getContextManager().getStaticContext();
-        private final QueryOptions queryOptions = QueryOptions.contextual(contexts);
 
         @Override
         public void execute(GuildMember source, String[] args, MessageReceivedEvent event) throws DiscordCommandException {
@@ -85,15 +81,25 @@ public abstract class Rank implements DiscordCommandExecutor {
                 event.getMessage().delete().queue();
                 return;
             }
-
             UserManager userManager = api.getUserManager();
             CompletableFuture<net.luckperms.api.model.user.User> userFuture = userManager.loadUser(optUser.get().getUniqueId());
             userFuture.whenComplete((user, throwable) -> {
-                String perms = user.getInheritedGroups(queryOptions).stream()
-                        .map(Group::getName)
-                        .collect(Collectors.joining("\n"));
+                String local = getGroups(user, contexts, false);
+                String remote = getGroups(user, contexts, true);
+                String perms = "__**Local**__\n" + local + "\n\n__**Other Servers**__\n" + remote;
                 GameChat.sendEmbed(optUser.get().getName() + "'s Groups:", perms);
             });
+        }
+
+        private String getGroups(net.luckperms.api.model.user.User user, ImmutableContextSet contexts, boolean negate){
+            return user.getDistinctNodes().parallelStream()
+                    .filter(node->node.getType() == NodeType.INHERITANCE && !node.isNegated())
+                    .filter(node -> node.getContexts().isSatisfiedBy(contexts) ^ negate)
+                    .map(n -> "**" + n.getKey().substring(6) + "**" + n.getContexts()
+                            .getAnyValue("server")
+                            .map(s->negate?" *["+s+"]*":"")
+                            .orElse(" *[global]*"))
+                    .collect(Collectors.joining("\n"));
         }
     }
 }
