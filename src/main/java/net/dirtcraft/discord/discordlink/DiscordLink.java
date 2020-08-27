@@ -1,14 +1,17 @@
 package net.dirtcraft.discord.discordlink;
 
 import com.google.inject.Inject;
-import net.dirtcraft.discord.discordlink.Commands.CommandManager;
+import net.dirtcraft.discord.discordlink.API.GameChat;
+import net.dirtcraft.discord.discordlink.Commands.DiscordCommandManager;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommand;
+import net.dirtcraft.discord.discordlink.Commands.SpongeCommandManager;
 import net.dirtcraft.discord.discordlink.Configuration.ConfigManager;
 import net.dirtcraft.discord.discordlink.Database.Storage;
 import net.dirtcraft.discord.discordlink.Events.DiscordEvents;
 import net.dirtcraft.discord.discordlink.Events.NormalChat;
 import net.dirtcraft.discord.discordlink.Events.SpongeEvents;
 import net.dirtcraft.discord.discordlink.Events.UltimateChat;
+import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;
@@ -19,8 +22,8 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
+import org.spongepowered.api.event.game.state.GameConstructionEvent;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
-import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.plugin.Dependency;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
@@ -43,24 +46,21 @@ import java.util.HashMap;
 )
 public class DiscordLink {
 
-    private static CommandManager commandManager;
+    private static DiscordCommandManager discordCommandManager;
+    private static SpongeCommandManager spongeCommandManager;
 
-    @Inject
+
     @DefaultConfig(sharedRoot = false)
-    private ConfigurationLoader<CommentedConfigurationNode> loader;
-
-    @Inject
-    private Logger logger;
-
-    @Inject
-    private PluginContainer container;
+    @Inject private ConfigurationLoader<CommentedConfigurationNode> loader;
+    @Inject private Logger logger;
+    @Inject private PluginContainer container;
 
     private static DiscordLink instance;
     private Storage storage;
 
-    @Listener (order = Order.LAST)
-    public void onPreInit(GamePreInitializationEvent event) {
-
+    @Listener (order = Order.AFTER_PRE)
+    public void onPreInit(GameConstructionEvent event) {
+        instance = this;
         if (!Sponge.getPluginManager().isLoaded("sponge-discord-lib")) {
             logger.error("Sponge-Discord-Lib is not installed! " + container.getName() + " will not load.");
             return;
@@ -70,27 +70,28 @@ public class DiscordLink {
             return;
         }
 
-        instance = this;
-
-        ConfigManager configManager = new ConfigManager(loader);
+        final ConfigManager configManager = new ConfigManager(loader);
         this.storage = new Storage();
+
+        final HashMap<String, DiscordCommand> commandMap = new HashMap<>();
+        discordCommandManager = new DiscordCommandManager(storage, commandMap);
+        getJDA().addEventListener(new DiscordEvents(commandMap));
+        GameChat.sendMessage("Discord Link initializing...", 30);
+        logger.info("Discord Link initializing...");
+    }
+
+    @Listener(order = Order.PRE)
+    public void onGameInit(GameInitializationEvent event) {
+        Sponge.getEventManager().registerListeners(instance, new SpongeEvents(instance, storage));
+        spongeCommandManager = new SpongeCommandManager(this, storage);
         Utility.setStatus();
         Utility.setTopic();
 
-        final HashMap<String, DiscordCommand> commandMap = new HashMap<>();
-        commandManager = new CommandManager(this, storage, commandMap);
-        getJDA().addEventListener(new DiscordEvents(commandMap));
-        Sponge.getEventManager().registerListeners(instance, new SpongeEvents(instance, storage));
         if (SpongeDiscordLib.getServerName().toLowerCase().contains("pixel")) {
             Sponge.getEventManager().registerListeners(instance, new NormalChat());
         } else {
             Sponge.getEventManager().registerListeners(instance, new UltimateChat());
         }
-    }
-
-    @Listener
-    public void onGameInit(GameInitializationEvent event) {
-
     }
 
     public static JDA getJDA() {
@@ -105,8 +106,8 @@ public class DiscordLink {
         return instance;
     }
 
-    public static CommandManager getCommandManager(){
-        return commandManager;
+    public static DiscordCommandManager getDiscordCommandManager(){
+        return discordCommandManager;
     }
 
     public Storage getStorage(){
