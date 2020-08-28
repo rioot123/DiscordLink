@@ -7,10 +7,7 @@ import net.dirtcraft.discord.discordlink.Commands.DiscordCommand;
 import net.dirtcraft.discord.discordlink.Commands.SpongeCommandManager;
 import net.dirtcraft.discord.discordlink.Configuration.ConfigManager;
 import net.dirtcraft.discord.discordlink.Database.Storage;
-import net.dirtcraft.discord.discordlink.Events.DiscordEvents;
-import net.dirtcraft.discord.discordlink.Events.NormalChat;
-import net.dirtcraft.discord.discordlink.Events.SpongeEvents;
-import net.dirtcraft.discord.discordlink.Events.UltimateChat;
+import net.dirtcraft.discord.discordlink.Events.*;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.core.JDA;
@@ -76,8 +73,12 @@ public class DiscordLink {
         final HashMap<String, DiscordCommand> commandMap = new HashMap<>();
         discordCommandManager = new DiscordCommandManager(storage, commandMap);
         getJDA().addEventListener(new DiscordEvents(commandMap));
-        GameChat.sendMessage("Discord Link initializing...", 30);
         logger.info("Discord Link initializing...");
+    }
+
+    @Listener(order = Order.FIRST)
+    public void onConstruction(GameConstructionEvent event){
+        Sponge.getEventManager().registerListeners(instance, new ServerBootHandler());
     }
 
     @Listener(order = Order.PRE)
