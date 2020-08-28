@@ -24,7 +24,7 @@ public abstract class RankProvider {
 
     public final static RankProvider INSTANCE = getRank();
 
-    public abstract void execute(GuildMember source, String[] args, MessageReceivedEvent event) throws DiscordCommandException;
+    public abstract void execute(User player);
 
     private static RankProvider getRank(){
         try {
@@ -40,7 +40,7 @@ public abstract class RankProvider {
 
     public static class Null extends RankProvider {
         @Override
-        public void execute(GuildMember source, String[] args, MessageReceivedEvent event) throws DiscordCommandException {
+        public void execute(User user) {
             GameChat.sendMessage("This version of luckperms is not supported!");
         }
     }
@@ -51,10 +51,9 @@ public abstract class RankProvider {
         private ContextSet contexts = api.getContextManager().getStaticContexts().getContexts();
 
         @Override
-        public void execute(GuildMember source, String[] args, MessageReceivedEvent event) throws DiscordCommandException {
-            Optional<User> optUser = args.length == 1? source.getSpongeUser() : Utility.getSpongeUser(args[1]);
+        public void execute(User player) {
             me.lucko.luckperms.api.manager.UserManager userManager = api.getUserManager();
-            CompletableFuture<me.lucko.luckperms.api.User> userFuture = userManager.loadUser(optUser.get().getUniqueId());
+            CompletableFuture<me.lucko.luckperms.api.User> userFuture = userManager.loadUser(player.getUniqueId());
             userFuture.whenComplete((user, throwable)->{
                 List<String> perms = user.getAllNodes().stream()
                         .filter(Node::isGroupNode)
@@ -62,7 +61,7 @@ public abstract class RankProvider {
                         .map(n->n.getPermission() + (n.appliesGlobally()? " [G]" : ""))
                         .map(n->n.substring(6))
                         .collect(Collectors.toList());
-                GameChat.sendEmbed(optUser.get().getName() + "'s Groups:", String.join("\n", perms));
+                GameChat.sendEmbed(player.getName() + "'s Groups:", String.join("\n", perms));
             });
         }
     }
@@ -72,21 +71,14 @@ public abstract class RankProvider {
         private final ImmutableContextSet contexts = api.getContextManager().getStaticContext();
 
         @Override
-        public void execute(GuildMember source, String[] args, MessageReceivedEvent event) throws DiscordCommandException {
-            Optional<User> optUser = args.length == 1 ? source.getSpongeUser() : Utility.getSpongeUser(args[1]);
-            if (!optUser.isPresent()) {
-                String response = args.length == 1? "You are not correctly verified, or have not played on this server." : "Invalid user. Either the user does not exist or they have never played on this server.";
-                GameChat.sendMessage(response, 30);
-                event.getMessage().delete().queue();
-                return;
-            }
+        public void execute(User player) {
             UserManager userManager = api.getUserManager();
-            CompletableFuture<net.luckperms.api.model.user.User> userFuture = userManager.loadUser(optUser.get().getUniqueId());
+            CompletableFuture<net.luckperms.api.model.user.User> userFuture = userManager.loadUser(player.getUniqueId());
             userFuture.whenComplete((user, throwable) -> {
                 String local = getGroups(user, contexts, false);
                 String remote = getGroups(user, contexts, true);
                 String perms = "__**Local**__\n" + local + "\n\n__**Other Servers**__\n" + remote;
-                GameChat.sendEmbed(optUser.get().getName() + "'s Groups:", perms);
+                GameChat.sendEmbed(player.getName() + "'s Groups:", perms);
             });
         }
 

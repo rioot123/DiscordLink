@@ -2,20 +2,40 @@ package net.dirtcraft.discord.discordlink.Events;
 
 import net.dirtcraft.discord.discordlink.API.GameChat;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
-import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.MessageEmbed;
+import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
+import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.requests.RequestFuture;
+import net.dv8tion.jda.core.requests.RestAction;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.game.state.*;
 
 import java.awt.*;
+import java.util.Arrays;
+import java.util.Objects;
 
 public class ServerBootHandler {
-    RequestFuture<Message> future;
+    private final Thread bootWatchdog;
+    private final String modpack = SpongeDiscordLib.getServerName();
+    private final long[] dmList = new long[]{248056002274918400L};
+    private final int time = 1000*60*30;
+
+    private RequestFuture<Message> future;
 
     public ServerBootHandler(){
         sendGameStageEmbed("Constructing Game Instance", 1);
+        bootWatchdog = new Thread(()->{
+            try{
+                Thread.sleep(time);
+                Arrays.stream(dmList)
+                        .mapToObj(GameChat.getGuild()::getMemberById)
+                        .filter(Objects::nonNull)
+                        .map(Member::getUser)
+                        .map(User::openPrivateChannel)
+                        .forEach(this::sendMessage);
+            } catch (InterruptedException ignored){ }
+        });
+        bootWatchdog.start();
     }
 
     @Listener(order = Order.FIRST)
@@ -51,6 +71,7 @@ public class ServerBootHandler {
     @Listener(order = Order.POST)
     public void onGameStartedServer(GameStartedServerEvent event){
         if (future == null) return;
+        bootWatchdog.interrupt();
         future.whenComplete((message, throwable) -> message.delete().queue());
         future = null;
     }
@@ -62,5 +83,13 @@ public class ServerBootHandler {
                 .build();
         if (future != null) future.whenComplete((message, throwable) -> message.delete().queue());
         future = GameChat.getChannel().sendMessage(embed).submit();
+    }
+
+    private void sendMessage(RestAction<PrivateChannel> channelRestAction){
+        try {
+            channelRestAction.queue(m -> m.sendMessage("Server \"" + modpack + "\" has been attempting to boot for " + time + "ms.").queue());
+        } catch (Exception ignored){
+            //no one cares bro
+        }
     }
 }

@@ -71,7 +71,7 @@ public class DiscordCommandManager {
         DiscordCommand ranks = DiscordCommand.builder()
                 .setDescription("Reveals a players ranks.")
                 .setCommandExecutor(new Ranks())
-                .setRequiredRoles(Roles.STAFF)
+                .setRequiredRoles(Roles.VERIFIED)
                 .build();
 
         DiscordCommand sync = DiscordCommand.builder()
