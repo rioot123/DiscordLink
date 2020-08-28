@@ -2,7 +2,7 @@ package net.dirtcraft.discord.discordlink.Commands.Sources;
 
 import net.dirtcraft.discord.discordlink.API.GameChat;
 import net.dirtcraft.discord.discordlink.API.GuildMember;
-import net.dirtcraft.discord.discordlink.Utility;
+import net.dirtcraft.discord.discordlink.Utility.Utility;
 import org.spongepowered.api.text.Text;
 
 public class GamechatSender extends WrappedConsole {

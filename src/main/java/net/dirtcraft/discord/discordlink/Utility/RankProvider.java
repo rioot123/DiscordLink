@@ -1,20 +1,17 @@
-package net.dirtcraft.discord.discordlink.Commands.Discord;
+package net.dirtcraft.discord.discordlink.Utility;
 
 import me.lucko.luckperms.api.LuckPermsApi;
 import me.lucko.luckperms.api.Node;
 import me.lucko.luckperms.api.context.ContextSet;
 import net.dirtcraft.discord.discordlink.API.GameChat;
 import net.dirtcraft.discord.discordlink.API.GuildMember;
-import net.dirtcraft.discord.discordlink.Commands.DiscordCommandExecutor;
 import net.dirtcraft.discord.discordlink.Exceptions.DiscordCommandException;
-import net.dirtcraft.discord.discordlink.Utility;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.context.ImmutableContextSet;
 import net.luckperms.api.model.user.UserManager;
 import net.luckperms.api.node.NodeType;
-import net.luckperms.api.query.QueryOptions;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.entity.living.player.User;
 
@@ -23,11 +20,13 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-public abstract class Rank implements DiscordCommandExecutor {
+public abstract class RankProvider {
 
-    public final static Rank INSTANCE = getRank();
+    public final static RankProvider INSTANCE = getRank();
 
-    private static Rank getRank(){
+    public abstract void execute(GuildMember source, String[] args, MessageReceivedEvent event) throws DiscordCommandException;
+
+    private static RankProvider getRank(){
         try {
             Class.forName("net.luckperms.api.LuckPerms");
             return new Api5();
@@ -39,14 +38,14 @@ public abstract class Rank implements DiscordCommandExecutor {
         return new Null();
     }
 
-    public static class Null extends Rank {
+    public static class Null extends RankProvider {
         @Override
         public void execute(GuildMember source, String[] args, MessageReceivedEvent event) throws DiscordCommandException {
             GameChat.sendMessage("This version of luckperms is not supported!");
         }
     }
 
-    public static class Api4 extends Rank {
+    public static class Api4 extends RankProvider {
         @NonNull
         private LuckPermsApi api = me.lucko.luckperms.LuckPerms.getApi();
         private ContextSet contexts = api.getContextManager().getStaticContexts().getContexts();
@@ -68,7 +67,7 @@ public abstract class Rank implements DiscordCommandExecutor {
         }
     }
 
-    public static class Api5 extends Rank {
+    public static class Api5 extends RankProvider {
         private final LuckPerms api = LuckPermsProvider.get();
         private final ImmutableContextSet contexts = api.getContextManager().getStaticContext();
 

@@ -1,4 +1,4 @@
-package net.dirtcraft.discord.discordlink;
+package net.dirtcraft.discord.discordlink.Utility;
 
 import com.google.common.collect.Lists;
 import net.dirtcraft.discord.discordlink.API.GameChat;
@@ -8,6 +8,7 @@ import net.dirtcraft.discord.discordlink.Commands.Sources.GamechatSender;
 import net.dirtcraft.discord.discordlink.Commands.Sources.PrivateSender;
 import net.dirtcraft.discord.discordlink.Commands.Sources.WrappedConsole;
 import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
+import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.spongediscordlib.DiscordUtil;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.core.EmbedBuilder;

@@ -12,7 +12,7 @@ public class Help implements DiscordCommandExecutor {
     @Override
     public void execute(GuildMember source, String[] args, MessageReceivedEvent event) throws DiscordCommandException {
         StringBuilder result = new StringBuilder("The following commands are available:\n");
-        DiscordLink.getCommandManager().getCommandMap().forEach((alias, cmd)->{
+        DiscordLink.getDiscordCommandManager().getCommandMap().forEach((alias, cmd)->{
             if (!cmd.hasPermission(source)) return;
             result.append(" **-** ")
                     .append(PluginConfiguration.Main.botPrefix)

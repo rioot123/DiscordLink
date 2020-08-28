@@ -14,16 +14,14 @@ import org.spongepowered.api.text.Text;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CommandManager {
+public class DiscordCommandManager {
 
     private final Storage storage;
     private final HashMap<String, DiscordCommand> commandMap;
 
-    public CommandManager(DiscordLink main, Storage storage, HashMap<String, DiscordCommand> commandMap) {
+    public DiscordCommandManager(Storage storage, HashMap<String, DiscordCommand> commandMap) {
         this.storage = storage;
         this.commandMap = commandMap;
-        Sponge.getCommandManager().register(main, this.verify(), "verify", "link");
-        Sponge.getCommandManager().register(main, this.unverify(), "unverify", "unlink");
 
         DiscordCommand help = DiscordCommand.builder()
                 .setCommandExecutor(new Help())
@@ -72,7 +70,7 @@ public class CommandManager {
 
         DiscordCommand ranks = DiscordCommand.builder()
                 .setDescription("Reveals a players ranks.")
-                .setCommandExecutor(Rank.INSTANCE)
+                .setCommandExecutor(new Ranks())
                 .setRequiredRoles(Roles.STAFF)
                 .build();
 
@@ -113,21 +111,6 @@ public class CommandManager {
             result.put(alias, cmd);
         });
         return result;
-    }
-
-    public CommandSpec verify() {
-        return CommandSpec.builder()
-                .description(Text.of("Verifies your Discord account"))
-                .executor(new Verify(storage))
-                .arguments(GenericArguments.optional(GenericArguments.string(Text.of("code"))))
-                .build();
-    }
-
-    public CommandSpec unverify() {
-        return CommandSpec.builder()
-                .description(Text.of("Unverifies your Discord account"))
-                .executor(new UnVerify(storage))
-                .build();
     }
 
 }

@@ -21,7 +21,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 
-import static net.dirtcraft.discord.discordlink.Utility.*;
+import static net.dirtcraft.discord.discordlink.Utility.Utility.*;
 
 
 public class DiscordEvents extends ListenerAdapter {
