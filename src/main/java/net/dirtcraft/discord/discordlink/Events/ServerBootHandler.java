@@ -17,8 +17,8 @@ import java.util.Objects;
 public class ServerBootHandler {
     private final Thread bootWatchdog;
     private final String modpack = SpongeDiscordLib.getServerName();
-    private final long[] dmList = new long[]{248056002274918400L};
-    private final int time = 1000*60*30;
+    private final long[] dmList = new long[]{248056002274918400L, 261928443179040768L};
+    private final int time = 1000 * 60 * 30;
 
     private RequestFuture<Message> future;
 
