@@ -76,7 +76,7 @@ public class Utility {
     public static void toConsole(MessageReceivedEvent event, GuildMember sender, ActionType type) {
         final List<String> blacklist = PluginConfiguration.Command.blacklist;
         final String command = type.getCommand(event);
-        if (PluginConfiguration.Command.ignored.contains(command)) return;
+        if (PluginConfiguration.Command.ignored.stream().anyMatch(command::startsWith)) return;
         if (sender.hasRole(Roles.DIRTY) || sender.hasRole(Roles.ADMIN) && blacklist.stream().noneMatch(command::startsWith)) {
             final WrappedConsole commandSender = type.silent ? new PrivateSender(sender, command) : new GamechatSender(sender, command);
             Task.builder()

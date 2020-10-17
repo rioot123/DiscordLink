@@ -1,6 +1,7 @@
 package net.dirtcraft.discord.discordlink.Commands.Discord;
 
 import io.github.nucleuspowered.nucleus.api.NucleusAPI;
+import io.github.nucleuspowered.nucleus.api.service.NucleusUserPreferenceService;
 import net.dirtcraft.discord.discordlink.API.GuildMember;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommandExecutor;
 import net.dirtcraft.discord.discordlink.DiscordLink;
@@ -9,6 +10,7 @@ import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 
 import java.util.ArrayList;
@@ -32,6 +34,8 @@ public class PlayerList implements DiscordCommandExecutor {
             }
         });
 
+        players.removeIf(online->online.get(Keys.VANISH).orElse(false));
+
         playerNames.sort(String::compareToIgnoreCase);
 
         EmbedBuilder embed = Utility.embedBuilder();
@@ -50,4 +54,6 @@ public class PlayerList implements DiscordCommandExecutor {
                 .sendMessage(embed.build())
                 .queue();
     }
+
+
 }

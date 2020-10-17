@@ -5,7 +5,7 @@ import net.dirtcraft.discord.discordlink.API.GuildMember;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import org.spongepowered.api.text.Text;
 
-public class GamechatSender extends WrappedConsole {
+public class GamechatSender extends WrappedConsole implements ScheduledSender {
     private GuildMember member;
     private String command;
 
@@ -15,33 +15,27 @@ public class GamechatSender extends WrappedConsole {
     }
 
     @Override
-    public void sendMessage(Text message) {
-        String plain = message.toPlain();
-        if ("".equals(plain) || plain.trim().isEmpty()) return;
+    public void dispatch(String message) {
         GameChat.sendMessage(
-                Utility.embedBuilder().addField("__Command__ \"**/" + command.toLowerCase() + "**\" __Sent__", plain, false)
+                Utility.embedBuilder().addField("__Command__ \"**/" + command.toLowerCase() + "**\" __Sent__", message, false)
                         .setFooter("Sent By: " + member.getUser().getAsTag(), member.getUser().getAvatarUrl())
                         .build());
     }
 
+
+    @Override
+    public void sendMessage(Text message) {
+        Scheduler.submit(this, message.toPlain());
+    }
+
     @Override
     public void sendMessages(Iterable<Text> messages) {
-        Text output = null;
-        for (Text message : messages) {
-            if(output == null) output = message;
-            else output = output.concat(Text.of("\n")).concat(message);
-        }
-        if (output != null) this.sendMessage(output);
+        for (Text message : messages) Scheduler.submit(this, message.toPlain());
     }
 
     @Override
     public void sendMessages(Text... messages) {
-        Text output = null;
-        for (Text message : messages) {
-            if(output == null) output = message;
-            else output = output.concat(Text.of("\n")).concat(message);
-        }
-        if (output != null) this.sendMessage(output);
+        for (Text message : messages) Scheduler.submit(this, message.toPlain());
     }
 
 }

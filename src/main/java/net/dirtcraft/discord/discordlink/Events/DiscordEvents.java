@@ -59,7 +59,7 @@ public class DiscordEvents extends ListenerAdapter {
                 DiscordCommand command = commandMap.get(args[0]);
                 if (command != null) command.process(sender, args, event);
             }
-        } else {
+        } else if (!action.proxy) {
             toConsole(event, sender, action);
         }
     }

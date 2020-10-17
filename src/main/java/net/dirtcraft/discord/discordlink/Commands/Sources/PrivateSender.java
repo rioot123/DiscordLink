@@ -26,8 +26,7 @@ public class PrivateSender extends WrappedConsole {
             if (output.length() + messagePlain.length() > 1800) {
                 member.sendMessage(">>> " + output.toString());
                 output = new StringBuilder();
-            }
-            else {
+            } else {
                 output.append(messagePlain);
                 output.append("\n");
             }
@@ -51,5 +50,4 @@ public class PrivateSender extends WrappedConsole {
         }
         if (output.length() > 0) member.sendMessage(">>> " + output.toString());
     }
-
 }

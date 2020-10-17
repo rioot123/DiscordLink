@@ -7,6 +7,7 @@ import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.core.entities.MessageEmbed;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.filter.cause.Root;
@@ -50,6 +51,7 @@ public class SpongeEvents {
 
     @Listener
     public void onPlayerJoin(ClientConnectionEvent.Join event, @Root Player player) {
+        if (player.get(Keys.VANISH).orElse(false)) return;
         if (player.hasPlayedBefore()) {
             String prefix = TextSerializers.FORMATTING_CODE.stripCodes(player.getOption("prefix").orElse(""));
 
@@ -70,6 +72,7 @@ public class SpongeEvents {
 
     @Listener
     public void onPlayerDisconnect(ClientConnectionEvent.Disconnect event, @Root Player player) {
+        if (player.get(Keys.VANISH).orElse(false)) return;
         String prefix = TextSerializers.FORMATTING_CODE.stripCodes(player.getOption("prefix").orElse(""));
 
         GameChat.sendMessage(PluginConfiguration.Format.playerDisconnect
