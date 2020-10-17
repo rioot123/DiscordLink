@@ -105,6 +105,31 @@ public class PluginConfiguration {
 
     @ConfigSerializable
     public static class Command {
+        @Setting(value = "Proxy-Commands", comment = "A list of commands that will be processed by the proxy-link module (This list should match the list in said module)")
+        public static List<String> ignored = Arrays.asList(
+                "find",
+                "ban",
+                "tempban",
+                "ipban",
+                "unban",
+                "mute",
+                "tempmute",
+                "ipmute",
+                "unmute",
+                "warn",
+                "unwarn",
+                "kick",
+                "history",
+                "staffhistory",
+                "banlist",
+                "warnings",
+                "dupeip",
+                "geoip",
+                "checkban",
+                "checkmute",
+                "lastuuid"
+        );
+
         @Setting(value = "Admin-Command-Blacklist", comment = "A list of commands admins are not allowed to use.")
         public static List<String> blacklist = Arrays.asList(
                 "luckperms",
@@ -113,14 +138,8 @@ public class PluginConfiguration {
                 "perm",
                 "lp",
                 "execute",
-                "ban",
-                "ipban",
-                "tempban",
                 "nameban",
                 "nameunban",
-                "tempmute",
-                "mute",
-                "kick",
                 "whitelist",
                 "minecraft:",
                 "sponge"

@@ -1,5 +1,6 @@
 package net.dirtcraft.discord.discordlink.Events;
 
+import net.dirtcraft.discord.discordlink.API.ActionType;
 import net.dirtcraft.discord.discordlink.API.GameChat;
 import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommand;
@@ -42,8 +43,14 @@ public class DiscordEvents extends ListenerAdapter {
 
         final String message = event.getMessage().getContentDisplay();
         final String rawMessage = event.getMessage().getContentRaw();
+        final ActionType action = ActionType.fromMessageRaw(rawMessage);
 
-        if (rawMessage.startsWith(PluginConfiguration.Main.botPrefix)) {
+        if (action == ActionType.CHAT){
+            Task.builder()
+                    .async()
+                    .execute(() -> discordToMc(sender, message))
+                    .submit(DiscordLink.getInstance());
+        } else if (action == ActionType.DISCORD) {
             final String[] args = event.getMessage().getContentRaw()
                     .substring(PluginConfiguration.Main.botPrefix.length())
                     .toLowerCase()
@@ -52,19 +59,9 @@ public class DiscordEvents extends ListenerAdapter {
                 DiscordCommand command = commandMap.get(args[0]);
                 if (command != null) command.process(sender, args, event);
             }
-            return;
-        } else if (rawMessage.startsWith(PluginConfiguration.Main.consolePrefix)) {
-            toConsole(event, sender,false);
-            return;
-        } else if (rawMessage.startsWith(PluginConfiguration.Main.silentConsolePrefix)) {
-            toConsole(event, sender, true);
-            return;
+        } else {
+            toConsole(event, sender, action);
         }
-
-        Task.builder()
-                .async()
-                .execute(() -> discordToMc(sender, message))
-                .submit(DiscordLink.getInstance());
     }
 
     private static void discordToMc(MessageSource sender, String message){

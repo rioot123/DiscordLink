@@ -1,6 +1,6 @@
 package net.dirtcraft.discord.discordlink.Utility;
 
-import com.google.common.collect.Lists;
+import net.dirtcraft.discord.discordlink.API.ActionType;
 import net.dirtcraft.discord.discordlink.API.GameChat;
 import net.dirtcraft.discord.discordlink.API.GuildMember;
 import net.dirtcraft.discord.discordlink.API.Roles;
@@ -16,20 +16,13 @@ import net.dv8tion.jda.core.entities.Game;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
 import java.awt.*;
 import java.time.Instant;
-import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.regex.Pattern;
 
 public class Utility {
 
@@ -80,18 +73,18 @@ public class Utility {
         DiscordUtil.setStatus(Game.GameType.STREAMING, SpongeDiscordLib.getServerName(), "https://www.twitch.tv/dirtcraft/");
     }
 
-    public static void toConsole(MessageReceivedEvent event, GuildMember sender, boolean silent) {
-        final int prefixLength = silent ? PluginConfiguration.Main.silentConsolePrefix.length() : PluginConfiguration.Main.consolePrefix.length();
-        final String command = event.getMessage().getContentRaw().substring(prefixLength);
+    public static void toConsole(MessageReceivedEvent event, GuildMember sender, ActionType type) {
         final List<String> blacklist = PluginConfiguration.Command.blacklist;
-        if (!(sender.hasRole(Roles.DIRTY) || sender.hasRole(Roles.ADMIN) && blacklist.stream().noneMatch(command::startsWith))) {
+        final String command = type.getCommand(event);
+        if (PluginConfiguration.Command.ignored.contains(command)) return;
+        if (sender.hasRole(Roles.DIRTY) || sender.hasRole(Roles.ADMIN) && blacklist.stream().noneMatch(command::startsWith)) {
+            final WrappedConsole commandSender = type.silent ? new PrivateSender(sender, command) : new GamechatSender(sender, command);
+            Task.builder()
+                    .execute(() -> Sponge.getCommandManager().process(commandSender, command))
+                    .submit(DiscordLink.getInstance());
+        } else {
             sendPermissionErrorMessage(event);
-            return;
         }
-        final WrappedConsole commandSender = silent ? new PrivateSender(sender, command) : new GamechatSender(sender, command);
-        Task.builder()
-                .execute(() -> Sponge.getCommandManager().process(commandSender, command))
-                .submit(DiscordLink.getInstance());
     }
 
     public static void sendResponse(MessageReceivedEvent event, String error){
@@ -117,31 +110,6 @@ public class Utility {
 
     public static Text format(String unformattedString) {
         return TextSerializers.FORMATTING_CODE.deserialize(unformattedString);
-    }
-
-    public static Collection<Player> getSpongePlayer(String name){
-        Pattern pattern = Pattern.compile("(\\d{8}-?\\d{4}-?\\d{4}-?\\d{4}-?\\d{12})");
-        if (name.startsWith("@a")){
-            return Sponge.getServer().getOnlinePlayers();
-        } else if ((name.length() == 32 || name.length() == 36) && pattern.matcher(name).matches()){
-            UUID uuid = UUID.fromString(name);
-            Optional<Player> optPlayer = Sponge.getServer().getPlayer(uuid);
-            return optPlayer.map(Lists::newArrayList).orElseGet(Lists::newArrayList);
-        } else {
-            Optional<Player> optPlayer = Sponge.getServer().getPlayer(name);
-            return optPlayer.map(Lists::newArrayList).orElseGet(Lists::newArrayList);
-        }
-    }
-
-    public static Optional<User> getSpongeUser(String nameOrUUID){
-        final UserStorageService userStorageService = Sponge.getServiceManager().provideUnchecked(UserStorageService.class);
-        Pattern pattern = Pattern.compile("(\\d{8}-?\\d{4}-?\\d{4}-?\\d{4}-?\\d{12})");
-        if ((nameOrUUID.length() == 32 || nameOrUUID.length() == 36) && pattern.matcher(nameOrUUID).matches()){
-            UUID uuid = UUID.fromString(nameOrUUID);
-            return userStorageService.get(uuid);
-        } else {
-            return userStorageService.get(nameOrUUID);
-        }
     }
 
     public static String sanitiseMinecraftText(String s){
