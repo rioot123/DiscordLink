@@ -27,17 +27,17 @@ public abstract class WrappedConsole implements ConsoleSource, SecuredSource, Sc
 
     @Override
     public void sendMessage(Text message) {
-        Scheduler.submit(this, message.toPlain());
+        ResponseScheduler.submit(this, message.toPlain());
     }
 
     @Override
     public void sendMessages(Iterable<Text> messages) {
-        for (Text message : messages) Scheduler.submit(this, message.toPlain());
+        for (Text message : messages) ResponseScheduler.submit(this, message.toPlain());
     }
 
     @Override
     public void sendMessages(Text... messages) {
-        for (Text message : messages) Scheduler.submit(this, message.toPlain());
+        for (Text message : messages) ResponseScheduler.submit(this, message.toPlain());
     }
 
     @Override

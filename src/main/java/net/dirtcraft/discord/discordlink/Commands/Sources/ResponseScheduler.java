@@ -9,11 +9,11 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class Scheduler {
-    public static final Scheduler instance = new Scheduler();
+public class ResponseScheduler {
+    public static final ResponseScheduler instance = new ResponseScheduler();
     final Queue<Message> tasks = new ConcurrentLinkedQueue<>();
 
-    private Scheduler() {
+    private ResponseScheduler() {
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new Messenger(), 0, 1250);
     }
@@ -46,14 +46,14 @@ public class Scheduler {
             StringBuilder output = new StringBuilder();
             for (String message : messages){
                 if (output.length() + message.length() > 1800){
-                    provider.dispatch(output.toString());
+                    provider.sendDiscordResponse(output.toString());
                     output = new StringBuilder(message);
                 } else {
                     output.append(output.length() > 0? "\n" : "");
                     output.append(message);
                 }
             }
-            if (output.length() > 0) provider.dispatch(output.toString());
+            if (output.length() > 0) provider.sendDiscordResponse(output.toString());
         }
     }
 }

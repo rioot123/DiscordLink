@@ -10,8 +10,6 @@ import org.spongepowered.api.event.message.MessageChannelEvent;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
-import java.util.regex.Matcher;
-
 public class NormalChat {
     private static final String ADMIN_PERM = "discordlink.chat.notify";
 

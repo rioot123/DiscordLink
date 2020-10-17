@@ -1,6 +1,7 @@
 package net.dirtcraft.discord.discordlink.API;
 
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+
 import java.util.Arrays;
 
 import static net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration.Main.*;

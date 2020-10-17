@@ -4,9 +4,6 @@ import me.lucko.luckperms.api.LuckPermsApi;
 import me.lucko.luckperms.api.Node;
 import me.lucko.luckperms.api.context.ContextSet;
 import net.dirtcraft.discord.discordlink.API.GameChat;
-import net.dirtcraft.discord.discordlink.API.GuildMember;
-import net.dirtcraft.discord.discordlink.Exceptions.DiscordCommandException;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.context.ImmutableContextSet;
@@ -16,7 +13,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.entity.living.player.User;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 

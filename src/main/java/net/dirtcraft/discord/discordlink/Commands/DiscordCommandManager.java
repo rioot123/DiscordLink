@@ -2,14 +2,7 @@ package net.dirtcraft.discord.discordlink.Commands;
 
 import net.dirtcraft.discord.discordlink.API.Roles;
 import net.dirtcraft.discord.discordlink.Commands.Discord.*;
-import net.dirtcraft.discord.discordlink.Commands.Sponge.UnVerify;
-import net.dirtcraft.discord.discordlink.Commands.Sponge.Verify;
 import net.dirtcraft.discord.discordlink.Database.Storage;
-import net.dirtcraft.discord.discordlink.DiscordLink;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.command.spec.CommandSpec;
-import org.spongepowered.api.text.Text;
 
 import java.util.HashMap;
 import java.util.Map;

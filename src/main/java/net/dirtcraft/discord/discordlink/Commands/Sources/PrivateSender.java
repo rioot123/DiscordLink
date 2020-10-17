@@ -1,9 +1,6 @@
 package net.dirtcraft.discord.discordlink.Commands.Sources;
 
-import net.dirtcraft.discord.discordlink.API.GameChat;
 import net.dirtcraft.discord.discordlink.API.GuildMember;
-import net.dirtcraft.discord.discordlink.Utility.Utility;
-import org.spongepowered.api.text.Text;
 
 public class PrivateSender extends WrappedConsole implements ScheduledSender {
     private final GuildMember member;
@@ -14,7 +11,7 @@ public class PrivateSender extends WrappedConsole implements ScheduledSender {
     }
 
     @Override
-    public void dispatch(String message) {
+    public void sendDiscordResponse(String message) {
         if (message.length() > 1950) return;
         member.sendMessage(message);
     }
