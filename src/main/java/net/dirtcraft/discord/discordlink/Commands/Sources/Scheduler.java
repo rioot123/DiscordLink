@@ -15,7 +15,7 @@ public class Scheduler {
 
     private Scheduler() {
         Timer timer = new Timer();
-        timer.scheduleAtFixedRate(new Messenger(), 0, 2500);
+        timer.scheduleAtFixedRate(new Messenger(), 0, 1250);
     }
 
     public static void submit(ScheduledSender provider, String message) {

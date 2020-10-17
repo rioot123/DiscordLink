@@ -66,6 +66,7 @@ public class DiscordCommand {
         } catch (DiscordPermissionException e) {
             sendPermissionError(event);
         } catch (Exception e) {
+            //e.printStackTrace();
             sendCommandError(event, e.getMessage() != null ? e.getMessage() : "an error occurred while executing the command.");
         }
     }

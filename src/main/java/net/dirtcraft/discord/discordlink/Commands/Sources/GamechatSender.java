@@ -16,26 +16,10 @@ public class GamechatSender extends WrappedConsole implements ScheduledSender {
 
     @Override
     public void dispatch(String message) {
+        if (message.length() > 1800) return;
         GameChat.sendMessage(
                 Utility.embedBuilder().addField("__Command__ \"**/" + command.toLowerCase() + "**\" __Sent__", message, false)
                         .setFooter("Sent By: " + member.getUser().getAsTag(), member.getUser().getAvatarUrl())
                         .build());
     }
-
-
-    @Override
-    public void sendMessage(Text message) {
-        Scheduler.submit(this, message.toPlain());
-    }
-
-    @Override
-    public void sendMessages(Iterable<Text> messages) {
-        for (Text message : messages) Scheduler.submit(this, message.toPlain());
-    }
-
-    @Override
-    public void sendMessages(Text... messages) {
-        for (Text message : messages) Scheduler.submit(this, message.toPlain());
-    }
-
 }
