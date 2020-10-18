@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-public abstract class WrappedConsole implements ConsoleSource, SecuredSource {
+public abstract class WrappedConsole implements ConsoleSource, SecuredSource, ScheduledSender {
 
     private CommandSource actualSource;
 
@@ -24,19 +24,20 @@ public abstract class WrappedConsole implements ConsoleSource, SecuredSource {
         actualSource = Sponge.getServer().getConsole();
     }
 
+
     @Override
     public void sendMessage(Text message) {
-        actualSource.sendMessage(message);
+        ResponseScheduler.submit(this, message.toPlain());
     }
 
     @Override
     public void sendMessages(Iterable<Text> messages) {
-        actualSource.sendMessages(messages);
+        for (Text message : messages) ResponseScheduler.submit(this, message.toPlain());
     }
 
     @Override
     public void sendMessages(Text... messages) {
-        actualSource.sendMessages(messages);
+        for (Text message : messages) ResponseScheduler.submit(this, message.toPlain());
     }
 
     @Override

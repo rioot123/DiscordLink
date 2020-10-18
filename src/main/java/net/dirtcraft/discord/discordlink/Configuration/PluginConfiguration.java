@@ -3,6 +3,7 @@ package net.dirtcraft.discord.discordlink.Configuration;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -18,6 +19,8 @@ public class PluginConfiguration {
     private PluginConfiguration.Roles roles = new PluginConfiguration.Roles();
     @Setting(value = "Commands")
     private PluginConfiguration.Command command = new PluginConfiguration.Command();
+    @Setting(value = "Notifier")
+    private PluginConfiguration.Notifier notifier = new PluginConfiguration.Notifier();
 
 
 
@@ -105,6 +108,31 @@ public class PluginConfiguration {
 
     @ConfigSerializable
     public static class Command {
+        @Setting(value = "Proxy-Commands", comment = "A list of commands that will be processed by the proxy-link module (This list should match the list in said module)")
+        public static List<String> ignored = Arrays.asList(
+                "find",
+                "ban",
+                "tempban",
+                "ipban",
+                "unban",
+                "mute",
+                "tempmute",
+                "ipmute",
+                "unmute",
+                "warn",
+                "unwarn",
+                "kick",
+                "history",
+                "staffhistory",
+                "banlist",
+                "warnings",
+                "dupeip",
+                "geoip",
+                "checkban",
+                "checkmute",
+                "lastuuid"
+        );
+
         @Setting(value = "Admin-Command-Blacklist", comment = "A list of commands admins are not allowed to use.")
         public static List<String> blacklist = Arrays.asList(
                 "luckperms",
@@ -113,18 +141,21 @@ public class PluginConfiguration {
                 "perm",
                 "lp",
                 "execute",
-                "ban",
-                "ipban",
-                "tempban",
                 "nameban",
                 "nameunban",
-                "tempmute",
-                "mute",
-                "kick",
                 "whitelist",
                 "minecraft:",
                 "sponge"
         );
+    }
+
+    @ConfigSerializable
+    public static class Notifier{
+        @Setting(value = "Boot-Notifier-Minutes", comment = "Max boot stage time (minutes) before sending DMs")
+        public static long maxStageMinutes = 12;
+
+        @Setting(value = "Notify-Users", comment = "Users to DM (Discord ID's)")
+        public static List<Long> notify = new ArrayList<>(Arrays.asList(248056002274918400L, 261928443179040768L));
     }
 
 }

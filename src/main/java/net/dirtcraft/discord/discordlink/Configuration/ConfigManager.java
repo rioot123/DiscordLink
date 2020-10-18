@@ -8,23 +8,33 @@ import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
 import java.io.IOException;
 
+@SuppressWarnings("UnstableApiUsage")
 public class ConfigManager {
     private ConfigurationLoader<CommentedConfigurationNode> loader;
     private ConfigurationOptions options;
-    private PluginConfiguration config;
+    private PluginConfiguration config = new PluginConfiguration();
+    private CommentedConfigurationNode node = null;
 
     public ConfigManager(ConfigurationLoader<CommentedConfigurationNode> loader) {
         this.loader = loader;
         options = ConfigurationOptions.defaults().setShouldCopyDefaults(true);
-        this.update();
+        this.load();
     }
 
-    private void update() {
+    public void load() {
         try {
-            CommentedConfigurationNode node = loader.load(options);
-            PluginConfiguration config = node.getValue(TypeToken.of(PluginConfiguration.class), new PluginConfiguration());
+            node = loader.load(options);
+            config = node.getValue(TypeToken.of(PluginConfiguration.class), config);
             loader.save(node);
-            this.config = config;
+        } catch (IOException | ObjectMappingException exception) {
+            exception.printStackTrace();
+        }
+    }
+
+    public void save(){
+        if (node == null) return;
+        try {
+            loader.save(node.setValue(TypeToken.of(PluginConfiguration.class), config));
         } catch (IOException | ObjectMappingException exception) {
             exception.printStackTrace();
         }

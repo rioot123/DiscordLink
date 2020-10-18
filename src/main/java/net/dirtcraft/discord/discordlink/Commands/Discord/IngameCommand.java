@@ -8,6 +8,8 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.scheduler.Task;
 
+import java.util.List;
+
 public class IngameCommand implements DiscordCommandExecutor {
     private final String command;
 
@@ -15,7 +17,7 @@ public class IngameCommand implements DiscordCommandExecutor {
         this.command = command;
     }
     @Override
-    public void execute(GuildMember source, String[] args, MessageReceivedEvent event) {
+    public void execute(GuildMember source, List<String> args, MessageReceivedEvent event) {
         PrivateSender sender = new PrivateSender(source, command);
         Task.builder()
                 .execute( () -> Sponge.getCommandManager().process(sender, command))

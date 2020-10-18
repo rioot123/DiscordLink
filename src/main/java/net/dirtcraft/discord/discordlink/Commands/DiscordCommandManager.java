@@ -1,28 +1,19 @@
 package net.dirtcraft.discord.discordlink.Commands;
 
+import net.dirtcraft.discord.discordlink.API.GameChat;
+import net.dirtcraft.discord.discordlink.API.GuildMember;
 import net.dirtcraft.discord.discordlink.API.Roles;
 import net.dirtcraft.discord.discordlink.Commands.Discord.*;
-import net.dirtcraft.discord.discordlink.Commands.Sponge.UnVerify;
-import net.dirtcraft.discord.discordlink.Commands.Sponge.Verify;
-import net.dirtcraft.discord.discordlink.Database.Storage;
 import net.dirtcraft.discord.discordlink.DiscordLink;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.command.spec.CommandSpec;
-import org.spongepowered.api.text.Text;
+import net.dirtcraft.discord.discordlink.Utility.Utility;
+import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.Arrays;
 
-public class DiscordCommandManager {
+public class DiscordCommandManager extends DiscordCommandTree {
 
-    private final Storage storage;
-    private final HashMap<String, DiscordCommand> commandMap;
-
-    public DiscordCommandManager(Storage storage, HashMap<String, DiscordCommand> commandMap) {
-        this.storage = storage;
-        this.commandMap = commandMap;
-
+    public DiscordCommandManager() {
         DiscordCommand help = DiscordCommand.builder()
                 .setCommandExecutor(new Help())
                 .build();
@@ -85,6 +76,11 @@ public class DiscordCommandManager {
                 .setCommandExecutor(new Unlink())
                 .build();
 
+        DiscordCommand notify = DiscordCommand.builder()
+                .setDescription("Manages notification settings.")
+                .setCommandExecutor(new NotifyBase())
+                .build();
+
         register(help, "help");
         register(list, "list");
         register(stop, "stop");
@@ -96,21 +92,27 @@ public class DiscordCommandManager {
         register(ranks, "ranks");
         register(sync, "sync");
         register(unverify, "unverify", "unlink");
+        register(notify, "notify");
     }
 
-    public void register(DiscordCommand command, String... alias){
-        for (String name : alias) {
-            commandMap.put(name, command);
+    public void process(GuildMember member, String args, MessageReceivedEvent event){
+        try {
+            String[] command = args.toLowerCase().split(" ");
+            execute(member, new ArrayList<>(Arrays.asList(command)), event);
+        } catch (Exception e){
+            sendCommandError(event, e.getMessage() != null ? e.getMessage() : "an error occurred while executing the command.");
         }
     }
 
-    public Map<String, DiscordCommand> getCommandMap(){
-        Map<String, DiscordCommand> result = new HashMap<>();
-        commandMap.forEach((alias, cmd) -> {
-            if (result.containsValue(cmd)) return;
-            result.put(alias, cmd);
-        });
-        return result;
+    private void sendCommandError(MessageReceivedEvent event, String msg){
+        event.getMessage().delete().queue();
+        GameChat.sendMessage("<@" + event.getAuthor().getId() + ">, " + msg, 5);
+        DiscordLink.getJDA()
+                .getTextChannelsByName("command-log", true).get(0)
+                .sendMessage(Utility.embedBuilder()
+                        .addField("__Tried Executing Command__", event.getMessage().getContentDisplay(), false)
+                        .setFooter(event.getAuthor().getAsTag(), event.getAuthor().getAvatarUrl())
+                        .build())
+                .queue();
     }
-
 }

@@ -1,6 +1,7 @@
 package net.dirtcraft.discord.discordlink.Commands.Discord;
 
 import io.github.nucleuspowered.nucleus.api.NucleusAPI;
+import io.github.nucleuspowered.nucleus.api.service.NucleusAFKService;
 import net.dirtcraft.discord.discordlink.API.GuildMember;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommandExecutor;
 import net.dirtcraft.discord.discordlink.DiscordLink;
@@ -9,36 +10,33 @@ import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class PlayerList implements DiscordCommandExecutor {
     @Override
-    public void execute(GuildMember source, String[] args, MessageReceivedEvent event) {
-        Collection<Player> players = Sponge.getServer().getOnlinePlayers();
+    public void execute(GuildMember source, List<String> args, MessageReceivedEvent event) {
+        final Collection<Player> players = Sponge.getServer().getOnlinePlayers();
+        final NucleusAFKService afkService = NucleusAPI.getAFKService().orElse(null);
+        final ArrayList<String> playerNames = new ArrayList<>();
 
-        ArrayList<String> playerNames = new ArrayList<>();
-        players.forEach(online -> {
-            if (NucleusAPI.getAFKService().isPresent()) {
-                if (NucleusAPI.getAFKService().get().isAFK(online)) {
-                    playerNames.add(online.getName() + " " + "—" + " " + "**AFK**");
-                } else {
-                    playerNames.add(online.getName());
-                }
-            } else {
-                playerNames.add(online.getName());
-            }
-        });
+        for (Player player : players){
+            if (player.get(Keys.VANISH).orElse(false)) continue;
+            if (afkService == null || !afkService.isAFK(player)) playerNames.add(player.getName());
+            else playerNames.add(player.getName() + " " + "—" + " " + "**AFK**");
+        }
 
         playerNames.sort(String::compareToIgnoreCase);
 
         EmbedBuilder embed = Utility.embedBuilder();
-        if (players.size() > 1) {
-            embed.addField("__**" + players.size() + "** players online__", String.join("\n", playerNames), false);
-        } else if (players.size() == 1) {
-            embed.addField("__**" + players.size() + "** player online__", String.join("\n", playerNames), false);
+        if (playerNames.size() > 1) {
+            embed.addField("__**" + playerNames.size() + "** players online__", String.join("\n", playerNames), false);
+        } else if (playerNames.size() == 1) {
+            embed.addField("__**" + playerNames.size() + "** player online__", String.join("\n", playerNames), false);
         } else {
             embed.setDescription("There are no players playing **" + SpongeDiscordLib.getServerName() + "**!");
         }
@@ -50,4 +48,6 @@ public class PlayerList implements DiscordCommandExecutor {
                 .sendMessage(embed.build())
                 .queue();
     }
+
+
 }

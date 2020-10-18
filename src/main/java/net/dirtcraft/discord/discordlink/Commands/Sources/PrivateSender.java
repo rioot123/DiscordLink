@@ -1,55 +1,19 @@
 package net.dirtcraft.discord.discordlink.Commands.Sources;
 
 import net.dirtcraft.discord.discordlink.API.GuildMember;
-import org.spongepowered.api.text.Text;
+import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 
-public class PrivateSender extends WrappedConsole {
+public class PrivateSender extends WrappedConsole implements ScheduledSender {
     private final GuildMember member;
 
     public PrivateSender(GuildMember member, String command) {
         this.member = member;
-        member.sendMessage("Command sent: " + command + "\n");
+        member.sendMessage(String.format("Command sent: \"%s\" @ <#%s>\n", command, SpongeDiscordLib.getGamechatChannelID()));
     }
 
     @Override
-    public void sendMessage(Text message) {
-        final String output = message.toPlain();
-        if (output.length() > 1950) return;
-        member.sendMessage(">>> " + message.toPlain());
+    public void sendDiscordResponse(String message) {
+        if (message.length() > 1950) return;
+        member.sendMessage(message);
     }
-
-    @Override
-    public void sendMessages(Iterable<Text> messages) {
-        StringBuilder output = new StringBuilder();
-        for (Text message : messages) {
-            final String messagePlain = message.toPlain();
-            if (output.length() + messagePlain.length() > 1800) {
-                member.sendMessage(">>> " + output.toString());
-                output = new StringBuilder();
-            }
-            else {
-                output.append(messagePlain);
-                output.append("\n");
-            }
-        }
-        if (output.length() > 0) member.sendMessage(">>> " + output.toString());
-    }
-
-    @Override
-    public void sendMessages(Text... messages) {
-        StringBuilder output = new StringBuilder();
-        for (Text message : messages) {
-            final String messagePlain = message.toPlain();
-            if (output.length() + messagePlain.length() > 1800) {
-                member.sendMessage(">>> " + output.toString());
-                output = new StringBuilder();
-            }
-            else {
-                output.append(messagePlain);
-                output.append("\n");
-            }
-        }
-        if (output.length() > 0) member.sendMessage(">>> " + output.toString());
-    }
-
 }
