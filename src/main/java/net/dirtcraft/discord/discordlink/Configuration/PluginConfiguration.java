@@ -3,6 +3,7 @@ package net.dirtcraft.discord.discordlink.Configuration;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -18,6 +19,8 @@ public class PluginConfiguration {
     private PluginConfiguration.Roles roles = new PluginConfiguration.Roles();
     @Setting(value = "Commands")
     private PluginConfiguration.Command command = new PluginConfiguration.Command();
+    @Setting(value = "Notifier")
+    private PluginConfiguration.Notifier notifier = new PluginConfiguration.Notifier();
 
 
 
@@ -144,6 +147,15 @@ public class PluginConfiguration {
                 "minecraft:",
                 "sponge"
         );
+    }
+
+    @ConfigSerializable
+    public static class Notifier{
+        @Setting(value = "Boot-Notifier-Minutes", comment = "Max boot stage time (minutes) before sending DMs")
+        public static long maxStageMinutes = 12;
+
+        @Setting(value = "Notify-Users", comment = "Users to DM")
+        public static List<Long> notify = new ArrayList<>();
     }
 
 }

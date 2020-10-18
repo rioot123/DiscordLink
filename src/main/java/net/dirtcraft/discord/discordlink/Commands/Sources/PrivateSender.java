@@ -1,13 +1,15 @@
 package net.dirtcraft.discord.discordlink.Commands.Sources;
 
 import net.dirtcraft.discord.discordlink.API.GuildMember;
+import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
+import org.spongepowered.api.Sponge;
 
 public class PrivateSender extends WrappedConsole implements ScheduledSender {
     private final GuildMember member;
 
     public PrivateSender(GuildMember member, String command) {
         this.member = member;
-        member.sendMessage("Command sent: " + command + "\n");
+        member.sendMessage(String.format("Command sent: \"%s\" @ <#%s>\n", command, SpongeDiscordLib.getGamechatChannelID()));
     }
 
     @Override
