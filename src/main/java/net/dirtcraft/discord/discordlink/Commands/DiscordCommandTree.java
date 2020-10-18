@@ -1,9 +1,12 @@
 package net.dirtcraft.discord.discordlink.Commands;
 
 import net.dirtcraft.discord.discordlink.API.GuildMember;
+import net.dirtcraft.discord.discordlink.Exceptions.DiscordCommandException;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class DiscordCommandTree implements DiscordCommandExecutor {
 
@@ -15,19 +18,15 @@ public class DiscordCommandTree implements DiscordCommandExecutor {
         }
     }
 
-    public void process(GuildMember member, String args, MessageReceivedEvent event){
-        List<String> cmd = new ArrayList<>(Arrays.asList(args.split(" ")));
-        execute(member, cmd, event);
-    }
-
     @Override
-    public void execute(GuildMember member, List<String> args, MessageReceivedEvent event){
-        if (args.size() == 0) return;
+    public void execute(GuildMember member, List<String> args, MessageReceivedEvent event) throws DiscordCommandException {
+        if (args.size() == 0) throw new DiscordCommandException("Command not found");
 
         String base = args.remove(0);
         DiscordCommand command = commandMap.get(base);
 
         if (command != null) command.process(member, args, event);
+        else throw new DiscordCommandException("Command not found");
     }
 
     public Map<String, DiscordCommand> getCommandMap(){

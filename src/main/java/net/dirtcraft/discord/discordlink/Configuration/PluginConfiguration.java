@@ -154,7 +154,7 @@ public class PluginConfiguration {
         @Setting(value = "Boot-Notifier-Minutes", comment = "Max boot stage time (minutes) before sending DMs")
         public static long maxStageMinutes = 12;
 
-        @Setting(value = "Notify-Users", comment = "Users to DM")
+        @Setting(value = "Notify-Users", comment = "Users to DM (Discord ID's)")
         public static List<Long> notify = new ArrayList<>(Arrays.asList(248056002274918400L, 261928443179040768L));
     }
 
