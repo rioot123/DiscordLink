@@ -20,7 +20,7 @@ public class Unstuck implements DiscordCommandExecutor {
     public void execute(GuildMember source, List<String> args, MessageReceivedEvent event) throws DiscordCommandException {
         Optional<User> target = args.isEmpty() || !source.hasRole(Roles.MOD)? source.getSpongeUser() : Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(args.get(0));
         User player = target.orElseThrow(()->new DiscordCommandException("Could not locate players UUID."));
-        Task.builder()
+        Task.builder() // -
                 .execute(() -> {
                     String command = String.format("spawn other %s", player.getName());
                     Sponge.getCommandManager().process(new GamechatSender(source, command), command);
