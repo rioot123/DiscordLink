@@ -9,16 +9,17 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.user.UserStorageService;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
 public class Discord implements DiscordCommandExecutor {
     @Override
-    public void execute(GuildMember source, String[] args, MessageReceivedEvent event) throws DiscordCommandException {
+    public void execute(GuildMember source, List<String> args, MessageReceivedEvent event) throws DiscordCommandException {
         final UserStorageService userStorageService = Sponge.getServiceManager().provideUnchecked(UserStorageService.class);
-        if (args.length < 2) throw new DiscordCommandException("Invalid Minecraft name");
-        final String minecraftIdentifier = args[1];
+        if (args.size() < 1) throw new DiscordCommandException("Invalid Minecraft name");
+        final String minecraftIdentifier = args.get(0);
         User optUser;
         Pattern pattern = Pattern.compile("(\\d{8}-?\\d{4}-?\\d{4}-?\\d{4}-?\\d{12})");
         if ((minecraftIdentifier.length() == 32 || minecraftIdentifier.length() == 36) && pattern.matcher(minecraftIdentifier).matches()){

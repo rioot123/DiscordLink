@@ -10,18 +10,19 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.scheduler.Task;
 
+import java.util.List;
 import java.util.Optional;
 
 public class SilentSeen implements DiscordCommandExecutor {
     @Override
-    public void execute(GuildMember source, String[] args, MessageReceivedEvent event) throws DiscordCommandException {
+    public void execute(GuildMember source, List<String> args, MessageReceivedEvent event) throws DiscordCommandException {
         String target;
-        if (args.length < 2){
+        if (args.isEmpty()){
             Optional<User> optUser = source.getSpongeUser();
             if (!optUser.isPresent()) throw new DiscordCommandException("You must be verified in order to not specify a player!");
             else target = optUser.get().getName();
         } else {
-            target = args[1];
+            target = args.get(0);
         }
         String command = "seen " + target;
         PrivateSender sender = new PrivateSender(source, command);

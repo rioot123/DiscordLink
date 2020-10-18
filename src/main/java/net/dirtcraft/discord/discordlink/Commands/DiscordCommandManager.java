@@ -2,20 +2,10 @@ package net.dirtcraft.discord.discordlink.Commands;
 
 import net.dirtcraft.discord.discordlink.API.Roles;
 import net.dirtcraft.discord.discordlink.Commands.Discord.*;
-import net.dirtcraft.discord.discordlink.Database.Storage;
 
-import java.util.HashMap;
-import java.util.Map;
+public class DiscordCommandManager extends DiscordCommandTree {
 
-public class DiscordCommandManager {
-
-    private final Storage storage;
-    private final HashMap<String, DiscordCommand> commandMap;
-
-    public DiscordCommandManager(Storage storage, HashMap<String, DiscordCommand> commandMap) {
-        this.storage = storage;
-        this.commandMap = commandMap;
-
+    public DiscordCommandManager() {
         DiscordCommand help = DiscordCommand.builder()
                 .setCommandExecutor(new Help())
                 .build();
@@ -78,6 +68,11 @@ public class DiscordCommandManager {
                 .setCommandExecutor(new Unlink())
                 .build();
 
+        DiscordCommand notify = DiscordCommand.builder()
+                .setDescription("Manages notification settings.")
+                .setCommandExecutor(new NotifyBase())
+                .build();
+
         register(help, "help");
         register(list, "list");
         register(stop, "stop");
@@ -89,21 +84,6 @@ public class DiscordCommandManager {
         register(ranks, "ranks");
         register(sync, "sync");
         register(unverify, "unverify", "unlink");
+        register(notify, "notify");
     }
-
-    public void register(DiscordCommand command, String... alias){
-        for (String name : alias) {
-            commandMap.put(name, command);
-        }
-    }
-
-    public Map<String, DiscordCommand> getCommandMap(){
-        Map<String, DiscordCommand> result = new HashMap<>();
-        commandMap.forEach((alias, cmd) -> {
-            if (result.containsValue(cmd)) return;
-            result.put(alias, cmd);
-        });
-        return result;
-    }
-
 }

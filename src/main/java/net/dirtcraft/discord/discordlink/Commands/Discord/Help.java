@@ -8,9 +8,11 @@ import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Exceptions.DiscordCommandException;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
+import java.util.List;
+
 public class Help implements DiscordCommandExecutor {
     @Override
-    public void execute(GuildMember source, String[] args, MessageReceivedEvent event) throws DiscordCommandException {
+    public void execute(GuildMember source, List<String> args, MessageReceivedEvent event) throws DiscordCommandException {
         StringBuilder result = new StringBuilder("The following commands are available:\n");
         DiscordLink.getDiscordCommandManager().getCommandMap().forEach((alias, cmd)->{
             if (!cmd.hasPermission(source)) return;

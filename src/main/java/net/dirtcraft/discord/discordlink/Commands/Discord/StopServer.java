@@ -6,6 +6,8 @@ import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
+import java.util.List;
+
 public class StopServer implements DiscordCommandExecutor {
     private final boolean gracefulExit;
 
@@ -14,7 +16,7 @@ public class StopServer implements DiscordCommandExecutor {
     }
 
     @Override
-    public void execute(GuildMember source, String[] args, MessageReceivedEvent event) {
+    public void execute(GuildMember source, List<String> args, MessageReceivedEvent event) {
         Utility.sendResponse(event, "Attempting to reboot the server.", 15);
         try{
             Thread.sleep(50);

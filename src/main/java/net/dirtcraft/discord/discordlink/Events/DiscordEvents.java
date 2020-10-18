@@ -4,6 +4,7 @@ import net.dirtcraft.discord.discordlink.API.ActionType;
 import net.dirtcraft.discord.discordlink.API.GameChat;
 import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommand;
+import net.dirtcraft.discord.discordlink.Commands.DiscordCommandManager;
 import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dv8tion.jda.core.entities.Message;
@@ -27,10 +28,10 @@ import static net.dirtcraft.discord.discordlink.Utility.Utility.*;
 
 public class DiscordEvents extends ListenerAdapter {
 
-    private final HashMap<String, DiscordCommand> commandMap;
+    private final DiscordCommandManager commandManager;
 
-    public DiscordEvents(HashMap<String, DiscordCommand> commandMap) {
-        this.commandMap = commandMap;
+    public DiscordEvents(DiscordCommandManager commandManager) {
+        this.commandManager = commandManager;
     }
 
     @Override
@@ -51,14 +52,7 @@ public class DiscordEvents extends ListenerAdapter {
                     .execute(() -> discordToMc(sender, message))
                     .submit(DiscordLink.getInstance());
         } else if (action == ActionType.DISCORD) {
-            final String[] args = event.getMessage().getContentRaw()
-                    .substring(PluginConfiguration.Main.botPrefix.length())
-                    .toLowerCase()
-                    .split(" ");
-            if (args.length != 0) {
-                DiscordCommand command = commandMap.get(args[0]);
-                if (command != null) command.process(sender, args, event);
-            }
+            commandManager.process(sender, action.getCommand(event), event);
         } else if (!action.proxy) {
             toConsole(event, sender, action);
         }

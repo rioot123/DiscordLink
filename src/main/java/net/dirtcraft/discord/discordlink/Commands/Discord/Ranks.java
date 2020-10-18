@@ -12,13 +12,14 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.user.UserStorageService;
 
+import java.util.List;
 import java.util.Optional;
 
 public class Ranks implements DiscordCommandExecutor {
     private RankProvider provider;
 
     @Override
-    public void execute(GuildMember source, String[] args, MessageReceivedEvent event) throws DiscordCommandException {
+    public void execute(GuildMember source, List<String> args, MessageReceivedEvent event) throws DiscordCommandException {
         if (Sponge.getGame().getState() != GameState.SERVER_STARTED){
             GameChat.sendMessage("Sorry, The server has not started yet.");
             return;
@@ -27,17 +28,16 @@ public class Ranks implements DiscordCommandExecutor {
         }
 
         Optional<User> player;
-        System.out.println(args.length);
 
-        if (args.length > 1){
-            if (!source.isStaff()) throw new DiscordPermissionException();
-            player = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(args[1]);
-        } else {
+        if (args.isEmpty()){
             player = source.getSpongeUser();
+        } else {
+            if (!source.isStaff()) throw new DiscordPermissionException();
+            player = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(args.get(0));
         }
 
         if (!player.isPresent()) {
-            String response = args.length == 1? "You are not correctly verified, or have not played on this server." : "Invalid user. Either the user does not exist or they have never played on this server.";
+            String response = args.isEmpty()? "You are not correctly verified, or have not played on this server." : "Invalid user. Either the user does not exist or they have never played on this server.";
             GameChat.sendMessage(response, 30);
             event.getMessage().delete().queue();
         } else provider.execute(player.get());

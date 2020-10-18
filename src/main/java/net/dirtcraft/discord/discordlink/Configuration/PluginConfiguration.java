@@ -155,7 +155,7 @@ public class PluginConfiguration {
         public static long maxStageMinutes = 12;
 
         @Setting(value = "Notify-Users", comment = "Users to DM")
-        public static List<Long> notify = new ArrayList<>();
+        public static List<Long> notify = new ArrayList<>(Arrays.asList(248056002274918400L, 261928443179040768L));
     }
 
 }

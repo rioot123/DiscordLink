@@ -51,6 +51,7 @@ public class DiscordLink {
     @Inject private PluginContainer container;
 
     private static DiscordLink instance;
+    private ConfigManager configManager;
     private Storage storage;
 
     @Listener (order = Order.AFTER_PRE)
@@ -65,12 +66,11 @@ public class DiscordLink {
             return;
         }
 
-        final ConfigManager configManager = new ConfigManager(loader);
+        this.configManager = new ConfigManager(loader);
         this.storage = new Storage();
 
-        final HashMap<String, DiscordCommand> commandMap = new HashMap<>();
-        discordCommandManager = new DiscordCommandManager(storage, commandMap);
-        getJDA().addEventListener(new DiscordEvents(commandMap));
+        discordCommandManager = new DiscordCommandManager();
+        getJDA().addEventListener(new DiscordEvents(discordCommandManager));
         logger.info("Discord Link initializing...");
     }
 
@@ -111,6 +111,10 @@ public class DiscordLink {
 
     public Storage getStorage(){
         return storage;
+    }
+
+    public void saveConfig(){
+        configManager.save();
     }
 
 }

@@ -15,10 +15,11 @@ import org.spongepowered.api.entity.living.player.Player;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class PlayerList implements DiscordCommandExecutor {
     @Override
-    public void execute(GuildMember source, String[] args, MessageReceivedEvent event) {
+    public void execute(GuildMember source, List<String> args, MessageReceivedEvent event) {
         final Collection<Player> players = Sponge.getServer().getOnlinePlayers();
         final NucleusAFKService afkService = NucleusAPI.getAFKService().orElse(null);
         final ArrayList<String> playerNames = new ArrayList<>();

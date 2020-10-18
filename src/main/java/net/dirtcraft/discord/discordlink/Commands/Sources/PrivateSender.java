@@ -2,7 +2,6 @@ package net.dirtcraft.discord.discordlink.Commands.Sources;
 
 import net.dirtcraft.discord.discordlink.API.GuildMember;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
-import org.spongepowered.api.Sponge;
 
 public class PrivateSender extends WrappedConsole implements ScheduledSender {
     private final GuildMember member;

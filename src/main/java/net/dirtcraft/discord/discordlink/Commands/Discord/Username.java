@@ -7,15 +7,16 @@ import net.dirtcraft.discord.discordlink.Exceptions.DiscordCommandException;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import org.spongepowered.api.entity.living.player.User;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Username implements DiscordCommandExecutor {
     @Override
-    public void execute(GuildMember source, String[] args, MessageReceivedEvent event) throws DiscordCommandException {
-        if (args.length < 2) throw new DiscordCommandException("Invalid Discord ID");
-        final String discordID = args[1];
+    public void execute(GuildMember source, List<String> args, MessageReceivedEvent event) throws DiscordCommandException {
+        if (args.isEmpty()) throw new DiscordCommandException("Invalid Discord ID");
+        final String discordID = args.get(0);
         Pattern pattern = Pattern.compile("<?@?!?(\\d+)>?");
         Matcher matcher = pattern.matcher(discordID);
         if (!matcher.matches() || GameChat.getGuild().getMemberById(matcher.group(1)) == null) throw new DiscordCommandException("Invalid Discord ID");

@@ -13,7 +13,6 @@ import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.game.state.*;
 
 import java.awt.*;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
@@ -21,7 +20,6 @@ public class ServerBootHandler {
     private final long second = 1000;
     final private long minute = second * 60;
     private final String modpack = SpongeDiscordLib.getServerName();
-    private final long[] dmList = new long[]{248056002274918400L, 261928443179040768L};
     private final long time = System.currentTimeMillis();
     private volatile GameState state = null;
 
@@ -33,8 +31,8 @@ public class ServerBootHandler {
             try{
                 Thread.sleep(minute * PluginConfiguration.Notifier.maxStageMinutes);
                 if (this.state != state) return;
-                Arrays.stream(dmList)
-                        .mapToObj(GameChat.getGuild()::getMemberById)
+                PluginConfiguration.Notifier.notify.stream()
+                        .map(GameChat.getGuild()::getMemberById)
                         .filter(Objects::nonNull)
                         .map(Member::getUser)
                         .map(User::openPrivateChannel)
