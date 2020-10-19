@@ -15,7 +15,7 @@ public class ResponseScheduler {
 
     private ResponseScheduler() {
         Timer timer = new Timer();
-        timer.scheduleAtFixedRate(new Messenger(), 0, 1250);
+        timer.scheduleAtFixedRate(new Messenger(), 1250, 1250);
     }
 
     public static void submit(ScheduledSender provider, String message) {
