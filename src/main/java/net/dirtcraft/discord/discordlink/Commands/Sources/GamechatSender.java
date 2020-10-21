@@ -15,6 +15,7 @@ public class GamechatSender extends WrappedConsole implements ScheduledSender {
 
     @Override
     public void sendDiscordResponse(String message) {
+        message = Utility.sanitiseMinecraftText(message);
         if (message.length() > getCharLimit()) return;
         GameChat.sendMessage(
                 Utility.embedBuilder().addField("__Command__ \"**/" + command.toLowerCase() + "**\" __Sent__", message, false)
