@@ -13,12 +13,12 @@ public class PrivateSender extends WrappedConsole implements ScheduledSender {
 
     @Override
     public void sendDiscordResponse(String message) {
-        if (message.length() > 1950) return;
+        if (message.length() > getCharLimit()) return;
         member.sendMessage("``" + message + "``");
     }
 
     @Override
     public int getCharLimit(){
-        return 1900;
+        return 2000;
     }
 }
