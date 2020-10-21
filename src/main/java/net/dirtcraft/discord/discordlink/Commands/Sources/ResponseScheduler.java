@@ -2,6 +2,7 @@ package net.dirtcraft.discord.discordlink.Commands.Sources;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import net.dirtcraft.discord.discordlink.Utility.Utility;
 
 import java.util.Collection;
 import java.util.Queue;
@@ -19,7 +20,7 @@ public class ResponseScheduler {
     }
 
     public static void submit(ScheduledSender provider, String message) {
-        instance.tasks.add(new Message(provider, message));
+        instance.tasks.add(new Message(provider, Utility.sanitiseMinecraftText(message)));
     }
 
     private static class Message {

@@ -1,7 +1,6 @@
 package net.dirtcraft.discord.discordlink.Commands.Sources;
 
 import net.dirtcraft.discord.discordlink.API.GuildMember;
-import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 
 public class PrivateSender extends WrappedConsole implements ScheduledSender {
@@ -14,7 +13,6 @@ public class PrivateSender extends WrappedConsole implements ScheduledSender {
 
     @Override
     public void sendDiscordResponse(String message) {
-        message = Utility.sanitiseMinecraftText(message);
         if (message.length() > getCharLimit()) return;
         member.sendMessage("``" + message + "``");
     }
