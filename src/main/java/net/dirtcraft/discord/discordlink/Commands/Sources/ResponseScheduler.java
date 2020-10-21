@@ -45,7 +45,7 @@ public class ResponseScheduler {
         private void dispatchMessages(ScheduledSender provider, Collection<String> messages){
             StringBuilder output = new StringBuilder();
             for (String message : messages){
-                if (output.length() + message.length() > 1800){
+                if (output.length() + message.length() > provider.getCharLimit()){
                     provider.sendDiscordResponse(output.toString());
                     output = new StringBuilder(message);
                 } else {
