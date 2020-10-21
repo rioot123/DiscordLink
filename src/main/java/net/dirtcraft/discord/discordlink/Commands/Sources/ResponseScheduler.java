@@ -20,7 +20,7 @@ public class ResponseScheduler {
     }
 
     public static void submit(ScheduledSender provider, String message) {
-        instance.tasks.add(new Message(provider, Utility.sanitiseMinecraftText(message)));
+        instance.tasks.add(new Message(provider, message));
     }
 
     private static class Message {
@@ -46,6 +46,7 @@ public class ResponseScheduler {
         private void dispatchMessages(ScheduledSender provider, Collection<String> messages){
             StringBuilder output = new StringBuilder();
             for (String message : messages){
+                if (provider.sanitise()) message = Utility.sanitiseMinecraftText(message);
                 if (output.length() + message.length() > provider.getCharLimit()){
                     provider.sendDiscordResponse(output.toString());
                     output = new StringBuilder(message);

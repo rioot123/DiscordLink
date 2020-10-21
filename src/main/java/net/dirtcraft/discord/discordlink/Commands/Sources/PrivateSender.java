@@ -21,4 +21,9 @@ public class PrivateSender extends WrappedConsole implements ScheduledSender {
     public int getCharLimit(){
         return 1996;
     }
+
+    @Override
+    public boolean sanitise(){
+        return false;
+    }
 }
