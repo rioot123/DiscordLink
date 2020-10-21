@@ -16,4 +16,9 @@ public class PrivateSender extends WrappedConsole implements ScheduledSender {
         if (message.length() > 1950) return;
         member.sendMessage(message);
     }
+
+    @Override
+    public int getCharLimit(){
+        return 1900;
+    }
 }
