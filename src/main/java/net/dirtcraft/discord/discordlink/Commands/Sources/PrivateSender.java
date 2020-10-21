@@ -14,7 +14,7 @@ public class PrivateSender extends WrappedConsole implements ScheduledSender {
     @Override
     public void sendDiscordResponse(String message) {
         if (message.length() > 1950) return;
-        member.sendMessage(message);
+        member.sendMessage("``" + message + "``");
     }
 
     @Override
