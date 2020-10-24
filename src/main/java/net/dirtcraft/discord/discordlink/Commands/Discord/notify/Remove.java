@@ -1,5 +1,6 @@
 package net.dirtcraft.discord.discordlink.Commands.Discord.notify;
 
+import net.dirtcraft.discord.discordlink.API.GameChat;
 import net.dirtcraft.discord.discordlink.API.GuildMember;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommandExecutor;
 import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
@@ -15,6 +16,7 @@ public class Remove implements DiscordCommandExecutor {
         try {
             PluginConfiguration.Notifier.notify.remove(source.getUser().getIdLong());
             DiscordLink.getInstance().saveConfig();
+            GameChat.sendMessage("Successfully removed " + source.getEffectiveName() + " from the notification list.", 30);
         } catch (Exception e){
             throw new DiscordCommandException(e.getMessage());
         }
