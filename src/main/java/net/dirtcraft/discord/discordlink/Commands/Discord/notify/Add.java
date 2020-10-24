@@ -16,7 +16,8 @@ public class Add implements DiscordCommandExecutor {
         try {
             PluginConfiguration.Notifier.notify.add(source.getUser().getIdLong());
             DiscordLink.getInstance().saveConfig();
-            GameChat.sendMessage("Successfully added " + source.getEffectiveName() + " to the notification list.", 30);
+            GameChat.sendEmbed("Command successfully executed", "Added " + source.getEffectiveName() + " to the notification list.", 30);
+            event.getMessage().delete().queue();
         } catch (Exception e){
             throw new DiscordCommandException(e.getMessage());
         }

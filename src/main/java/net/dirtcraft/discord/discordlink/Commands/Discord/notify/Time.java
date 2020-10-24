@@ -13,11 +13,16 @@ import java.util.List;
 public class Time implements DiscordCommandExecutor {
     @Override
     public void execute(GuildMember source, List<String> args, MessageReceivedEvent event) throws DiscordCommandException {
-        if (args.isEmpty()) throw new DiscordCommandException("You need to specify a time in minutes.");
+        if (args.isEmpty()) {
+            GameChat.sendEmbed("Boot-stall notificator", "notify time is currently " + PluginConfiguration.Notifier.maxStageMinutes + "minutes.", 30);
+            event.getMessage().delete().queue();
+            return;
+        }
         try {
             PluginConfiguration.Notifier.maxStageMinutes = Long.parseLong(args.get(0));
             DiscordLink.getInstance().saveConfig();
-            GameChat.sendMessage("Successfully set notify time to " + PluginConfiguration.Notifier.maxStageMinutes + ".", 30);
+            GameChat.sendEmbed("Command successfully executed", "notify time has been set to " + PluginConfiguration.Notifier.maxStageMinutes + "minutes.", 30);
+            event.getMessage().delete().queue();
         } catch (Exception e){
             throw new DiscordCommandException("Invalid input type!");
         }

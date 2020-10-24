@@ -16,7 +16,8 @@ public class Remove implements DiscordCommandExecutor {
         try {
             PluginConfiguration.Notifier.notify.remove(source.getUser().getIdLong());
             DiscordLink.getInstance().saveConfig();
-            GameChat.sendMessage("Successfully removed " + source.getEffectiveName() + " from the notification list.", 30);
+            GameChat.sendEmbed("Command successfully executed", "Removed " + source.getEffectiveName() + " from the notification list.", 30);
+            event.getMessage().delete().queue();
         } catch (Exception e){
             throw new DiscordCommandException(e.getMessage());
         }
