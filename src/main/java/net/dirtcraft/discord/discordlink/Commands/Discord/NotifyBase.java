@@ -58,6 +58,7 @@ public class NotifyBase extends DiscordCommandTree {
                     .append(alias)
                     .append("\n");
         });
-        GameChat.sendEmbed("Sub Commands:", result.toString());
+        GameChat.sendEmbed("Sub Commands:", result.toString(), 30);
+        event.getMessage().delete().queue();
     }
 }
