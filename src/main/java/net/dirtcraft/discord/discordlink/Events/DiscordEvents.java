@@ -26,7 +26,7 @@ import java.util.*;
 import static net.dirtcraft.discord.discordlink.Utility.Utility.*;
 
 
-public class DiscordEvents extends ListenerAdapter {
+public class DiscordEvents extends ListenerAdapter {//--
 
     private final DiscordCommandManager commandManager;
 
