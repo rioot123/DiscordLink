@@ -20,7 +20,10 @@ public class DiscordCommandTree implements DiscordCommandExecutor {
 
     @Override
     public void execute(GuildMember member, List<String> args, MessageReceivedEvent event) throws DiscordCommandException {
-        if (args.size() == 0) throw new DiscordCommandException("Command not found");
+        if (args.size() == 0) {
+            defaultResponse(member, args, event);
+            return;
+        }
 
         String base = args.remove(0);
         DiscordCommand command = commandMap.get(base);
@@ -36,5 +39,9 @@ public class DiscordCommandTree implements DiscordCommandExecutor {
             result.put(alias, cmd);
         });
         return result;
+    }
+
+    public void defaultResponse(GuildMember member, List<String> args, MessageReceivedEvent event) throws DiscordCommandException{
+        throw new DiscordCommandException("Command not found");
     }
 }

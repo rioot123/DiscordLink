@@ -42,6 +42,7 @@ public class GameChat {
 
     public static void sendEmbed(String header, String message, int duration) {
         header = header == null? "" : header;
+        message = message == null? "" : message;
         MessageEmbed embed = Utility.embedBuilder()
                 .addField(header, message, false)
                 //.setFooter(event.getAuthor().getAsTag(), event.getAuthor().getAvatarUrl())

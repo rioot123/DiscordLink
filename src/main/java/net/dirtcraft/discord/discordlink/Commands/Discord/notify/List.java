@@ -19,8 +19,10 @@ public class List implements DiscordCommandExecutor {
                     .map(GameChat.getGuild()::getMemberById)
                     .filter(Objects::nonNull)
                     .map(Member::getEffectiveName)
+                    .map(s->" **-** " + s)
                     .collect(Collectors.joining("\n"));
-            GameChat.sendMessage(staff, 30);
+            GameChat.sendEmbed("People to notify:", staff, 30);
+            event.getMessage().delete().queue();
         } catch (Exception e){
             throw new DiscordCommandException(e.getMessage());
         }
