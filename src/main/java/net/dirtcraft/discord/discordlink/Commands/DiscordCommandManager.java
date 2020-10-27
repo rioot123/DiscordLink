@@ -101,6 +101,8 @@ public class DiscordCommandManager extends DiscordCommandTree {
             execute(member, null, new ArrayList<>(Arrays.asList(command)));
         } catch (Exception e){
             sendCommandError(member, e.getMessage() != null ? e.getMessage() : "an error occurred while executing the command.");
+        } finally {
+            member.getMessage().delete().queue();
         }
     }
 
