@@ -10,10 +10,7 @@ repositories {
     jcenter()
     mavenCentral()
     maven { url = "https://raw.github.com/FabioZumbi12/UltimateChat/mvn-repo/" }
-    maven {
-        url 'https://jitpack.io'
-        //credentials { username authToken }
-    }
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
@@ -22,8 +19,9 @@ dependencies {
     compile 'net.luckperms:api:5.1'
     compile 'org.spongepowered:spongeapi:7.1.0-SNAPSHOT'
     compile 'br.net.fabiozumbi12.UltimateChat:UltimateChat-Sponge-7:1.9.1'
-    implementation 'com.github.NucleusPowered:Nucleus:1.11.0'
-    compile 'com.github.Dirt-Craft:Sponge-Discord-Lib:deploy-SNAPSHOT'
+    compile 'com.github.NucleusPowered:Nucleus:1.11.0'
+    //compile 'com.github.Dirt-Craft:Sponge-Discord-Lib:deploy-SNAPSHOT'
+    compile 'com.github.Dirt-Craft:Sponge-Discord-Lib:newJDA-SNAPSHOT'
     compile 'com.github.Dirt-Craft:Dirt-Database-Lib:deploy-SNAPSHOT'
 }
 
