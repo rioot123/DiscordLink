@@ -1,6 +1,6 @@
 package net.dirtcraft.discord.discordlink.API;
 
-import net.dv8tion.jda.core.entities.Role;
+import net.dv8tion.jda.api.entities.Role;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import javax.annotation.Nullable;
