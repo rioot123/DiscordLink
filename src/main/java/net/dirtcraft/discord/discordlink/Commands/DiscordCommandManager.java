@@ -1,12 +1,10 @@
 package net.dirtcraft.discord.discordlink.Commands;
 
 import net.dirtcraft.discord.discordlink.API.GameChat;
-import net.dirtcraft.discord.discordlink.API.GuildMember;
 import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.API.Roles;
 import net.dirtcraft.discord.discordlink.Commands.Discord.*;
 import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
-import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Exceptions.DiscordCommandException;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dv8tion.jda.api.EmbedBuilder;

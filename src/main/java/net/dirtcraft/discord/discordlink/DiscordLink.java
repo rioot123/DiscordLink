@@ -1,7 +1,6 @@
 package net.dirtcraft.discord.discordlink;
 
 import com.google.inject.Inject;
-import net.dirtcraft.discord.discordlink.Commands.DiscordCommandManager;
 import net.dirtcraft.discord.discordlink.Commands.Sponge.UnVerify;
 import net.dirtcraft.discord.discordlink.Commands.Sponge.Verify;
 import net.dirtcraft.discord.discordlink.Configuration.ConfigManager;

@@ -22,7 +22,8 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
-import static net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration.Command.*;
+import static net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration.Command.blacklist;
+import static net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration.Command.ignored;
 
 public class Utility {
 

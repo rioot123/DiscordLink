@@ -13,7 +13,6 @@ import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.Exceptions.DiscordCommandException;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 
 public class NotifyBase extends DiscordCommandTree {
     public NotifyBase(){
