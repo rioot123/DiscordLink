@@ -11,7 +11,6 @@ import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.game.state.*;
 
 import java.awt.*;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
