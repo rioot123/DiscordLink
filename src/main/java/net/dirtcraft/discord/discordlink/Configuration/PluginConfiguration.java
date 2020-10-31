@@ -3,26 +3,24 @@ package net.dirtcraft.discord.discordlink.Configuration;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 @ConfigSerializable
 public class PluginConfiguration {
-    @Setting(value = "Main")
-    private PluginConfiguration.Main main = new PluginConfiguration.Main();
-    @Setting(value = "Format")
-    private PluginConfiguration.Format format = new PluginConfiguration.Format();
-    @Setting(value = "Embed")
-    private PluginConfiguration.Embed embed = new PluginConfiguration.Embed();
-    @Setting(value = "Roles")
-    private PluginConfiguration.Roles roles = new PluginConfiguration.Roles();
-    @Setting(value = "Commands")
-    private PluginConfiguration.Command command = new PluginConfiguration.Command();
-    @Setting(value = "Notifier")
-    private PluginConfiguration.Notifier notifier = new PluginConfiguration.Notifier();
+    @Setting private PluginConfiguration.Main main = new PluginConfiguration.Main();
+    @Setting private PluginConfiguration.Format format = new PluginConfiguration.Format();
+    @Setting private PluginConfiguration.Embed embed = new PluginConfiguration.Embed();
+    @Setting private PluginConfiguration.Roles roles = new PluginConfiguration.Roles();
+    @Setting private PluginConfiguration.Command command = new PluginConfiguration.Command();
+    @Setting private PluginConfiguration.Database database = new PluginConfiguration.Database();
+    @Setting private PluginConfiguration.CrashDetector crashDetector= new PluginConfiguration.CrashDetector();
 
-
+    @ConfigSerializable
+    public static class CrashDetector {
+        @Setting(value = "Server-log-ID")
+        public static String serverLogID = "566095634008899585";
+    }
 
     @ConfigSerializable
     public static class Main {
@@ -36,9 +34,17 @@ public class PluginConfiguration {
         @Setting(value = "Bot-Prefix", comment = "Prefix to use bot commands")
         public static String discordCommand = "!";
 
-        @Setting(value = "Discord-Server-ID")
-        public static String discordServerID = "269639757351354368";
+        @Setting(value = "Discord Bot Token")
+        public static String botToken = "";
 
+        @Setting(value = "Gamechat Channel ID")
+        public static String GAMECHAT_CHANNEL_ID = "";
+
+        @Setting(value = "Server Name")
+        public static String SERVER_NAME = "";
+
+        @Setting(value = "Discord Server Invite")
+        public static String DISCORD_INVITE = "https://discord.com/invite/mqQX9f";
     }
 
     @ConfigSerializable
@@ -65,6 +71,8 @@ public class PluginConfiguration {
         @Setting(value = "Player-Disconnect", comment = "Message to Discord when a player leaves the server")
         public static String playerDisconnect = "`{prefix} {username} has left the game`";
 
+        @Setting(value = "Invite-Discord", comment = "Message send to invite player.")
+        public static String discordInvite = "&6Join us on discord! &9&l{url}&6.";
     }
 
     @ConfigSerializable
@@ -75,7 +83,6 @@ public class PluginConfiguration {
 
         @Setting(value = "Timestamp")
         public static boolean timestamp = true;
-
     }
 
     @ConfigSerializable
@@ -135,27 +142,23 @@ public class PluginConfiguration {
 
         @Setting(value = "Admin-Command-Blacklist", comment = "A list of commands admins are not allowed to use.")
         public static List<String> blacklist = Arrays.asList(
-                "luckperms",
+                "pex",
                 "perm",
                 "permissions",
-                "perm",
-                "lp",
                 "execute",
-                "nameban",
-                "nameunban",
                 "whitelist",
                 "minecraft:",
-                "sponge"
+                "spigot",
+                "bukkit",
+                "plugins"
         );
     }
 
     @ConfigSerializable
-    public static class Notifier{
-        @Setting(value = "Boot-Notifier-Minutes", comment = "Max boot stage time (minutes) before sending DMs")
-        public static long maxStageMinutes = 12;
-
-        @Setting(value = "Notify-Users", comment = "Users to DM (Discord ID's)")
-        public static List<Long> notify = new ArrayList<>(Arrays.asList(248056002274918400L, 261928443179040768L));
+    public static class Database {
+        @Setting public static String USER = "";
+        @Setting public static String PASS = "";
+        @Setting public static String IP = "127.0.0.1";
+        @Setting public static int PORT = 3306;
     }
-
 }

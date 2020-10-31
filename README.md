@@ -21,7 +21,7 @@ Changelog
     - Made command output nicer (Especially !help)
     - Added DM command parsing (Currently only does console commands ATM, logged.)
     - Added game construction event to tracked boot stages (boot embeds)
-    - No longer initializes if JDA cannot be loaded, or any of the other deps.
+    - ~~No longer initializes if JDA cannot be loaded, or any of the other deps.~~
     - Made only notify, help, shutdown commands can run pre-boot.
     - Made main class extend boot handler to stop bogus accusations of poor programming
     - Made message delete calls exceptionless to reduce log noise.
@@ -32,15 +32,15 @@ Changelog
   
   - 1.3.1
     - !halt command - nukes the server
-    - !unlink command - removes user from verified database
-    - !sync command - /lp sync for admins
-    - !ranks command - shows ranks
-    - Load plugin at the earliest possible stage to allow for boot cancellation in the event of a thread-lock.
-    - Add server watchdog, DMs listed people if a game-stage exceeds the time threshold. Fully customizable.
-    - Add boot stage embeds so people can see the server boot in realtime.
+    - ~~!unlink command - removes user from verified database~~
+    - ~~!sync command - /lp sync for admins~~
+    - ~~!ranks command - shows ranks~~
+    - ~~Load plugin at the earliest possible stage to allow for boot cancellation in the event of a thread-lock.~~
+    - ~~Add server watchdog, DMs listed people if a game-stage exceeds the time threshold. Fully customizable.~~
+    - ~~Add boot stage embeds so people can see the server boot in realtime.~~
     - Support for upcoming proxy module
-    - Hide vanished players from leave/join messages, !list
+    - ~~Hide vanished players from leave/join messages, !list~~
     - New command feedback system, Stacks messages and sends all at once, eliminating embed spam and instead fills each embed before sending.
     
   - Prior
-    - check git history pleb. I can't be bothered going back further, changelog starts from here.
+    - Refer CHANGELOG.md.

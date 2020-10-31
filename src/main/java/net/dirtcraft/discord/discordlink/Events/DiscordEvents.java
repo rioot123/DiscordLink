@@ -1,36 +1,37 @@
 package net.dirtcraft.discord.discordlink.Events;
 
+import com.earth2me.essentials.Essentials;
+import com.earth2me.essentials.User;
 import net.dirtcraft.discord.discordlink.API.Action;
 import net.dirtcraft.discord.discordlink.API.GameChat;
 import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommandManager;
 import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
-import net.dirtcraft.discord.discordlink.DiscordLink;
+import net.dirtcraft.discord.discordlink.Utility.ApiUtils;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dv8tion.jda.api.entities.ChannelType;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.spongepowered.api.GameState;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.action.TextActions;
-import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.text.format.TextStyles;
-import org.spongepowered.api.text.serializer.TextSerializers;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import static net.dirtcraft.discord.discordlink.Utility.Utility.*;
 
-
 public class DiscordEvents extends ListenerAdapter {
-
     private final DiscordCommandManager commandManager = new DiscordCommandManager();
 
     @Override
@@ -40,7 +41,8 @@ public class DiscordEvents extends ListenerAdapter {
                 if (event.getChannelType() == ChannelType.PRIVATE) processPrivateMessage(event);
                 else if (GameChat.isGamechat(event.getChannel())) processGuildMessage(event);
             } catch (Exception e){
-                DiscordLink.getInstance().getLogger().warn("Exception while processing gamechat message!", e);
+                System.out.println("Exception while processing gamechat message!");
+                e.printStackTrace();
                 Utility.dmExceptionAsync(e, 248056002274918400L);
             }
         });
@@ -53,9 +55,9 @@ public class DiscordEvents extends ListenerAdapter {
         final String rawMessage = event.getMessage().getContentRaw();
         final Action intent = Action.fromMessageRaw(rawMessage);
 
-        if (intent.isChat() && isReady()) discordToMCAsync(sender, message);
+        if (intent.isChat() && ApiUtils.isGameReady()) discordToMCAsync(sender, message);
         else if (intent.isBotCommand()) commandManager.process(sender, intent.getCommand(event));
-        else if (intent.isConsole() && isReady()) {
+        else if (intent.isConsole() && ApiUtils.isGameReady()) {
             boolean executed = toConsole(intent.getCommand(event), sender, intent);
             if (executed && intent.isPrivate()) Utility.logCommand(sender, "__Executed Private Command__");
             event.getMessage().delete().queue(s->{},e->{});
@@ -63,108 +65,123 @@ public class DiscordEvents extends ListenerAdapter {
     }
 
     public void processPrivateMessage(MessageReceivedEvent event) {
-        if (!isReady() || event.getAuthor().isBot()) return;
+        if (!ApiUtils.isGameReady() || event.getAuthor().isBot()) return;
         final MessageSource sender = new MessageSource(event);
         final Action intent = Action.PRIVATE_COMMAND;
         final String message = Action.filterConsolePrefixes(event.getMessage().getContentRaw());
         if (toConsole(message, sender, intent)) logCommand(sender, "__Executed Private Command via DM__");
     }
 
-    private static void discordToMCAsync(MessageSource sender, String message){
-        Task.builder()
-                .async()
-                .execute(() -> discordToMc(sender, message))
-                .submit(DiscordLink.getInstance());
+    private void discordToMCAsync(MessageSource sender, String message){
+        final Optional<OfflinePlayer> optSpigotUser = sender.getPlayerData();
+        final String mcUsername = optSpigotUser.isPresent() && optSpigotUser.get().getName() != null ? optSpigotUser.get().getName() : null;
+        final String username;
+
+        if (sender.isStaff() || mcUsername == null) username = sender.getHighestRank().getStyle() + sender.getEffectiveName().replaceAll(STRIP_CODE_REGEX, "");
+        else username = sender.getNameStyle() + mcUsername;
+
+        final String[] elements = formatColourCodes(PluginConfiguration.Format.discordToServer)
+                .replace("{username}", username)
+                .replace("»", sender.getChevron())
+                .split("\\{message}");
+
+        if (elements.length < 1) return;
+        ArrayList<BaseComponent> result = new ArrayList<>();
+        result.add(new TextComponent(formatNonMessageElements(elements[0], sender, mcUsername)));
+        formatMessageElements(message, sender, result);
+        if (elements.length == 2) result.add(new TextComponent(formatNonMessageElements(elements[1], sender, mcUsername)));
+
+        BaseComponent[] toBroadcast = new BaseComponent[result.size()];
+        for (int i = 0; i < toBroadcast.length; i++) toBroadcast[i] = result.get(i);
+
+        if (!sender.isStaff() && optSpigotUser.isPresent()) {
+            sendMessageToPlayer(optSpigotUser.get(), toBroadcast);
+        } else {
+            Bukkit.getOnlinePlayers().forEach(p->p.spigot().sendMessage(toBroadcast));
+        }
+
+        final StringBuilder plain = new StringBuilder();
+        Arrays.stream(toBroadcast).forEach(t->plain.append(Utility.removeColourCodes(t.toLegacyText())));
+        System.out.println(plain);
     }
 
-    private static void discordToMc(MessageSource sender, String message){
-        try {
-            final Optional<User> optUser = sender.getSpongeUser();
-            final String mcUsername = optUser.map(User::getName).orElse(null);
-            final Text.Builder toBroadcast = Text.builder();
-            final String username;
+    private void sendMessageToPlayer(OfflinePlayer optSpigotUser, BaseComponent[] toBroadcast) {
+        final Essentials ess = (Essentials) Bukkit.getPluginManager().getPlugin("Essentials");
 
-            if (sender.isStaff() || mcUsername == null) username = sender.getHighestRank().getStyle() + sender.getEffectiveName().replaceAll(STRIP_CODE_REGEX, "");
-            else username = sender.getNameStyle() + mcUsername;
+        if (ess == null) {
+            Bukkit.getOnlinePlayers().forEach(p->p.spigot().sendMessage(toBroadcast));
+        } else {
+            final User senderUser = ess.getUser(optSpigotUser.getUniqueId());
 
+            if (senderUser == null) {
+                Bukkit.getOnlinePlayers().forEach(p->p.spigot().sendMessage(toBroadcast));
+                return;
+            }
 
-            String[] messageElements = PluginConfiguration.Format.discordToServer
-                    .replace("{username}", username)
-                    .replace("»", sender.getChevron())
-                    .split("\\{message}");
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                final User playerUser = ess.getUser(player.getUniqueId());
 
-            if (messageElements.length == 0) return;
-            toBroadcast.append(formatNonContentElements(sender, mcUsername, messageElements[0]));
-            toBroadcast.append(formatContentElement(sender.isStaff(), message));
-            if (messageElements.length > 1)
-                toBroadcast.append(formatNonContentElements(sender, mcUsername, messageElements[1]));
+                if (playerUser != null)  {
+                    if (playerUser.isIgnoredPlayer(senderUser)) continue;
+                }
 
-            Sponge.getServer().getBroadcastChannel().send(toBroadcast.build());
-        } catch (Exception e){
-            Utility.dmExceptionAsync(e, 248056002274918400L);
-            e.printStackTrace();
+                player.spigot().sendMessage(toBroadcast);
+            }
         }
     }
 
-    private static Collection<Text> formatContentElement(boolean isStaff, String message){
-        final List<Text> text = new ArrayList<>();
+    private void formatMessageElements(String message, MessageSource sender, List<BaseComponent> output){
         final StringBuilder sb = new StringBuilder();
         Arrays.stream(message.split(" ")).forEach(s->{
-            if (s.toLowerCase().matches(URL_DETECT_REGEX)){
-                s+=" ";
-                Text.Builder url = Text.builder(s);
-                try{
-                    url.color(TextColors.BLUE);
-                    url.style(TextStyles.UNDERLINE, TextStyles.ITALIC);
-                    url.onClick(TextActions.openUrl(new URL(s)));
-                    url.onHover(TextActions.showText(Text.of("§aClick to open link")));
-                } catch (MalformedURLException e){
-                    url.color(TextColors.BLUE);
-                    url.style(TextStyles.UNDERLINE, TextStyles.ITALIC);
-                    url.onHover(TextActions.showText(Text.of("§cMalformed URL")));
-                }
-                text.add(Text.of(sb.toString()));
-                text.add(url.build());
+            if (s.toLowerCase().matches(DETECT_URL_REGEX)){
+                BaseComponent toBroadcast = new TextComponent(s);
+                BaseComponent[] urlHover = new BaseComponent[1];
+                urlHover[0] = new TextComponent("Click to open url!");
+                toBroadcast.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, s));
+                toBroadcast.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, urlHover));
+                toBroadcast.setColor(ChatColor.BLUE);
+                toBroadcast.setItalic(true);
+                toBroadcast.setUnderlined(true);
+                output.add(new TextComponent(sb.toString()));
+                output.add(toBroadcast);
                 sb.setLength(0);
+                sb.append(" ");
             } else {
-                s+=" ";
-                String element = isStaff? s.replaceAll(STRIP_CODE_REGEX, "§$1") : s.replaceAll(STRIP_CODE_REGEX,"");
-                sb.append(element);
+                if (sender.isStaff()) sb.append(formatColourCodes(s)).append(" ");
+                else sb.append(s.replaceAll(STRIP_CODE_REGEX, "")).append(" ");
             }
         });
-        if (sb.length() != 0){
+        if (sb.length() != 0) {
             sb.setLength(sb.length()-1);
-            text.add(Text.of(sb.toString()));
+            output.add(new TextComponent(sb.toString()));
         }
-        return text;
     }
 
-    private static Text formatNonContentElements(MessageSource sender, String mcUsername, String element){
-        Text.Builder text = Text.builder().append(TextSerializers.FORMATTING_CODE.deserialize(element));
-        List<String> tooltip = new ArrayList<>();
+    private TextComponent formatNonMessageElements(String message, MessageSource sender, String mcUsername){
+        TextComponent formattedMessage = new TextComponent(message);
 
-        tooltip.add("&5&nClick me&7 to join &cDirtCraft's &9Discord");
-        if (mcUsername != null) tooltip.add("&7MC Username&8: &6" + mcUsername);
-        tooltip.add("&7Discord Name&8: &6" + sender.getUser().getName() + "&8#&7" + sender.getUser().getDiscriminator());
-        tooltip.add("§7Rank§8: §6" + sender.getHighestRank().getName());
-        tooltip.add("§7Staff Member§8: §6" + (sender.isStaff() ? "§aYes" : "§cNo"));
+        ArrayList<String> tooltip = new ArrayList<>();
+        tooltip.add("§5§nClick me§7 to join §cDirtCraft's §9Discord");
+        if (mcUsername != null) tooltip.add("\n§7MC Username§8: §6" + mcUsername);
+        tooltip.add("\n§7Discord Name§8: §6" + sender.getUser().getName() + "§8#§7" + sender.getUser().getDiscriminator());
+        tooltip.add("\n§7Rank§8: §6" + sender.getHighestRank().getName());
+        tooltip.add("\n§7Staff Member§8: §6" + (sender.isStaff() ? "§aYes" : "§cNo"));
 
-        text.onHover(TextActions.showText(format(String.join("\n", tooltip))));
-        try{
-            text.onClick(TextActions.openUrl(new URL("https://dirtcraft.net")));
-        } catch (MalformedURLException ignored){}
-        return text.toText();
+        final BaseComponent[] hoverElement = tooltip.stream().map(TextComponent::new).toArray(BaseComponent[]::new);
+
+        formattedMessage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverElement));
+        formattedMessage.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, PluginConfiguration.Main.DISCORD_INVITE));
+        return formattedMessage;
     }
 
     private boolean hasAttachment(MessageReceivedEvent event) {
-        for (net.dv8tion.jda.api.entities.Message.Attachment attachment : event.getMessage().getAttachments()) {
-            if (attachment != null) return true;
+        boolean hasAttachment = false;
+        for (Message.Attachment attachment : event.getMessage().getAttachments()) {
+            if (attachment != null) {
+                hasAttachment = true;
+            }
         }
-        return false;
-    }
-
-    private boolean isReady(){
-        return Sponge.getGame().getState() == GameState.SERVER_STARTED;
+        return hasAttachment;
     }
 
 }

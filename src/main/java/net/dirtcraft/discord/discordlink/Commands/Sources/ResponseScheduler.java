@@ -47,6 +47,7 @@ public class ResponseScheduler {
             StringBuilder output = new StringBuilder();
             for (String message : messages){
                 if (provider.sanitise()) message = Utility.sanitiseMinecraftText(message);
+                else message = Utility.stripColorCodes(message);
                 if (output.length() + message.length() > provider.getCharLimit()){
                     provider.sendDiscordResponse(output.toString());
                     output = new StringBuilder(message);

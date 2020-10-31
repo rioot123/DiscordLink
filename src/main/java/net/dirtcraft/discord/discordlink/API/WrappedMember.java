@@ -14,7 +14,7 @@ import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
 
-public class WrappedMember implements Member {
+public abstract class WrappedMember implements Member {
     protected final Member member;
 
     public WrappedMember(Member member){
@@ -77,6 +77,7 @@ public class WrappedMember implements Member {
         return member.hasPermission(channel, permissions);
     }
 
+    @NotNull
     @Override
     public JDA getJDA() {
         return member.getJDA();
@@ -139,7 +140,7 @@ public class WrappedMember implements Member {
         return member.getEffectiveName();
     }
 
-    @Nonnull
+    @NotNull
     @Override
     public List<Role> getRoles() {
         return member.getRoles();
@@ -156,8 +157,8 @@ public class WrappedMember implements Member {
     }
 
     @Override
-    public boolean canInteract(@NotNull Member member) {
-        return this.member.canInteract(member);
+    public boolean canInteract(Member member) {
+        return member.canInteract(member);
     }
 
     @Override

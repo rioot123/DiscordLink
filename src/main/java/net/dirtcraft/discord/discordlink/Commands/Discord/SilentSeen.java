@@ -5,9 +5,8 @@ import net.dirtcraft.discord.discordlink.Commands.DiscordCommandExecutor;
 import net.dirtcraft.discord.discordlink.Commands.Sources.PrivateSender;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Exceptions.DiscordCommandException;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.scheduler.Task;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,7 +16,7 @@ public class SilentSeen implements DiscordCommandExecutor {
     public void execute(MessageSource source, String cmd, List<String> args) throws DiscordCommandException {
         String target;
         if (args.isEmpty()){
-            Optional<User> optUser = source.getSpongeUser();
+            Optional<OfflinePlayer> optUser = source.getPlayerData();
             if (!optUser.isPresent()) throw new DiscordCommandException("You must be verified in order to not specify a player!");
             else target = optUser.get().getName();
         } else {
@@ -25,8 +24,6 @@ public class SilentSeen implements DiscordCommandExecutor {
         }
         String command = "seen " + target;
         PrivateSender sender = new PrivateSender(source, command);
-        Task.builder()
-                .execute(() -> Sponge.getCommandManager().process(sender, command))
-                .submit(DiscordLink.getInstance());
+        Bukkit.getScheduler().callSyncMethod(DiscordLink.getInstance(), ()->Bukkit.dispatchCommand(sender, command));
     }
 }

@@ -12,12 +12,12 @@ import java.util.stream.Collectors;
 import static net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration.Main.*;
 
 public enum Action {
-    CHAT            ( "\n",    Sender.NONE,     Type.CHAT_MESSAGE),
+    CHAT            ( "\n",    Sender.NONE,     Type.CHAT_MESSAGE    ),
     PUBLIC_BUNGEE   ( "$",     Sender.GAMECHAT, Type.BUNGEE_COMMAND  ),
     PRIVATE_BUNGEE  ( "#$",    Sender.PRIVATE,  Type.BUNGEE_COMMAND  ),
-    PUBLIC_COMMAND  ( consolePublic,  Sender.GAMECHAT, Type.CONSOLE_COMMAND ),
-    PRIVATE_COMMAND ( consolePrivate, Sender.PRIVATE,  Type.CONSOLE_COMMAND ),
-    DISCORD_COMMAND ( discordCommand, Sender.NONE,     Type.DISCORD_COMMAND );
+    PUBLIC_COMMAND  (consolePublic,   Sender.GAMECHAT, Type.CONSOLE_COMMAND ),
+    PRIVATE_COMMAND (consolePrivate,  Sender.PRIVATE,  Type.CONSOLE_COMMAND ),
+    DISCORD_COMMAND (discordCommand,  Sender.NONE,     Type.DISCORD_COMMAND );
 
     final public String prefix;
     final public Sender sender;

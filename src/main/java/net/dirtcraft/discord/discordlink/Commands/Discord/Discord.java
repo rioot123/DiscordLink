@@ -5,9 +5,8 @@ import net.dirtcraft.discord.discordlink.API.GuildMember;
 import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommandExecutor;
 import net.dirtcraft.discord.discordlink.Exceptions.DiscordCommandException;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.service.user.UserStorageService;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,20 +14,21 @@ import java.util.UUID;
 import java.util.regex.Pattern;
 
 public class Discord implements DiscordCommandExecutor {
+    @SuppressWarnings("deprecation") // stupid bukkit bullcrap
     @Override
     public void execute(MessageSource source, String command, List<String> args) throws DiscordCommandException {
-        final UserStorageService userStorageService = Sponge.getServiceManager().provideUnchecked(UserStorageService.class);
-        if (args.size() < 1) throw new DiscordCommandException("Invalid Minecraft name");
+        if (args.isEmpty()) throw new DiscordCommandException("Invalid Minecraft name");
         final String minecraftIdentifier = args.get(0);
-        User optUser;
+        OfflinePlayer offlinePlayer;
         Pattern pattern = Pattern.compile("(\\d{8}-?\\d{4}-?\\d{4}-?\\d{4}-?\\d{12})");
         if ((minecraftIdentifier.length() == 32 || minecraftIdentifier.length() == 36) && pattern.matcher(minecraftIdentifier).matches()){
             UUID uuid = UUID.fromString(minecraftIdentifier);
-            optUser = userStorageService.get(uuid).orElseThrow(()->new DiscordCommandException("Invalid UUID."));
+            offlinePlayer = Bukkit.getOfflinePlayer(uuid);
         } else {
-            optUser = userStorageService.get(minecraftIdentifier).orElseThrow(()->new DiscordCommandException("Invalid username."));
+            offlinePlayer = Bukkit.getOfflinePlayer(minecraftIdentifier);
         }
-        Optional<GuildMember> optDiscordSource = GuildMember.fromPlayerId(optUser.getUniqueId());
+        if (!offlinePlayer.hasPlayedBefore()) throw new DiscordCommandException("Invalid username or UUID.");
+        Optional<GuildMember> optDiscordSource = GuildMember.fromPlayerId(offlinePlayer.getUniqueId());
         if (!optDiscordSource.isPresent()) throw new DiscordCommandException("User not verified.");
         GameChat.sendEmbed(null, "\\" + optDiscordSource.get().getAsMention());
     }

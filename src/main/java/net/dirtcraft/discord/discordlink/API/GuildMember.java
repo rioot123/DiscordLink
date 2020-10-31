@@ -1,38 +1,32 @@
 package net.dirtcraft.discord.discordlink.API;
 
 import net.dirtcraft.discord.discordlink.DiscordLink;
+import net.dirtcraft.discord.discordlink.Utility.ApiUtils;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.service.user.UserStorageService;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 
 import java.util.*;
 
 public class GuildMember extends WrappedMember {
-    private User user;
+    private OfflinePlayer user;
     private boolean retrievedPlayer;
     private List<Roles> roles;
     private Roles highestRank;
 
-    public static Optional<GuildMember> fromPlayerId(UUID player){
-        String memberID =  DiscordLink.getInstance().getStorage().getDiscordUser(player);
+    public static Optional<GuildMember> fromPlayerId(UUID player) {
+        String memberID = DiscordLink.getInstance().getStorage().getDiscordUser(player);
         if (memberID == null) return Optional.empty();
 
         final Member member = Utility.getMemberById(memberID).orElse(null);
         if (member == null) return Optional.empty();
 
         final GuildMember profile = new GuildMember(member);
-        profile.user = Sponge.getServiceManager()
-                .provideUnchecked(UserStorageService.class)
-                .get(player)
-                .orElse(null);
+        profile.user = ApiUtils.getPlayerOffline(player).orElse(null);
         profile.retrievedPlayer = true;
-
         return Optional.of(profile);
     }
 
@@ -53,21 +47,18 @@ public class GuildMember extends WrappedMember {
     }
 
     public Optional<Player> getPlayer(){
-        if (!retrievedPlayer){
-            final Optional<User> optUser = getSpongeUser();
-            return optUser.flatMap(User::getPlayer);
-        } else if (user == null) return Optional.empty();
-        else return user.getPlayer();
+        if (!retrievedPlayer) return getPlayerData().flatMap(ApiUtils::getPlayer);
+        else return Optional.ofNullable(user).flatMap(ApiUtils::getPlayer);
     }
 
-    public Optional<User> getSpongeUser(){
-        if (!retrievedPlayer){
-            final UserStorageService userStorage = Sponge.getGame().getServiceManager().provideUnchecked(UserStorageService.class);
+    public Optional<OfflinePlayer> getPlayerData(){
+        if (!retrievedPlayer) {
             final String playerId = DiscordLink.getInstance().getStorage().getUUIDfromDiscordID(member.getUser().getId());
-            final Optional<User> optUser = playerId == null ? Optional.empty() : userStorage.get(UUID.fromString(playerId));
-            user = optUser.orElse(null);
+            final Optional<OfflinePlayer> optData = Optional.ofNullable(playerId)
+                    .map(UUID::fromString)
+                    .flatMap(ApiUtils::getPlayerOffline);
             retrievedPlayer = true;
-            return optUser;
+            return optData;
         } else return Optional.ofNullable(user);
     }
 
@@ -79,19 +70,19 @@ public class GuildMember extends WrappedMember {
         member.getUser().openPrivateChannel().queue(dm-> dm.sendMessage(message).queue());
     }
 
-    public boolean isStaff(){
+    public boolean isStaff() {
         return roles.contains(Roles.STAFF);
     }
 
-    public boolean isDonor(){
+    public boolean isDonor() {
         return roles.contains(Roles.DONOR);
     }
 
-    public boolean isBoosting(){
+    public boolean isBoosting() {
         return roles.contains(Roles.NITRO);
     }
 
-    public boolean isVerified(){
+    public boolean isVerified() {
         return roles.contains(Roles.VERIFIED);
     }
 
@@ -107,7 +98,7 @@ public class GuildMember extends WrappedMember {
         return highestRank.getStyle();
     }
 
-    @NonNull public Roles getHighestRank(){
+    public Roles getHighestRank(){
         return highestRank;
     }
 }

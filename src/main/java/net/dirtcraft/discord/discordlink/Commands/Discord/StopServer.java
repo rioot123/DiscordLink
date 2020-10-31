@@ -1,9 +1,9 @@
 package net.dirtcraft.discord.discordlink.Commands.Discord;
 
+import cpw.mods.fml.common.FMLCommonHandler;
 import net.dirtcraft.discord.discordlink.API.GameChat;
 import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommandExecutor;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -24,7 +24,7 @@ public class StopServer implements DiscordCommandExecutor {
         } catch (Throwable ignored){
 
         } finally {
-            CompletableFuture.runAsync(()->FMLCommonHandler.instance().exitJava(-1, !gracefulExit));
+            CompletableFuture.runAsync(()-> FMLCommonHandler.instance().exitJava(-1, !gracefulExit));
         }
     }
 }

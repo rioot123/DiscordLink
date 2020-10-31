@@ -1,124 +1,114 @@
 package net.dirtcraft.discord.discordlink;
 
-import com.google.inject.Inject;
-import net.dirtcraft.discord.discordlink.Commands.Sponge.UnVerify;
-import net.dirtcraft.discord.discordlink.Commands.Sponge.Verify;
-import net.dirtcraft.discord.discordlink.Configuration.ConfigManager;
+import com.google.common.reflect.TypeToken;
+import net.dirtcraft.discord.dirtdatabaselib.SQLManager;
+import net.dirtcraft.discord.discordlink.API.GameChat;
+import net.dirtcraft.discord.discordlink.Commands.Bukkit.Discord;
+import net.dirtcraft.discord.discordlink.Commands.Bukkit.Unverify;
+import net.dirtcraft.discord.discordlink.Commands.Bukkit.Verify;
+import net.dirtcraft.discord.discordlink.Commands.DiscordCommandManager;
+import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.Database.Storage;
-import net.dirtcraft.discord.discordlink.Events.*;
+import net.dirtcraft.discord.discordlink.Events.DiscordEvents;
+import net.dirtcraft.discord.discordlink.Events.SpigotEvents;
+import net.dirtcraft.discord.discordlink.Utility.CrashDetector;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
-import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.api.JDA;
-import ninja.leaping.configurate.commented.CommentedConfigurationNode;
-import ninja.leaping.configurate.loader.ConfigurationLoader;
-import org.slf4j.Logger;
-import org.spongepowered.api.GameState;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.command.spec.CommandSpec;
-import org.spongepowered.api.config.DefaultConfig;
-import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.Order;
-import org.spongepowered.api.event.game.state.GameConstructionEvent;
-import org.spongepowered.api.event.game.state.GameInitializationEvent;
-import org.spongepowered.api.plugin.Dependency;
-import org.spongepowered.api.plugin.Plugin;
-import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.text.Text;
+import net.dv8tion.jda.api.JDABuilder;
+import net.milkbowl.vault.chat.Chat;
+import ninja.leaping.configurate.ConfigurationNode;
+import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
+import ninja.leaping.configurate.objectmapping.ObjectMappingException;
+import org.bukkit.Bukkit;
+import org.bukkit.plugin.RegisteredServiceProvider;
+import org.bukkit.plugin.java.JavaPlugin;
 
-@Plugin(
-        id = "discord-link",
-        name = "Discord Link",
-        description = "Handles gamechats on the DirtCraft Discord.",
-        authors = {
-                "juliann",
-                "ShinyAfro"
-        },
-        dependencies = {
-                @Dependency(id = "sponge-discord-lib", optional = true),
-                @Dependency(id = "ultimatechat", optional = true),
-                @Dependency(id = "dirt-database-lib", optional = true)
-        }
-)
-public class DiscordLink extends ServerBootHandler {
+import javax.security.auth.login.LoginException;
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+@SuppressWarnings("UnstableApiUsage")
+public class DiscordLink extends JavaPlugin {
+
     private static DiscordLink instance;
     private static JDA jda;
 
-    @DefaultConfig(sharedRoot = false)
-    @Inject private ConfigurationLoader<CommentedConfigurationNode> loader;
-    @Inject private Logger logger;
-    @Inject private PluginContainer container;
-    private ConfigManager configManager;
+    public final List<UUID> tpSpawnList = new ArrayList<>();
     private Storage storage;
 
     @Override
-    @Listener (order = Order.AFTER_PRE)
-    public void onGameConstruction(GameConstructionEvent event) {
-        logger.info("Discord Link initializing...");
-        if (!Sponge.getPluginManager().isLoaded("sponge-discord-lib")) {
-            logger.error("Sponge-Discord-Lib is not installed! " + container.getName() + " will not load.");
-            return;
-        }
-        if (!Sponge.getPluginManager().isLoaded("dirt-database-lib")) {
-            logger.error("Dirt-Database-Lib is not installed! " + container.getName() + " will not load.");
-            return;
-        }
-        if ((jda = SpongeDiscordLib.getJDA()) == null) {
-            logger.error("JDA failed to connect to discord gateway! " + container.getName() + " will not load.");
-            return;
-        }
-        this.configManager = new ConfigManager(loader);
-        this.storage = new Storage();
+    public void onEnable() {
+        saveDefaultConfig();
         instance = this;
 
-        getJDA().addEventListener(new DiscordEvents());
-        super.onGameConstruction(event);
-        logger.info("Discord Link initialized");
+        try {
+            File configDir = new File(getDataFolder(), "config.hocon");
+            //noinspection ResultOfMethodCallIgnored
+            getDataFolder().mkdirs();
+            HoconConfigurationLoader loader = HoconConfigurationLoader.builder()
+                    .setFile(configDir)
+                    .build();
+            ConfigurationNode node = loader.load(loader.getDefaultOptions().setShouldCopyDefaults(true));
+            node.getValue(TypeToken.of(PluginConfiguration.class), new PluginConfiguration());
+            loader.save(node);
+
+            jda = JDABuilder.createDefault(PluginConfiguration.Main.botToken)
+                    .build()
+                    .awaitReady();
+            jda.addEventListener(new DiscordEvents());
+
+        } catch (IOException | ObjectMappingException e){
+            System.out.println("[DISCORD-LINK]: FAILED TO PARSE CONFIG. PLEASE MAKE SURE CONFIG DIR IS ACCESSABLE / HAS FILE WRITE ACCESS.");
+            e.printStackTrace();
+            return;
+        } catch (LoginException | InterruptedException e){
+            System.out.println("[DISCORD-LINK]: FAILED TO LOG ON USING BOT TOKEN. MAKE SURE BOT TOKEN IS VALID!!!");
+            e.printStackTrace();
+            return;
+        }
+
+        RegisteredServiceProvider<Chat> chatProvider = getServer().getServicesManager().getRegistration(Chat.class);
+        Chat chat;
+        if (chatProvider == null) return;
+        else chat = chatProvider.getProvider();
+
+        Bukkit.getPluginManager().registerEvents(new SpigotEvents(chat), this);
+
+        this.storage = new Storage();
+        Utility.setStatus();
+        Utility.setTopic();
+        GameChat.sendMessage(
+                Utility.embedBuilder()
+                        .setColor(Color.GREEN)
+                        .setDescription(PluginConfiguration.Format.serverStart
+                                .replace("{modpack}", PluginConfiguration.Main.SERVER_NAME)
+                        ).build());
+
+        getCommand("verify").setExecutor(new Verify());
+        getCommand("unverify").setExecutor(new Unverify());
+        getCommand("discord").setExecutor(new Discord());
+
+        CrashDetector.analyze(this);
     }
 
     @Override
-    @Listener(order = Order.PRE)
-    public void onGameInitialization(GameInitializationEvent event) {
-        super.onGameInitialization(event);
-        if (instance == null) return;
-        Sponge.getEventManager().registerListeners(instance, new SpongeEvents(instance, storage));
-        this.registerCommands();
+    public void onDisable() {
+        SQLManager.close();
         Utility.setStatus();
         Utility.setTopic();
-
-        if (SpongeDiscordLib.getServerName().toLowerCase().contains("pixel")) {
-            Sponge.getEventManager().registerListeners(instance, new NormalChat());
-        } else {
-            Sponge.getEventManager().registerListeners(instance, new UltimateChat());
-        }
-    }
-
-    private void registerCommands(){
-        CommandSpec verify = CommandSpec.builder()
-                .description(Text.of("Verifies your Discord account"))
-                .executor(new Verify(storage))
-                .arguments(GenericArguments.optional(GenericArguments.string(Text.of("code"))))
-                .build();
-
-        CommandSpec unverify = CommandSpec.builder()
-                .description(Text.of("Unverifies your Discord account"))
-                .executor(new UnVerify(storage))
-                .build();
-
-        Sponge.getCommandManager().register(this, verify, "verify", "link");
-        Sponge.getCommandManager().register(this, unverify, "unverify", "unlink");
-    }
-
-    public void saveConfig(){
-        configManager.save();
+        GameChat.sendMessage(
+                Utility.embedBuilder()
+                        .setDescription(PluginConfiguration.Format.serverStop
+                                .replace("{modpack}", PluginConfiguration.Main.SERVER_NAME)
+                        ).build());
     }
 
     public Storage getStorage(){
         return storage;
-    }
-
-    public Logger getLogger(){
-        return logger;
     }
 
     public static DiscordLink getInstance() {
@@ -128,11 +118,4 @@ public class DiscordLink extends ServerBootHandler {
     public static JDA getJDA() {
         return jda;
     }
-
-    private static boolean isReady(){
-        return instance != null &&
-               jda != null &&
-               Sponge.getGame().getState() == GameState.SERVER_STARTED;
-    }
-
 }

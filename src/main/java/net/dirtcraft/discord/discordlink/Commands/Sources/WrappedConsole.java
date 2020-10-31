@@ -1,138 +1,138 @@
 package net.dirtcraft.discord.discordlink.Commands.Sources;
 
-import net.dirtcraft.dirtlocker.API.ConsoleLock.SecuredSource;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.source.ConsoleSource;
-import org.spongepowered.api.service.context.Context;
-import org.spongepowered.api.service.permission.SubjectCollection;
-import org.spongepowered.api.service.permission.SubjectData;
-import org.spongepowered.api.service.permission.SubjectReference;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.channel.MessageChannel;
-import org.spongepowered.api.util.Tristate;
+import org.bukkit.Bukkit;
+import org.bukkit.Server;
+import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.conversations.Conversation;
+import org.bukkit.conversations.ConversationAbandonedEvent;
+import org.bukkit.permissions.Permission;
+import org.bukkit.permissions.PermissionAttachment;
+import org.bukkit.permissions.PermissionAttachmentInfo;
+import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
-public abstract class WrappedConsole implements ConsoleSource, SecuredSource, ScheduledSender {
+public abstract class WrappedConsole implements ConsoleCommandSender, ScheduledSender {
 
-    private CommandSource actualSource;
+    private ConsoleCommandSender actualSource = Bukkit.getConsoleSender();
 
     WrappedConsole(){
-        actualSource = Sponge.getServer().getConsole();
-    }
-
-
-    @Override
-    public void sendMessage(Text message) {
-        ResponseScheduler.submit(this, message.toPlain());
     }
 
     @Override
-    public void sendMessages(Iterable<Text> messages) {
-        for (Text message : messages) ResponseScheduler.submit(this, message.toPlain());
+    public void sendMessage(@NotNull String message) {
+        ResponseScheduler.submit(this, message);
     }
 
     @Override
-    public void sendMessages(Text... messages) {
-        for (Text message : messages) ResponseScheduler.submit(this, message.toPlain());
+    public void sendMessage(@NotNull String[] messages) {
+        for (String message : messages) sendMessage(message);
     }
 
     @Override
-    public String getName() {
-        return this.actualSource.getName();
+    public void sendRawMessage(@NotNull String message) {
+        sendMessage(message);
     }
 
     @Override
-    public boolean isSubjectDataPersisted() {
-        return this.actualSource.isSubjectDataPersisted();
+    public @NotNull Server getServer() {
+        return actualSource.getServer();
     }
 
     @Override
-    public SubjectReference asSubjectReference() {
-        return this.actualSource.asSubjectReference();
+    public @NotNull String getName() {
+        return actualSource.getName();
     }
 
     @Override
-    public MessageChannel getMessageChannel() {
-        return this.actualSource.getMessageChannel();
+    public boolean isConversing() {
+        return actualSource.isConversing();
     }
 
     @Override
-    public void setMessageChannel(MessageChannel channel) {
-        this.actualSource.setMessageChannel(channel);
+    public void acceptConversationInput(@NotNull String input) {
+        actualSource.acceptConversationInput(input);
     }
 
     @Override
-    public Optional<CommandSource> getCommandSource() {
-        return this.actualSource.getCommandSource();
+    public boolean beginConversation(@NotNull Conversation conversation) {
+        return actualSource.beginConversation(conversation);
     }
 
     @Override
-    public SubjectCollection getContainingCollection() {
-        return this.actualSource.getContainingCollection();
+    public void abandonConversation(@NotNull Conversation conversation) {
+        actualSource.abandonConversation(conversation);
     }
 
     @Override
-    public SubjectData getSubjectData() {
-        return this.actualSource.getSubjectData();
+    public void abandonConversation(@NotNull Conversation conversation, @NotNull ConversationAbandonedEvent details) {
+        actualSource.abandonConversation(conversation, details);
     }
 
     @Override
-    public SubjectData getTransientSubjectData() {
-        return this.actualSource.getTransientSubjectData();
+    public boolean isPermissionSet(@NotNull String name) {
+        return actualSource.isPermissionSet(name);
     }
 
     @Override
-    public boolean hasPermission(Set<Context> contexts, String permission) {
-        return this.actualSource.hasPermission(contexts, permission);
+    public boolean isPermissionSet(@NotNull Permission perm) {
+        return actualSource.isPermissionSet(perm);
     }
 
     @Override
-    public boolean hasPermission(String permission) {
-        return this.actualSource.hasPermission(permission);
+    public boolean hasPermission(@NotNull String name) {
+        return actualSource.hasPermission(name);
     }
 
     @Override
-    public Tristate getPermissionValue(Set<Context> contexts, String permission) {
-        return this.actualSource.getPermissionValue(contexts, permission);
+    public boolean hasPermission(@NotNull Permission perm) {
+        return actualSource.hasPermission(perm);
     }
 
     @Override
-    public boolean isChildOf(SubjectReference parent) {
-        return this.actualSource.isChildOf(parent);
+    public @NotNull PermissionAttachment addAttachment(@NotNull Plugin plugin, @NotNull String name, boolean value) {
+        return actualSource.addAttachment(plugin, name, value);
     }
 
     @Override
-    public boolean isChildOf(Set<Context> contexts, SubjectReference parent) {
-        return this.actualSource.isChildOf(contexts, parent);
+    public @NotNull PermissionAttachment addAttachment(@NotNull Plugin plugin) {
+        return actualSource.addAttachment(plugin);
     }
 
     @Override
-    public List<SubjectReference> getParents() {
-        return this.actualSource.getParents();
+    public @Nullable PermissionAttachment addAttachment(@NotNull Plugin plugin, @NotNull String name, boolean value, int ticks) {
+        return actualSource.addAttachment(plugin, name, value, ticks);
     }
 
     @Override
-    public List<SubjectReference> getParents(Set<Context> contexts) {
-        return this.actualSource.getParents(contexts);
+    public @Nullable PermissionAttachment addAttachment(@NotNull Plugin plugin, int ticks) {
+        return actualSource.addAttachment(plugin, ticks);
     }
 
     @Override
-    public Optional<String> getOption(Set<Context> contexts, String key) {
-        return this.actualSource.getOption(contexts, key);
+    public void removeAttachment(@NotNull PermissionAttachment attachment) {
+        actualSource.removeAttachment(attachment);
     }
 
     @Override
-    public String getIdentifier() {
-        return this.actualSource.getIdentifier();
+    public void recalculatePermissions() {
+        actualSource.recalculatePermissions();
     }
 
     @Override
-    public Set<Context> getActiveContexts() {
-        return this.actualSource.getActiveContexts();
+    public @NotNull Set<PermissionAttachmentInfo> getEffectivePermissions() {
+        return actualSource.getEffectivePermissions();
     }
 
+    @Override
+    public boolean isOp() {
+        return actualSource.isOp();
+    }
+
+    @Override
+    public void setOp(boolean value) {
+        actualSource.setOp(value);
+    }
 }

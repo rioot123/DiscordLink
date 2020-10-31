@@ -18,23 +18,22 @@ public class DiscordCommandManager extends DiscordCommandTree {
     private final HashSet<String> defaultAliases = new HashSet<>(Arrays.asList("", "help"));
 
     public DiscordCommandManager() {
+
         DiscordCommand list = DiscordCommand.builder()
                 .setDescription("Shows a list of all players online.")
                 .setCommandExecutor(new PlayerList())
                 .build();
 
-        DiscordCommand halt = DiscordCommand.builder()
-                .setDescription("Stops the server abruptly.")
-                .setCommandExecutor(new StopServer(false))
-                .setPreBootEnabled(true)
-                .setRequiredRoles(Roles.ADMIN)
+        DiscordCommand stop = DiscordCommand.builder()
+                .setDescription("Gracefully stops the server.")
+                .setCommandExecutor(new StopServer(true))
+                .setRequiredRoles(Roles.DIRTY)
                 .build();
 
-        DiscordCommand stop = DiscordCommand.builder()
-                .setDescription("Stops the server gracefully.")
-                .setCommandExecutor(new StopServer(true))
-                .setPreBootEnabled(true)
-                .setRequiredRoles(Roles.ADMIN)
+        DiscordCommand halt = DiscordCommand.builder()
+                .setDescription("Abruptly stops the server.")
+                .setCommandExecutor(new StopServer(false))
+                .setRequiredRoles(Roles.DIRTY)
                 .build();
 
         DiscordCommand unstuck = DiscordCommand.builder()
@@ -46,58 +45,28 @@ public class DiscordCommandManager extends DiscordCommandTree {
         DiscordCommand seen = DiscordCommand.builder()
                 .setDescription("Sends you a DM with a players info.")
                 .setCommandExecutor(new SilentSeen())
-                .setCommandUsage("<Player>")
                 .setRequiredRoles(Roles.STAFF)
                 .build();
 
         DiscordCommand username = DiscordCommand.builder()
                 .setDescription("Reveals a verified players minecraft username.")
                 .setCommandExecutor(new Username())
-                .setCommandUsage("<@Discord>")
                 .setRequiredRoles(Roles.STAFF)
                 .build();
 
         DiscordCommand discord = DiscordCommand.builder()
                 .setDescription("Reveals a verified players discord username.")
                 .setCommandExecutor(new Discord())
-                .setCommandUsage("<Player>")
                 .setRequiredRoles(Roles.STAFF)
                 .build();
 
-        DiscordCommand ranks = DiscordCommand.builder()
-                .setDescription("Reveals a players ranks.")
-                .setCommandExecutor(new Ranks())
-                .setRequiredRoles(Roles.VERIFIED)
-                .build();
-
-        DiscordCommand sync = DiscordCommand.builder()
-                .setDescription("Runs LP Sync to re-sync the perms")
-                .setCommandExecutor(new IngameCommand("lp sync"))
-                .setRequiredRoles(Roles.ADMIN)
-                .build();
-
-        DiscordCommand unverify = DiscordCommand.builder()
-                .setDescription("Unverifies your account.")
-                .setCommandExecutor(new Unlink())
-                .build();
-
-        DiscordCommand notify = DiscordCommand.builder()
-                .setDescription("Shows server-boot notifier commands")
-                .setPreBootEnabled(true)
-                .setCommandExecutor(new NotifyBase())
-                .build();
-
         register(list, "list");
-        register(stop, "stop");
         register(halt, "halt");
+        register(stop, "stop");
         register(seen, "seen");
         register(unstuck, "unstuck", "spawn");
         register(username, "username");
         register(discord, "discord");
-        register(ranks, "ranks");
-        register(sync, "sync");
-        register(unverify, "unverify", "unlink");
-        register(notify, "notify");
     }
 
     public void process(MessageSource member, String args){
@@ -123,4 +92,5 @@ public class DiscordCommandManager extends DiscordCommandTree {
         });
         GameChat.sendMessage(embed.build());
     }
+
 }
