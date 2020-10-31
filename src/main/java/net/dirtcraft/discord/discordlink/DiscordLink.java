@@ -6,7 +6,6 @@ import net.dirtcraft.discord.discordlink.API.GameChat;
 import net.dirtcraft.discord.discordlink.Commands.Bukkit.Discord;
 import net.dirtcraft.discord.discordlink.Commands.Bukkit.Unverify;
 import net.dirtcraft.discord.discordlink.Commands.Bukkit.Verify;
-import net.dirtcraft.discord.discordlink.Commands.DiscordCommandManager;
 import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.Database.Storage;
 import net.dirtcraft.discord.discordlink.Events.DiscordEvents;
