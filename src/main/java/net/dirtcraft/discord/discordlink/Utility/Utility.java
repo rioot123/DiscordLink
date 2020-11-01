@@ -2,7 +2,7 @@ package net.dirtcraft.discord.discordlink.Utility;
 
 import net.dirtcraft.discord.discordlink.API.*;
 import net.dirtcraft.discord.discordlink.Commands.Sources.WrappedConsole;
-import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
+import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -19,8 +19,8 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
-import static net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration.Command.blacklist;
-import static net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration.Command.ignored;
+import static net.dirtcraft.discord.discordlink.Storage.PluginConfiguration.Command.blacklist;
+import static net.dirtcraft.discord.discordlink.Storage.PluginConfiguration.Command.ignored;
 
 public class Utility {
 

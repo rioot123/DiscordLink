@@ -1,4 +1,4 @@
-package net.dirtcraft.discord.discordlink.Configuration;
+package net.dirtcraft.discord.discordlink.Storage;
 
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;

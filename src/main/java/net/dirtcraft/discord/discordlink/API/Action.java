@@ -9,15 +9,15 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-import static net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration.Main.*;
+import static net.dirtcraft.discord.discordlink.Storage.PluginConfiguration.Main.*;
 
 public enum Action {
     CHAT            ( "\n",    Sender.NONE,     Type.CHAT_MESSAGE    ),
     PUBLIC_BUNGEE   ( "$",     Sender.GAMECHAT, Type.BUNGEE_COMMAND  ),
     PRIVATE_BUNGEE  ( "#$",    Sender.PRIVATE,  Type.BUNGEE_COMMAND  ),
-    PUBLIC_COMMAND  (consolePublic,   Sender.GAMECHAT, Type.CONSOLE_COMMAND ),
-    PRIVATE_COMMAND (consolePrivate,  Sender.PRIVATE,  Type.CONSOLE_COMMAND ),
-    DISCORD_COMMAND (discordCommand,  Sender.NONE,     Type.DISCORD_COMMAND );
+    PUBLIC_COMMAND  ( consolePublic,  Sender.GAMECHAT, Type.CONSOLE_COMMAND ),
+    PRIVATE_COMMAND ( consolePrivate, Sender.PRIVATE,  Type.CONSOLE_COMMAND ),
+    DISCORD_COMMAND ( discordCommand, Sender.NONE,     Type.DISCORD_COMMAND );
 
     final public String prefix;
     final public Sender sender;

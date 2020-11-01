@@ -1,6 +1,6 @@
 package net.dirtcraft.discord.spongediscordlib;
 
-import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
+import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;

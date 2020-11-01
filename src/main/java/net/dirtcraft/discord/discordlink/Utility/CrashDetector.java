@@ -2,7 +2,7 @@ package net.dirtcraft.discord.discordlink.Utility;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
+import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dv8tion.jda.api.EmbedBuilder;
 import org.bukkit.Bukkit;

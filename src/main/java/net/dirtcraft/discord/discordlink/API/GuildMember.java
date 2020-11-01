@@ -1,18 +1,18 @@
 package net.dirtcraft.discord.discordlink.API;
 
+import net.dirtcraft.discord.discordlink.Compatability.PlatformPlayer;
+import net.dirtcraft.discord.discordlink.Compatability.PlatformUser;
 import net.dirtcraft.discord.discordlink.DiscordLink;
-import net.dirtcraft.discord.discordlink.Utility.ApiUtils;
+import net.dirtcraft.discord.discordlink.Compatability.PlatformUtils;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
 
 import java.util.*;
 
 public class GuildMember extends WrappedMember {
-    private OfflinePlayer user;
+    private PlatformUser user;
     private boolean retrievedPlayer;
     private List<Roles> roles;
     private Roles highestRank;
@@ -25,7 +25,7 @@ public class GuildMember extends WrappedMember {
         if (member == null) return Optional.empty();
 
         final GuildMember profile = new GuildMember(member);
-        profile.user = ApiUtils.getPlayerOffline(player).orElse(null);
+        profile.user = PlatformUtils.getPlayerOffline(player).orElse(null);
         profile.retrievedPlayer = true;
         return Optional.of(profile);
     }
@@ -46,17 +46,17 @@ public class GuildMember extends WrappedMember {
                 .forEach(roles::add);
     }
 
-    public Optional<Player> getPlayer(){
-        if (!retrievedPlayer) return getPlayerData().flatMap(ApiUtils::getPlayer);
-        else return Optional.ofNullable(user).flatMap(ApiUtils::getPlayer);
+    public Optional<PlatformPlayer> getPlayer(){
+        if (!retrievedPlayer) return getPlayerData().flatMap(PlatformUtils::getPlayer);
+        else return Optional.ofNullable(user).flatMap(PlatformUtils::getPlayer);
     }
 
-    public Optional<OfflinePlayer> getPlayerData(){
+    public Optional<PlatformUser> getPlayerData(){
         if (!retrievedPlayer) {
             final String playerId = DiscordLink.getInstance().getStorage().getUUIDfromDiscordID(member.getUser().getId());
-            final Optional<OfflinePlayer> optData = Optional.ofNullable(playerId)
+            final Optional<PlatformUser> optData = Optional.ofNullable(playerId)
                     .map(UUID::fromString)
-                    .flatMap(ApiUtils::getPlayerOffline);
+                    .flatMap(PlatformUtils::getPlayerOffline);
             retrievedPlayer = true;
             return optData;
         } else return Optional.ofNullable(user);

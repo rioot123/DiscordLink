@@ -5,7 +5,7 @@ import net.dirtcraft.discord.discordlink.API.GuildMember;
 import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.API.Roles;
 import net.dirtcraft.discord.discordlink.Exceptions.DiscordPermissionException;
-import net.dirtcraft.discord.discordlink.Utility.ApiUtils;
+import net.dirtcraft.discord.discordlink.Compatability.PlatformUtils;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 
 import java.util.ArrayList;
@@ -35,7 +35,7 @@ public class DiscordCommand {
     }
 
     public final void process(MessageSource member, String command, List<String> args) {
-        if (!ApiUtils.isGameReady()) return;
+        if (!PlatformUtils.isGameReady()) return;
         if (!allowedRoles.stream().allMatch(member::hasRole)) {
             Utility.sendPermissionError(member);
             return;

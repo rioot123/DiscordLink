@@ -1,4 +1,4 @@
-package net.dirtcraft.discord.discordlink.Database;
+package net.dirtcraft.discord.discordlink.Storage;
 
 
 import net.dirtcraft.discord.dirtdatabaselib.DirtDatabaseLib;
@@ -11,7 +11,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
 
-public class Storage {
+public class Database {
 
     private DataSource source;
 
@@ -76,6 +76,18 @@ public class Storage {
         try (Connection connection = getConnection();
              PreparedStatement ps = connection.prepareStatement("DELETE FROM verification WHERE uuid = ?")) {
             ps.setString(1, uuid.toString());
+
+            ps.executeUpdate();
+
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+        }
+    }
+
+    public void deleteRecord(String discordId) {
+        try (Connection connection = getConnection();
+             PreparedStatement ps = connection.prepareStatement("DELETE FROM verification WHERE discordid = ?")) {
+            ps.setString(1, discordId);
 
             ps.executeUpdate();
 

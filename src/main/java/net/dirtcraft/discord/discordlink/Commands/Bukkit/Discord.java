@@ -1,6 +1,6 @@
 package net.dirtcraft.discord.discordlink.Commands.Bukkit;
 
-import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
+import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;

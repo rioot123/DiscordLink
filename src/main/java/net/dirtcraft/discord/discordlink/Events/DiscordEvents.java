@@ -6,8 +6,9 @@ import net.dirtcraft.discord.discordlink.API.Action;
 import net.dirtcraft.discord.discordlink.API.GameChat;
 import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommandManager;
-import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
-import net.dirtcraft.discord.discordlink.Utility.ApiUtils;
+import net.dirtcraft.discord.discordlink.Compatability.PlatformUser;
+import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
+import net.dirtcraft.discord.discordlink.Compatability.PlatformUtils;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Message;
@@ -55,9 +56,9 @@ public class DiscordEvents extends ListenerAdapter {
         final String rawMessage = event.getMessage().getContentRaw();
         final Action intent = Action.fromMessageRaw(rawMessage);
 
-        if (intent.isChat() && ApiUtils.isGameReady()) discordToMCAsync(sender, message);
+        if (intent.isChat() && PlatformUtils.isGameReady()) discordToMCAsync(sender, message);
         else if (intent.isBotCommand()) commandManager.process(sender, intent.getCommand(event));
-        else if (intent.isConsole() && ApiUtils.isGameReady()) {
+        else if (intent.isConsole() && PlatformUtils.isGameReady()) {
             boolean executed = toConsole(intent.getCommand(event), sender, intent);
             if (executed && intent.isPrivate()) Utility.logCommand(sender, "__Executed Private Command__");
             event.getMessage().delete().queue(s->{},e->{});
@@ -65,7 +66,7 @@ public class DiscordEvents extends ListenerAdapter {
     }
 
     public void processPrivateMessage(MessageReceivedEvent event) {
-        if (!ApiUtils.isGameReady() || event.getAuthor().isBot()) return;
+        if (!PlatformUtils.isGameReady() || event.getAuthor().isBot()) return;
         final MessageSource sender = new MessageSource(event);
         final Action intent = Action.PRIVATE_COMMAND;
         final String message = Action.filterConsolePrefixes(event.getMessage().getContentRaw());
@@ -73,8 +74,8 @@ public class DiscordEvents extends ListenerAdapter {
     }
 
     private void discordToMCAsync(MessageSource sender, String message){
-        final Optional<OfflinePlayer> optSpigotUser = sender.getPlayerData();
-        final String mcUsername = optSpigotUser.isPresent() && optSpigotUser.get().getName() != null ? optSpigotUser.get().getName() : null;
+        final Optional<PlatformUser> optSpigotUser = sender.getPlayerData();
+        final String mcUsername = optSpigotUser.flatMap(PlatformUser::getName).orElse(null);
         final String username;
 
         if (sender.isStaff() || mcUsername == null) username = sender.getHighestRank().getStyle() + sender.getEffectiveName().replaceAll(STRIP_CODE_REGEX, "");
@@ -95,7 +96,7 @@ public class DiscordEvents extends ListenerAdapter {
         for (int i = 0; i < toBroadcast.length; i++) toBroadcast[i] = result.get(i);
 
         if (!sender.isStaff() && optSpigotUser.isPresent()) {
-            sendMessageToPlayer(optSpigotUser.get(), toBroadcast);
+            sendMessageToPlayer(optSpigotUser.map(PlatformUser::getUser).get(), toBroadcast);
         } else {
             Bukkit.getOnlinePlayers().forEach(p->p.spigot().sendMessage(toBroadcast));
         }

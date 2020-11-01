@@ -2,8 +2,8 @@ package net.dirtcraft.discord.discordlink.Commands.Bukkit;
 
 import net.dirtcraft.discord.discordlink.API.GameChat;
 import net.dirtcraft.discord.discordlink.API.GuildMember;
-import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
-import net.dirtcraft.discord.discordlink.Database.Storage;
+import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
+import net.dirtcraft.discord.discordlink.Storage.Database;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dv8tion.jda.api.entities.Guild;
@@ -28,7 +28,7 @@ public class Unverify implements CommandExecutor {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     private String unverify(Player player) {
-        final Storage storage = DiscordLink.getInstance().getStorage();
+        final Database storage = DiscordLink.getInstance().getStorage();
         GuildMember discord = GuildMember.fromPlayerId(player.getUniqueId()).orElse(null);
         User user = discord == null ? null : discord.getUser();
         storage.deleteRecord(player.getUniqueId());

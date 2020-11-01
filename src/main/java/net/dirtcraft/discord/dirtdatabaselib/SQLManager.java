@@ -1,6 +1,6 @@
 package net.dirtcraft.discord.dirtdatabaselib;
 
-import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
+import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
 
 import java.io.IOException;
 import java.nio.file.Path;

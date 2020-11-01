@@ -1,8 +1,10 @@
 package net.dirtcraft.discord.discordlink.Events;
 
 import net.dirtcraft.discord.discordlink.API.GameChat;
-import net.dirtcraft.discord.discordlink.Configuration.Permissions;
-import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
+import net.dirtcraft.discord.discordlink.Compatability.PlatformPlayer;
+import net.dirtcraft.discord.discordlink.Compatability.PlatformUtils;
+import net.dirtcraft.discord.discordlink.Storage.Permissions;
+import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -24,7 +26,6 @@ public class SpigotEvents implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onChat(AsyncPlayerChatEvent event){
          if (event.isCancelled()) return;
-
         String prefix = Utility.sanitiseMinecraftText(vault.getPlayerPrefix(event.getPlayer()));
         String nickName = Utility.sanitiseMinecraftText(event.getPlayer().getDisplayName());
         String message = Utility.sanitiseMinecraftText(event.getMessage());
@@ -38,7 +39,8 @@ public class SpigotEvents implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerJoin(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
+        PlatformPlayer player = PlatformUtils.getPlayer(event.getPlayer());
+        if (player.isVanished()) return;
         if (player.hasPlayedBefore()) {
             String prefix = Utility.removeColourCodes(vault.getPlayerPrefix(event.getPlayer()));
             GameChat.sendMessage(PluginConfiguration.Format.playerJoin
@@ -51,18 +53,14 @@ public class SpigotEvents implements Listener {
                     .setDescription(PluginConfiguration.Format.newPlayerJoin
                             .replace("{username}", player.getName()))
                     .build();
-
             GameChat.sendMessage(embed);
-        }
-        if (DiscordLink.getInstance().tpSpawnList.contains(player.getUniqueId())){
-            player.teleport(Bukkit.getWorld("world").getSpawnLocation());
-            DiscordLink.getInstance().tpSpawnList.remove(player.getUniqueId());
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerDisconnect(PlayerQuitEvent event) {
-        Player player = event.getPlayer();
+        PlatformPlayer player = PlatformUtils.getPlayer(event.getPlayer());
+        if (player.isVanished()) return;
         String prefix = Utility.removeColourCodes(vault.getPlayerPrefix(event.getPlayer()));
         GameChat.sendMessage(PluginConfiguration.Format.playerDisconnect
                 .replace("{username}", player.getName())
