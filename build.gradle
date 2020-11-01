@@ -31,7 +31,7 @@ dependencies {
     compile 'org.bukkit:bukkit:1.14.4-R0.1-SNAPSHOT'
     
     shadow 'org.spongepowered:configurate-hocon:3.6.1'
-    shadow ('net.dv8tion:JDA:4.2.0_168') {
+    shadow ('net.dv8tion:JDA:4.2.0_214') {
         exclude module: 'opus-java'
     }
 
