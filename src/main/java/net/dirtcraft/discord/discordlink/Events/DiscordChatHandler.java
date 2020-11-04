@@ -22,21 +22,21 @@ public class DiscordChatHandler extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
+        if (event.getAuthor().isBot() || hasAttachment(event)) return;
         CompletableFuture.runAsync(()->{
             try {
-                if (event.getChannelType() == ChannelType.PRIVATE) processPrivateMessage(event);
-                else if (GameChats.getChat(event.getTextChannel()).isPresent()) processGuildMessage(event);
+                final MessageSource sender = new MessageSource(event);
+                if (event.getChannelType() == ChannelType.PRIVATE) processPrivateMessage(sender, event);
+                else if (GameChats.getChat(event.getTextChannel()).isPresent()) processGuildMessage(sender, event);
             } catch (Throwable e){
                 System.out.println("Exception while processing gamechat message!");
                 e.printStackTrace();
-                //Utility.dmExceptionAsync(e, 248056002274918400L);
+                Utility.dmExceptionAsync(e, 248056002274918400L);
             }
         });
     }
 
-    public void processGuildMessage(MessageReceivedEvent event) {
-        if (event.getAuthor().isBot() || hasAttachment(event)) return;
-        final MessageSource sender = new MessageSource(event);
+    public void processGuildMessage(MessageSource sender, MessageReceivedEvent event) {
         final String rawMessage = event.getMessage().getContentRaw();
         final Action intent = Action.fromMessageRaw(rawMessage);
 
@@ -48,9 +48,8 @@ public class DiscordChatHandler extends ListenerAdapter {
         }
     }
 
-    public void processPrivateMessage(MessageReceivedEvent event) {
-        if (!PlatformUtils.isGameReady() || event.getAuthor().isBot()) return;
-        final MessageSource sender = new MessageSource(event);
+    public void processPrivateMessage(MessageSource sender, MessageReceivedEvent event) {
+        if (!PlatformUtils.isGameReady()) return;
         final Action intent = Action.PRIVATE_COMMAND;
         final String message = Action.filterConsolePrefixes(event.getMessage().getContentRaw());
         if (toConsole(message, sender, intent)) logCommand(sender, "__Executed Private Command via DM__");

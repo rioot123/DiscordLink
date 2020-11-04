@@ -140,11 +140,11 @@ public class Utility {
                 .replaceAll("<@\\d+>", "");
     }
 
-    public static void dmExceptionAsync(Exception e, long... id){
+    public static void dmExceptionAsync(Throwable e, long... id){
         CompletableFuture.runAsync(()->dmException(e, id));
     }
 
-    private static void dmException(Exception e, long... id){
+    private static void dmException(Throwable e, long... id){
         Arrays.stream(id)
                 .mapToObj(Utility::getMemberById)
                 .filter(Optional::isPresent)
@@ -154,7 +154,7 @@ public class Utility {
                 .forEach(dm->dmException(dm, e));
     }
 
-    private static void dmException(RestAction<PrivateChannel> dms, Exception e){
+    private static void dmException(RestAction<PrivateChannel> dms, Throwable e){
         String[] ex = ExceptionUtils.getStackTrace(e).split("\\r?\\n");
         sendMessages(s->dms.queue(dm->dm.sendMessage(s).queue()), 1980, ex);
     }

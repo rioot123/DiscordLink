@@ -3,7 +3,6 @@ package net.dirtcraft.discord.discordlink.Storage;
 import net.dirtcraft.discord.dirtdatabaselib.DirtDatabaseLib;
 
 import javax.annotation.Nullable;
-import javax.sql.DataSource;
 import java.sql.*;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
