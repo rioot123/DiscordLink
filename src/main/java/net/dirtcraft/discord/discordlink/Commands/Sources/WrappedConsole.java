@@ -1,25 +1,15 @@
 package net.dirtcraft.discord.discordlink.Commands.Sources;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Server;
-import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.conversations.Conversation;
-import org.bukkit.conversations.ConversationAbandonedEvent;
-import org.bukkit.permissions.Permission;
-import org.bukkit.permissions.PermissionAttachment;
-import org.bukkit.permissions.PermissionAttachmentInfo;
-import org.bukkit.plugin.Plugin;
+import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.chat.BaseComponent;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.Set;
+import java.util.Collection;
 
-public abstract class WrappedConsole implements ConsoleCommandSender, ScheduledSender {
+public abstract class WrappedConsole implements CommandSender, ScheduledSender {
 
-    private ConsoleCommandSender actualSource = Bukkit.getConsoleSender();
-
-    WrappedConsole(){
-    }
+    private CommandSender actualSource = ProxyServer.getInstance().getConsole();
 
     @Override
     public void sendMessage(@NotNull String message) {
@@ -27,112 +17,52 @@ public abstract class WrappedConsole implements ConsoleCommandSender, ScheduledS
     }
 
     @Override
-    public void sendMessage(@NotNull String[] messages) {
+    public void sendMessages(@NotNull String... messages) {
         for (String message : messages) sendMessage(message);
     }
 
     @Override
-    public void sendRawMessage(@NotNull String message) {
-        sendMessage(message);
+    public void sendMessage(BaseComponent... message) {
+        ResponseScheduler.submit(this, BaseComponent.toPlainText(message));
     }
 
     @Override
-    public @NotNull Server getServer() {
-        return actualSource.getServer();
+    public void sendMessage(BaseComponent message) {
+        ResponseScheduler.submit(this, BaseComponent.toPlainText(message));
     }
 
     @Override
-    public @NotNull String getName() {
+    public String getName() {
         return actualSource.getName();
     }
 
     @Override
-    public boolean isConversing() {
-        return actualSource.isConversing();
+    public Collection<String> getGroups() {
+        return actualSource.getGroups();
     }
 
     @Override
-    public void acceptConversationInput(@NotNull String input) {
-        actualSource.acceptConversationInput(input);
+    public void addGroups(String... groups) {
+        actualSource.addGroups(groups);
     }
 
     @Override
-    public boolean beginConversation(@NotNull Conversation conversation) {
-        return actualSource.beginConversation(conversation);
+    public void removeGroups(String... groups) {
+        actualSource.removeGroups(groups);
     }
 
     @Override
-    public void abandonConversation(@NotNull Conversation conversation) {
-        actualSource.abandonConversation(conversation);
+    public boolean hasPermission(String permission) {
+        return actualSource.hasPermission(permission);
     }
 
     @Override
-    public void abandonConversation(@NotNull Conversation conversation, @NotNull ConversationAbandonedEvent details) {
-        actualSource.abandonConversation(conversation, details);
+    public void setPermission(String permission, boolean value) {
+        actualSource.setPermission(permission, value);
     }
 
     @Override
-    public boolean isPermissionSet(@NotNull String name) {
-        return actualSource.isPermissionSet(name);
-    }
-
-    @Override
-    public boolean isPermissionSet(@NotNull Permission perm) {
-        return actualSource.isPermissionSet(perm);
-    }
-
-    @Override
-    public boolean hasPermission(@NotNull String name) {
-        return actualSource.hasPermission(name);
-    }
-
-    @Override
-    public boolean hasPermission(@NotNull Permission perm) {
-        return actualSource.hasPermission(perm);
-    }
-
-    @Override
-    public @NotNull PermissionAttachment addAttachment(@NotNull Plugin plugin, @NotNull String name, boolean value) {
-        return actualSource.addAttachment(plugin, name, value);
-    }
-
-    @Override
-    public @NotNull PermissionAttachment addAttachment(@NotNull Plugin plugin) {
-        return actualSource.addAttachment(plugin);
-    }
-
-    @Override
-    public @Nullable PermissionAttachment addAttachment(@NotNull Plugin plugin, @NotNull String name, boolean value, int ticks) {
-        return actualSource.addAttachment(plugin, name, value, ticks);
-    }
-
-    @Override
-    public @Nullable PermissionAttachment addAttachment(@NotNull Plugin plugin, int ticks) {
-        return actualSource.addAttachment(plugin, ticks);
-    }
-
-    @Override
-    public void removeAttachment(@NotNull PermissionAttachment attachment) {
-        actualSource.removeAttachment(attachment);
-    }
-
-    @Override
-    public void recalculatePermissions() {
-        actualSource.recalculatePermissions();
-    }
-
-    @Override
-    public @NotNull Set<PermissionAttachmentInfo> getEffectivePermissions() {
-        return actualSource.getEffectivePermissions();
-    }
-
-    @Override
-    public boolean isOp() {
-        return actualSource.isOp();
-    }
-
-    @Override
-    public void setOp(boolean value) {
-        actualSource.setOp(value);
+    public Collection<String> getPermissions() {
+        return actualSource.getPermissions();
     }
 }

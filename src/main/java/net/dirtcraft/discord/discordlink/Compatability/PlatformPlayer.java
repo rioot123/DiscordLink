@@ -1,14 +1,14 @@
 package net.dirtcraft.discord.discordlink.Compatability;
 
-import org.bukkit.entity.Player;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import javax.annotation.Nonnull;
 import java.util.UUID;
 
 public class PlatformPlayer {
-    private final Player player;
+    private final ProxiedPlayer player;
 
-    PlatformPlayer(Player player){
+    PlatformPlayer(ProxiedPlayer player){
         this.player = player;
     }
 
@@ -20,12 +20,12 @@ public class PlatformPlayer {
         return player.getUniqueId();
     }
 
-    public Player getPlayer(){
+    public ProxiedPlayer getPlayer(){
         return player;
     }
 
     public boolean isVanished(){
-        return PlatformUtils.vanishProvider.isVanished(this);
+        return false;
     }
 
     public boolean notVanished(){
@@ -33,6 +33,6 @@ public class PlatformPlayer {
     }
 
     public boolean hasPlayedBefore(){
-        return player.hasPlayedBefore();
+        return true;
     }
 }

@@ -1,35 +1,33 @@
 package net.dirtcraft.discord.discordlink.Compatability;
 
-import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
+import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.Optional;
 import java.util.UUID;
 
 public class PlatformUser {
-    private final OfflinePlayer user;
+    private final UUID user;
+    private final String name;
 
-    PlatformUser(OfflinePlayer user){
+    PlatformUser(UUID user, String name){
         this.user = user;
+        this.name = name;
     }
 
     public Optional<String> getName(){
-        return Optional.ofNullable(user.getName());
+        return Optional.ofNullable(name);
     }
 
     public UUID getUUID(){
-        return user.getUniqueId();
-    }
-
-    public OfflinePlayer getUser(){
         return user;
     }
 
     public boolean isOnline(){
-        return user.isOnline();
+        return ProxyServer.getInstance().getPlayer(user) != null;
     }
 
-    Player getPlayer(){
-        return user.getPlayer();
+    ProxiedPlayer getPlayer(){
+        return ProxyServer.getInstance().getPlayer(user);
     }
 }

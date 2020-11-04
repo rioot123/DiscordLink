@@ -22,14 +22,17 @@ repositories {
         name = 'gradle-plugins'
         url = 'https://plugins.gradle.org/m2'
     }
+    maven {
+        url 'https://jitpack.io'
+        //credentials { username authToken }
+    }
 }
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
-    
-    compile fileTree(dir: 'libraries', include: '*.jar')
-    compile 'org.bukkit:bukkit:1.14.4-R0.1-SNAPSHOT'
-    
+    compile "com.gitlab.ruany:LiteBansAPI:0.3.4"
+    compileOnly 'net.md-5:bungeecord-api:1.15-SNAPSHOT'
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.11'
+    shadow group: 'com.google.code.gson', name: 'gson', version: '2.3.1'
     shadow 'org.spongepowered:configurate-hocon:3.6.1'
     shadow ('net.dv8tion:JDA:4.2.0_214') {
         exclude module: 'opus-java'
@@ -38,8 +41,7 @@ dependencies {
     // Database connectors
     shadow 'com.zaxxer:HikariCP:2.6.3'
     shadow 'org.mariadb.jdbc:mariadb-java-client:2.0.3'
-    shadow 'com.h2database:h2:1.4.196'
-    shadow group: 'com.google.code.gson', name: 'gson', version: '2.3.1'
+    //shadow 'com.h2database:h2:1.4.196'
 }
 
 import org.apache.tools.ant.filters.ReplaceTokens

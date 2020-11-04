@@ -2,15 +2,17 @@ package net.dirtcraft.discord.discordlink.Utility;
 
 import net.dirtcraft.discord.discordlink.API.*;
 import net.dirtcraft.discord.discordlink.Commands.Sources.WrappedConsole;
-import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.DiscordLink;
-import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
+import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.PrivateChannel;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.requests.RestAction;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.bukkit.Bukkit;
+import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.plugin.PluginManager;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.awt.*;
 import java.time.Instant;
@@ -19,17 +21,16 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
-import static net.dirtcraft.discord.discordlink.Storage.PluginConfiguration.Command.blacklist;
-import static net.dirtcraft.discord.discordlink.Storage.PluginConfiguration.Command.ignored;
+import static net.dirtcraft.discord.discordlink.Storage.PluginConfiguration.Command.sanctions;
+import static net.dirtcraft.discord.discordlink.Storage.PluginConfiguration.Command.whiteList;
 
 public class Utility {
 
     public static final String STRIP_CODE_REGEX = "(?i)[§&][0-9a-fklmnor]";
-    public static final String DETECT_URL_REGEX = "((https?|ftp|gopher|telnet|file):((//)|(\\\\))+[\\w\\d:#@%/;$()~_?\\+-=\\\\\\.&]*)";
 
     public static Optional<Member> getMemberById(String id){
         try {
-            return Optional.of(GameChat.getGuild().retrieveMemberById(id).complete());
+            return Optional.of(GameChats.getGuild().retrieveMemberById(id).complete());
         } catch (Exception e){
             return Optional.empty();
         }
@@ -37,7 +38,7 @@ public class Utility {
 
     public static Optional<Member> getMemberById(long id){
         try {
-            return Optional.of(GameChat.getGuild().retrieveMemberById(id).complete());
+            return Optional.of(GameChats.getGuild().retrieveMemberById(id).complete());
         } catch (Exception e){
             return Optional.empty();
         }
@@ -45,7 +46,7 @@ public class Utility {
 
     public static Optional<Member> getMember(User user){
         try {
-            return Optional.of(GameChat.getGuild().retrieveMember(user).complete());
+            return Optional.of(GameChats.getGuild().retrieveMember(user).complete());
         } catch (Exception e){
             return Optional.empty();
         }
@@ -61,54 +62,47 @@ public class Utility {
         return embed;
     }
 
-    public static void setTopic() {
-        TextChannel channel = DiscordLink
-                .getJDA()
-                .getTextChannelById(PluginConfiguration.Main.GAMECHAT_CHANNEL_ID);
-        String code = channel.getName().split("-")[1];
-
-        channel.getManager()
-                .setTopic("ModPack: **" + PluginConfiguration.Main.SERVER_NAME + "** — IP: " + code + ".dirtcraft.gg")
-                .queue();
-    }
-
-    public static void setStatus() {
-        SpongeDiscordLib.setStatus(Activity.ActivityType.STREAMING, PluginConfiguration.Main.SERVER_NAME, "https://www.twitch.tv/dirtcraft/");
-    }
-
     public static boolean toConsole(String command, MessageSource sender, Action type) {
-        if (ignored.stream().anyMatch(command::startsWith)) return false;
-        if (canUseCommand(sender, command)) {
-            final WrappedConsole commandSender = type.getSender(sender, command);
-            toConsole(commandSender, command);
+        if (!canUseCommand(sender, type)){
+            sendCommandError(sender, command);
+            return false;
+        } else if (isSanction(command)){
+            WrappedConsole console = type.getSender(sender, command);
+            sender.executeSanction(command, console, false);
+            return true;
+        } else if (type.isBungee() || isWhitelisted(command)){
+            WrappedConsole console = type.getSender(sender, command);
+            toConsole(console, command);
             return true;
         } else {
-            sendPermissionError(sender);
             return false;
         }
     }
 
     public static void toConsole(WrappedConsole commandSender, String command) {
-        Bukkit.getScheduler().callSyncMethod(DiscordLink.getInstance(), () -> Bukkit.dispatchCommand(commandSender, command));
+        PluginManager manager = ProxyServer.getInstance().getPluginManager();
+        manager.dispatchCommand(commandSender, command);
     }
 
-    private static boolean canUseCommand(GuildMember sender, String command){
-        return sender.hasRole(Roles.DIRTY) ||
-                sender.hasRole(Roles.ADMIN) && blacklist.stream().noneMatch(command::startsWith);
+    private static boolean canUseCommand(GuildMember sender, Action type){
+        return sender.hasRole(Roles.DIRTY) || !type.isBungee() && sender.hasRole(Roles.ADMIN);
     }
 
-    public static void sendResponse(MessageReceivedEvent event, String error, int delay){
-        event.getMessage().delete().queue();
-        GameChat.sendMessage("<@" + event.getAuthor().getId() + ">, " + error, delay);
+    private static boolean isSanction(String command){
+        return sanctions.stream().anyMatch(command::startsWith);
+    }
+
+    private static boolean isWhitelisted(String command){
+        return whiteList.stream().anyMatch(command::startsWith);
     }
 
     public static void sendPermissionError(MessageSource event){
-        GameChat.sendMessage("<@" + event.getUser().getId() + ">, you do **not** have permission to use this command!", 5);
+        event.getGamechat().sendMessage("<@" + event.getUser().getId() + ">, you do **not** have permission to use this command!", 5);
         logCommand(event, "__Tried Executing Command__");
     }
 
     public static void sendCommandError(MessageSource event, String msg){
-        GameChat.sendMessage("<@" + event.getUser().getId() + ">, " + msg, 5);
+        event.getGamechat().sendMessage("<@" + event.getUser().getId() + ">, " + msg, 5);
         logCommand(event, "__Tried Executing Command__");
     }
 
@@ -126,20 +120,24 @@ public class Utility {
         return s.replaceAll("&([0-9a-fA-FrlonmkRLONMK])", "§$1");
     }
 
-    public static String removeColourCodes(String s){
-        return s.replaceAll("[§&].", "");
+    public static void sendPermissionErrorMessage(GameChat chat, MessageReceivedEvent event){
+        event.getMessage().delete().queue();
+        chat.sendMessage("<@" + event.getAuthor().getId() + ">, you do **not** have permission to use this command!", 5);
+        DiscordLink.getJDA()
+                .getTextChannelsByName("command-log", true).get(0)
+                .sendMessage(Utility.embedBuilder()
+                        .addField("__Tried Executing Command__", event.getMessage().getContentDisplay(), false)
+                        .setFooter(event.getAuthor().getAsTag(), event.getAuthor().getAvatarUrl())
+                        .build())
+                .queue();
     }
 
-    public static String sanitiseMinecraftText(String s){
+    public static String sanitizeMinecraftText(String s){
         return s.replaceAll(STRIP_CODE_REGEX, "")
+                .replaceAll("([_*~`>|\\\\])", "\\\\$1")
                 .replace("@everyone", "")
                 .replace("@here", "")
-                .replaceAll("([_*~`>|\\\\])", "\\\\$1")
                 .replaceAll("<@\\d+>", "");
-    }
-
-    public static String stripColorCodes(String s){
-        return s.replaceAll(STRIP_CODE_REGEX, "");
     }
 
     public static void dmExceptionAsync(Exception e, long... id){
@@ -159,6 +157,10 @@ public class Utility {
     private static void dmException(RestAction<PrivateChannel> dms, Exception e){
         String[] ex = ExceptionUtils.getStackTrace(e).split("\\r?\\n");
         sendMessages(s->dms.queue(dm->dm.sendMessage(s).queue()), 1980, ex);
+    }
+
+    public static String stripColorCodes(String s){
+        return s.replaceAll(STRIP_CODE_REGEX, "");
     }
 
     public static void sendMessages(Consumer<String> destination, int limit, String... messages){

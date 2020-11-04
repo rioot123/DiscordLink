@@ -189,6 +189,8 @@ public abstract class WrappedMember implements Member {
     }
 
     @Override
+    @Deprecated
+    @SuppressWarnings("deprecation")
     public boolean isFake() {
         return member.isFake();
     }

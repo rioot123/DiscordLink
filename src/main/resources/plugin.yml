@@ -1,20 +1,7 @@
 name: Discord_Link
 version: @version@
+author: ShinyAfro
+description: Discord-Link Bungee module for proxy-level command processing.
 main: net.dirtcraft.discord.discordlink.DiscordLink
 api-version: 1.13
-load: STARTUP
-authors: [ShinyAfro]
-description: Discord Integration
-depend: [Vault]
-softdepend: [Essentials]
-
-commands:
-  verify:
-    description: Links your discord account to the current minecraft account.
-    usage: /verify <code>
-  unverify:
-    description: Unlinks any discord accounts to this minecraft account.
-    usage: /unverify
-  discord:
-    description: Invite you to the discord.
-    usage: /discord
+depend: [LiteBans]

@@ -1,6 +1,6 @@
 package net.dirtcraft.discord.discordlink.Exceptions;
 
-public class DiscordCommandException extends Exception {
+public class DiscordCommandException extends DiscordLinkException {
     private String message;
     public DiscordCommandException(){
         this.message = null;

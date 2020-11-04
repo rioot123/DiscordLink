@@ -1,0 +1,6 @@
+name: Discord_Link
+version: @version@
+author: ShinyAfro
+description: Discord-Link Bungee module for proxy-level command processing.
+main: net.dirtcraft.discord.discordlink.DiscordLink
+depends: [LiteBans]
