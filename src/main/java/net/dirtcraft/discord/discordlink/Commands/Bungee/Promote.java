@@ -21,8 +21,16 @@ public class Promote extends Command {
 
     @Override
     public void execute(CommandSender sender, String[] args) {
-        if (!(sender instanceof ProxiedPlayer) || args.length < 1) return;
-        if (!sender.hasPermission(Permission.PROMOTE_PERMISSION)) sender.sendMessage(TextComponent.fromLegacyText("§cYou do not have permission to do that."));
+        if (!(sender instanceof ProxiedPlayer)) {
+            sender.sendMessage(TextComponent.fromLegacyText("§cYou must be a player to use this command!."));
+            return;
+        } else if (!sender.hasPermission(Permission.PROMOTE_PERMISSION)) {
+            sender.sendMessage(TextComponent.fromLegacyText("§cYou do not have permission to do that."));
+            return;
+        } else if (args.length < 1){
+            sender.sendMessage(TextComponent.fromLegacyText("§cYou must specify a target to promote."));
+            return;
+        }
         UUID secret = UUID.randomUUID();
         UUID player = ((ProxiedPlayer) sender).getUniqueId();
         String target =args[0];
@@ -49,8 +57,18 @@ public class Promote extends Command {
             return;
         }
         PermissionUtils perms = PermissionUtils.INSTANCE;
-        if (rankUpdate.added != null) perms.addRank(rankUpdate.target, rankUpdate.added);
-        if (rankUpdate.removed != null) perms.removeRank(rankUpdate.target, rankUpdate.removed);
         sender.sendMessage(TextComponent.fromLegacyText("§2Successfully §a§lpromoted §6" + name + " §2via Bungee!"));
+        if (rankUpdate.added != null) {
+            perms.addRank(rankUpdate.target, rankUpdate.added);
+            sender.sendMessage(TextComponent.fromLegacyText("§bUpdated Rank: §e" + rankUpdate.added));
+        } else {
+            sender.sendMessage(TextComponent.fromLegacyText("§bUpdated Rank: §eN/A"));
+        }
+        if (rankUpdate.removed != null) {
+            perms.removeRank(rankUpdate.target, rankUpdate.removed);
+            sender.sendMessage(TextComponent.fromLegacyText("§3Previous Rank: §6" + rankUpdate.removed));
+        } else {
+            sender.sendMessage(TextComponent.fromLegacyText("§3Previous Rank: §eN/A"));
+        }
     }
 }
