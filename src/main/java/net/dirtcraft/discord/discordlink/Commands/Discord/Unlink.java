@@ -5,8 +5,8 @@ import net.dirtcraft.discord.discordlink.API.GuildMember;
 import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.API.Roles;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommandExecutor;
-import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
-import net.dirtcraft.discord.discordlink.Database.Storage;
+import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
+import net.dirtcraft.discord.discordlink.Storage.Database;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Exceptions.DiscordCommandException;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
@@ -24,7 +24,7 @@ public class Unlink implements DiscordCommandExecutor {
     @Override
     public void execute(MessageSource source, String command, List<String> args) throws DiscordCommandException {
         Guild guild = GameChat.getGuild();
-        Storage storage = DiscordLink.getInstance().getStorage();
+        Database storage = DiscordLink.getInstance().getStorage();
         if (args.isEmpty()){
             DiscordLink.getInstance().getStorage().deleteRecord(source.getUser().getId());
             Role verifiedRole = guild.getRoleById(PluginConfiguration.Roles.verifiedRoleID);

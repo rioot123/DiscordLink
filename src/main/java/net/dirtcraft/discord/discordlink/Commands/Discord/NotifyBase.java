@@ -9,7 +9,7 @@ import net.dirtcraft.discord.discordlink.Commands.Discord.notify.Remove;
 import net.dirtcraft.discord.discordlink.Commands.Discord.notify.Time;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommand;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommandTree;
-import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
+import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.Exceptions.DiscordCommandException;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dv8tion.jda.api.EmbedBuilder;

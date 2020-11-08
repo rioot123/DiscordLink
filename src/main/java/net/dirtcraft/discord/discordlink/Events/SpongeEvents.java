@@ -1,8 +1,8 @@
 package net.dirtcraft.discord.discordlink.Events;
 
 import net.dirtcraft.discord.discordlink.API.GameChat;
-import net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration;
-import net.dirtcraft.discord.discordlink.Database.Storage;
+import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
+import net.dirtcraft.discord.discordlink.Storage.Database;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
@@ -21,9 +21,9 @@ import java.awt.*;
 public class SpongeEvents {
 
     private final DiscordLink main;
-    private final Storage storage;
+    private final Database storage;
 
-    public SpongeEvents(DiscordLink main, Storage storage) {
+    public SpongeEvents(DiscordLink main, Database storage) {
         this.main = main;
         this.storage = storage;
     }

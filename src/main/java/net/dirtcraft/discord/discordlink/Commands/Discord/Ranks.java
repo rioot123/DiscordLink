@@ -5,7 +5,7 @@ import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommandExecutor;
 import net.dirtcraft.discord.discordlink.Exceptions.DiscordCommandException;
 import net.dirtcraft.discord.discordlink.Exceptions.DiscordPermissionException;
-import net.dirtcraft.discord.discordlink.Utility.RankProvider;
+import net.dirtcraft.discord.discordlink.Utility.PermissionUtils;
 import org.spongepowered.api.GameState;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.User;
@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class Ranks implements DiscordCommandExecutor {
-    private RankProvider provider;
+    private PermissionUtils provider;
 
     @Override
     public void execute(MessageSource source, String command, List<String> args) throws DiscordCommandException {
@@ -23,7 +23,7 @@ public class Ranks implements DiscordCommandExecutor {
             GameChat.sendMessage("Sorry, The server has not started yet.");
             return;
         } else if (provider == null) {
-            provider = RankProvider.INSTANCE;
+            provider = PermissionUtils.INSTANCE;
         }
 
         Optional<User> player;

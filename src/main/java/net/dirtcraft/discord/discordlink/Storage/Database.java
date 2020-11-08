@@ -1,4 +1,4 @@
-package net.dirtcraft.discord.discordlink.Database;
+package net.dirtcraft.discord.discordlink.Storage;
 
 import net.dirtcraft.plugin.dirtdatabaselib.DirtDatabaseLib;
 
@@ -9,7 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
 
-public class Storage {
+public class Database {
 
     public boolean isVerified(UUID uuid) {
         boolean result;

@@ -3,9 +3,10 @@ package net.dirtcraft.discord.discordlink;
 import com.google.inject.Inject;
 import net.dirtcraft.discord.discordlink.Commands.Sponge.UnVerify;
 import net.dirtcraft.discord.discordlink.Commands.Sponge.Verify;
-import net.dirtcraft.discord.discordlink.Configuration.ConfigManager;
-import net.dirtcraft.discord.discordlink.Database.Storage;
+import net.dirtcraft.discord.discordlink.Storage.ConfigManager;
+import net.dirtcraft.discord.discordlink.Storage.Database;
 import net.dirtcraft.discord.discordlink.Events.*;
+import net.dirtcraft.discord.discordlink.Storage.Settings;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.api.JDA;
@@ -21,6 +22,7 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.game.state.GameConstructionEvent;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
+import org.spongepowered.api.network.ChannelBinding;
 import org.spongepowered.api.plugin.Dependency;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
@@ -48,13 +50,15 @@ public class DiscordLink extends ServerBootHandler {
     @Inject private ConfigurationLoader<CommentedConfigurationNode> loader;
     @Inject private Logger logger;
     @Inject private PluginContainer container;
+    private ChannelBinding.RawDataChannel channel;
     private ConfigManager configManager;
-    private Storage storage;
+    private Database storage;
 
     @Override
-    @Listener (order = Order.AFTER_PRE)
+    @Listener (order = Order.PRE)
     public void onGameConstruction(GameConstructionEvent event) {
         logger.info("Discord Link initializing...");
+        SpongeDiscordLib.getInstance().onPreInit(event);
         if (!Sponge.getPluginManager().isLoaded("sponge-discord-lib")) {
             logger.error("Sponge-Discord-Lib is not installed! " + container.getName() + " will not load.");
             return;
@@ -68,9 +72,11 @@ public class DiscordLink extends ServerBootHandler {
             return;
         }
         this.configManager = new ConfigManager(loader);
-        this.storage = new Storage();
+        this.storage = new Database();
         instance = this;
 
+        channel = Sponge.getGame().getChannelRegistrar().createRawChannel(this, Settings.ROOT_CHANNEL);
+        channel.addListener(new PluginMessageHandler());
         getJDA().addEventListener(new DiscordEvents());
         super.onGameConstruction(event);
         logger.info("Discord Link initialized");
@@ -113,12 +119,16 @@ public class DiscordLink extends ServerBootHandler {
         configManager.save();
     }
 
-    public Storage getStorage(){
+    public Database getStorage(){
         return storage;
     }
 
     public Logger getLogger(){
         return logger;
+    }
+
+    public ChannelBinding.RawDataChannel getChannel(){
+        return channel;
     }
 
     public static DiscordLink getInstance() {

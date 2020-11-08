@@ -1,10 +1,8 @@
 package net.dirtcraft.discord.discordlink.Commands.Sources;
 
-import net.dirtcraft.discord.discordlink.API.GameChat;
 import net.dirtcraft.discord.discordlink.API.GuildMember;
-import net.dirtcraft.discord.discordlink.Utility.Utility;
 
-public class GamechatSender extends WrappedConsole implements ScheduledSender {
+public class GamechatSender extends WrappedConsole implements ScheduledSender.Public {
     private GuildMember member;
     private String command;
 
@@ -14,11 +12,12 @@ public class GamechatSender extends WrappedConsole implements ScheduledSender {
     }
 
     @Override
-    public void sendDiscordResponse(String message) {
-        if (message.length() > getCharLimit()) return;
-        GameChat.sendMessage(
-                Utility.embedBuilder().addField("__Command__ \"**/" + command.toLowerCase() + "**\" __Sent__", message, false)
-                        .setFooter("Sent By: " + member.getUser().getAsTag(), member.getUser().getAvatarUrl())
-                        .build());
+    public GuildMember getMember() {
+        return member;
+    }
+
+    @Override
+    public String getCommand() {
+        return command;
     }
 }

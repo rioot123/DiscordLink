@@ -5,7 +5,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 import javax.annotation.Nullable;
 
-import static net.dirtcraft.discord.discordlink.Configuration.PluginConfiguration.Roles.*;
+import static net.dirtcraft.discord.discordlink.Storage.PluginConfiguration.Roles.*;
 
 public enum Roles {
     OWNER   (ownerRoleID,   true, 'c',"Owner"           ),
