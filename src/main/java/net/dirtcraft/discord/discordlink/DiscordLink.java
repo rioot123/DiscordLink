@@ -1,14 +1,14 @@
 package net.dirtcraft.discord.discordlink;
 
 import net.dirtcraft.discord.dirtdatabaselib.SQLManager;
-import net.dirtcraft.discord.discordlink.Commands.Bungee.Discord;
-import net.dirtcraft.discord.discordlink.Commands.Bungee.Link;
-import net.dirtcraft.discord.discordlink.Commands.Bungee.Unlink;
+import net.dirtcraft.discord.discordlink.Commands.Bungee.*;
 import net.dirtcraft.discord.discordlink.Events.DiscordChatHandler;
 import net.dirtcraft.discord.discordlink.Events.DiscordJoinHandler;
+import net.dirtcraft.discord.discordlink.Events.PluginMessageHandler;
 import net.dirtcraft.discord.discordlink.Exceptions.DependantNotLoadedException;
 import net.dirtcraft.discord.discordlink.Storage.ConfigManager;
 import net.dirtcraft.discord.discordlink.Storage.Database;
+import net.dirtcraft.discord.discordlink.Storage.Settings;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.api.JDA;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -29,6 +29,7 @@ public class DiscordLink extends Plugin {
     private Logger logger;
     private ConfigManager configManager;
     private Database storage;
+    private PluginMessageHandler channelHandler;
 
     @Override
     public void onEnable() {
@@ -38,6 +39,7 @@ public class DiscordLink extends Plugin {
             this.logger = getLogger();
             this.configManager = new ConfigManager(loader);
             this.storage = new Database();
+            this.channelHandler = new PluginMessageHandler(this);
             instance = this;
 
             if ((jda = SpongeDiscordLib.getJDA()) == null) throw new DependantNotLoadedException("JDA NOT LOADED");
@@ -47,6 +49,10 @@ public class DiscordLink extends Plugin {
             this.getProxy().getPluginManager().registerCommand(this, new Link());
             this.getProxy().getPluginManager().registerCommand(this, new Unlink());
             this.getProxy().getPluginManager().registerCommand(this, new Discord());
+            this.getProxy().getPluginManager().registerCommand(this, new Promote());
+            this.getProxy().getPluginManager().registerCommand(this, new Demote());
+            getProxy().getPluginManager().registerListener(this, channelHandler);
+            getProxy().registerChannel(Settings.ROOT_CHANNEL);
 
             logger.info("Discord Link initialized");
         } catch (DependantNotLoadedException e){
@@ -68,6 +74,10 @@ public class DiscordLink extends Plugin {
 
     public Database getStorage(){
         return storage;
+    }
+
+    public PluginMessageHandler getChannelHandler(){
+        return channelHandler;
     }
 
     public static DiscordLink getInstance() {

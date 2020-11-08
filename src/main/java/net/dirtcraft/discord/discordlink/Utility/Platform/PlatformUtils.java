@@ -1,4 +1,4 @@
-package net.dirtcraft.discord.discordlink.Compatability;
+package net.dirtcraft.discord.discordlink.Utility.Platform;
 
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Storage.Database;

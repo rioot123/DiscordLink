@@ -1,10 +1,13 @@
 package net.dirtcraft.discord.discordlink.Commands.Bungee;
 
+import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.io.ByteStreams;
 import net.dirtcraft.discord.discordlink.API.GameChats;
 import net.dirtcraft.discord.discordlink.API.GuildMember;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Storage.Database;
 import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
+import net.dirtcraft.discord.discordlink.Storage.Settings;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
@@ -13,6 +16,7 @@ import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public class Link extends Command {
@@ -46,4 +50,14 @@ public class Link extends Command {
         if (donorRole != null && !discord.isDonor() && player.hasPermission("discordlink.donator")) controller.addRoleToMember(discord, donorRole).queue();
         return Utility.formatColourCodes("&2Successfully linked");
     }
+
+    @SuppressWarnings("UnstableApiUsage")
+    private void sendPacket(ProxiedPlayer player){
+        ByteArrayDataOutput out = ByteStreams.newDataOutput();
+        out.writeUTF(Settings.ROLES_CHANNEL);
+        out.writeUTF(UUID.randomUUID().toString()); // Verification
+        out.writeUTF(player.getUniqueId().toString());
+    }
+
+
 }

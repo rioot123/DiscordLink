@@ -1,4 +1,4 @@
-package net.dirtcraft.discord.discordlink.Compatability;
+package net.dirtcraft.discord.discordlink.Utility.Platform;
 
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -34,5 +34,13 @@ public class PlatformPlayer {
 
     public boolean hasPlayedBefore(){
         return true;
+    }
+
+    public boolean hasPermission(String permission){
+        return player.hasPermission(permission);
+    }
+
+    public void sendMessage(String message){
+        player.sendMessage(message);
     }
 }

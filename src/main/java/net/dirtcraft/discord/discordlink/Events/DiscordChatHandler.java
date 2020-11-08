@@ -4,7 +4,7 @@ import net.dirtcraft.discord.discordlink.API.Action;
 import net.dirtcraft.discord.discordlink.API.GameChats;
 import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommandManager;
-import net.dirtcraft.discord.discordlink.Compatability.PlatformUtils;
+import net.dirtcraft.discord.discordlink.Utility.Platform.PlatformUtils;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Message;
