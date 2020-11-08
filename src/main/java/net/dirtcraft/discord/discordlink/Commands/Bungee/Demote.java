@@ -32,7 +32,7 @@ public class Demote extends Command {
             sender.sendMessage(TextComponent.fromLegacyText("§cYou do not have permission to do that."));
             return;
         } else if (arguments.isEmpty()){
-            sender.sendMessage(TextComponent.fromLegacyText("§cYou must specify a target to promote."));
+            sender.sendMessage(TextComponent.fromLegacyText("§cYou must specify a target to demote."));
             return;
         }
         boolean localOnly = arguments.remove("--local");
@@ -58,7 +58,7 @@ public class Demote extends Command {
 
     private void responseHandler(ProxiedPlayer sender, String name, PermissionUtils.RankUpdate rankUpdate, boolean local) {
         if (rankUpdate == null) {
-            sender.sendMessage(TextComponent.fromLegacyText("§cYou do not have permission to promote this user."));
+            sender.sendMessage(TextComponent.fromLegacyText("§cYou do not have permission to demote this user."));
             return;
         }
         PermissionUtils perms = PermissionUtils.INSTANCE;
