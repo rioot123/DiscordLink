@@ -6,6 +6,7 @@ import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Storage.Permission;
 import net.dirtcraft.discord.discordlink.Storage.Settings;
 import net.dirtcraft.discord.discordlink.Utility.PermissionUtils;
+import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -67,5 +68,7 @@ public class Demote extends Command {
             if (rankUpdate.removed != null) perms.removeRank(rankUpdate.target, rankUpdate.removed);
             if (rankUpdate.added != null) perms.addRank(rankUpdate.target, rankUpdate.added);
         }
+        if (Utility.assignStaffRoles(rankUpdate)) sender.sendMessage(TextComponent.fromLegacyText("§2Successfully set discord roles."));
+        else sender.sendMessage(TextComponent.fromLegacyText("§4Failed to set discord roles. Please notify a manager."));
     }
 }

@@ -12,6 +12,7 @@ public class Permission {
     public static boolean canModify(CommandSender sender, String... group){
         return Arrays.stream(group)
                 .filter(Objects::nonNull)
+                .map(s->PROMOTE_PERMISSION_GROUP_PREFIX+s)
                 .allMatch(sender::hasPermission);
     }
 }

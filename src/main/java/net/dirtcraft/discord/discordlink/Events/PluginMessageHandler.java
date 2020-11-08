@@ -11,6 +11,7 @@ import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -25,10 +26,12 @@ public class PluginMessageHandler implements Listener {
     @SuppressWarnings("UnstableApiUsage")
     @EventHandler
     public void on(PluginMessageEvent event) {
-        if (!event.getTag().equalsIgnoreCase(Settings.ROOT_CHANNEL)) return;
-        ByteArrayDataInput in = ByteStreams.newDataInput(event.getData());
-        final String type = in.readUTF();
-        if (type.equalsIgnoreCase(Settings.PROMOTION_CHANNEL)) handlePromoteEvent(in);
+        CompletableFuture.runAsync(()->{
+            if (!event.getTag().equalsIgnoreCase(Settings.ROOT_CHANNEL)) return;
+            ByteArrayDataInput in = ByteStreams.newDataInput(event.getData());
+            final String type = in.readUTF();
+            if (type.equalsIgnoreCase(Settings.PROMOTION_CHANNEL)) handlePromoteEvent(in);
+        });
     }
 
     private void handlePromoteEvent(ByteArrayDataInput in){

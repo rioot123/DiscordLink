@@ -3,17 +3,23 @@ package net.dirtcraft.discord.discordlink.Storage;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
+import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @ConfigSerializable
 public class PluginConfiguration {
-    @Setting private PluginConfiguration.Main main = new PluginConfiguration.Main();
-    @Setting private PluginConfiguration.Embed embed = new PluginConfiguration.Embed();
-    @Setting private PluginConfiguration.Roles roles = new PluginConfiguration.Roles();
-    @Setting private PluginConfiguration.Command command = new PluginConfiguration.Command();
-    @Setting private PluginConfiguration.Database database = new PluginConfiguration.Database();
-    @Setting private PluginConfiguration.Format format = new PluginConfiguration.Format();
+    @Setting private Main main = new Main();
+    @Setting private Embed embed = new Embed();
+    @Setting private Roles roles = new Roles();
+    @Setting private Command command = new Command();
+    @Setting private Database database = new Database();
+    @Setting private Format format = new Format();
+    @Setting private Promotion promotion = new Promotion();
+
 
     @ConfigSerializable
     public static class Main {
@@ -126,5 +132,18 @@ public class PluginConfiguration {
         @Setting public static String PASS = "";
         @Setting public static String IP = "127.0.0.1";
         @Setting public static int PORT = 3306;
+    }
+
+    @ConfigSerializable
+    public static class Promotion{
+        @Setting(value = "Discord-Staff-Tag", comment = "The role that denotes someone is staff.")
+        public static Long staffTag = 549039481450397699L;
+        @Setting(value = "Role-Map", comment = "For certain groups that are represented by a role, map them here for them to be assigned.")
+        public static Map<String, Long> roles = Stream.of(
+                new AbstractMap.SimpleImmutableEntry<>("manager", 591732856443895808L),
+                new AbstractMap.SimpleImmutableEntry<>("admin", 531631265443479562L),
+                new AbstractMap.SimpleImmutableEntry<>("moderator", 332701183477284867L),
+                new AbstractMap.SimpleImmutableEntry<>("helper", 563538434333999108L))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 }

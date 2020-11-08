@@ -5,9 +5,7 @@ import net.dirtcraft.discord.discordlink.Commands.Sources.WrappedConsole;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.PrivateChannel;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.md_5.bungee.api.ProxyServer;
@@ -18,6 +16,7 @@ import java.awt.*;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
@@ -175,5 +174,25 @@ public class Utility {
             }
         }
         if (sb.length() > 0) destination.accept(sb.toString());
+    }
+
+    public static boolean assignStaffRoles(PermissionUtils.RankUpdate update){
+        Guild guild = GameChats.getGuild();
+        GuildMember member = GuildMember.fromPlayerId(update.target).orElse(null);
+        if (member == null) return false;
+        Role oldRole = getGroupRole(update.removed);
+        Role newRole = getGroupRole(update.added);
+        Role staffRole = guild.getRoleById(PluginConfiguration.Promotion.staffTag);
+
+        if (newRole != null) guild.addRoleToMember(member, newRole).queue();
+        if (oldRole != null) guild.removeRoleFromMember(member, oldRole).queue();
+        if (staffRole != null && update.removed == null) guild.addRoleToMember(member, staffRole).queue();
+        if (staffRole != null && update.added == null) guild.removeRoleFromMember(member, staffRole).queue();
+        return true;
+    }
+
+    private static Role getGroupRole(String group){
+        Long id = PluginConfiguration.Promotion.roles.getOrDefault(group, null);
+        return id == null? null : GameChats.getGuild().getRoleById(id);
     }
 }
