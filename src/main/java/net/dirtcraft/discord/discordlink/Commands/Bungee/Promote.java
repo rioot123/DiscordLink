@@ -45,7 +45,7 @@ public class Promote extends Command {
 
     private void responseHandler(ProxiedPlayer sender, String name, PermissionUtils.RankUpdate rankUpdate) {
         if (rankUpdate == null) {
-            sender.sendMessage(TextComponent.fromLegacyText("c4You do not have permission to promote this user."));
+            sender.sendMessage(TextComponent.fromLegacyText("§cYou do not have permission to promote this user."));
             return;
         }
         PermissionUtils perms = PermissionUtils.INSTANCE;
