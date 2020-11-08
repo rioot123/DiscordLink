@@ -1,5 +1,6 @@
 package net.dirtcraft.discord.discordlink.Commands.Bungee;
 
+import com.google.common.collect.Lists;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import net.dirtcraft.discord.discordlink.DiscordLink;
@@ -13,6 +14,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.api.plugin.Command;
 
+import java.util.List;
 import java.util.UUID;
 
 public class Demote extends Command {
@@ -22,21 +24,23 @@ public class Demote extends Command {
 
     @Override
     public void execute(CommandSender sender, String[] args) {
+        List<String> arguments = Lists.newArrayList(args);
         if (!(sender instanceof ProxiedPlayer)) {
             sender.sendMessage(TextComponent.fromLegacyText("§cYou must be a player to use this command!."));
             return;
         } else if (!sender.hasPermission(Permission.PROMOTE_PERMISSION)) {
             sender.sendMessage(TextComponent.fromLegacyText("§cYou do not have permission to do that."));
             return;
-        } else if (args.length < 1){
+        } else if (arguments.isEmpty()){
             sender.sendMessage(TextComponent.fromLegacyText("§cYou must specify a target to promote."));
             return;
         }
+        boolean localOnly = arguments.remove("--local");
         UUID secret = UUID.randomUUID();
         UUID player = ((ProxiedPlayer) sender).getUniqueId();
-        String target =args[0];
-        String track = args.length < 2 ? "staff" : args[1];
-        DiscordLink.getInstance().getChannelHandler().registerCallback(secret, success->responseHandler((ProxiedPlayer) sender, target, success));
+        String target = arguments.get(0);
+        String track = arguments.size() < 2 ? "staff" : arguments.get(1);
+        DiscordLink.getInstance().getChannelHandler().registerCallback(secret, success->responseHandler((ProxiedPlayer) sender, target, success, localOnly));
         sendPacket(secret, player, target, track, ((ProxiedPlayer) sender).getServer());
     }
 
@@ -52,7 +56,7 @@ public class Demote extends Command {
         server.sendData(Settings.ROOT_CHANNEL, out.toByteArray());
     }
 
-    private void responseHandler(ProxiedPlayer sender, String name, PermissionUtils.RankUpdate rankUpdate) {
+    private void responseHandler(ProxiedPlayer sender, String name, PermissionUtils.RankUpdate rankUpdate, boolean local) {
         if (rankUpdate == null) {
             sender.sendMessage(TextComponent.fromLegacyText("§cYou do not have permission to promote this user."));
             return;
@@ -63,6 +67,8 @@ public class Demote extends Command {
         else sender.sendMessage(TextComponent.fromLegacyText("§bUpdated Rank: §eN/A"));
         if (rankUpdate.removed != null) sender.sendMessage(TextComponent.fromLegacyText("§3Previous Rank: §6" + rankUpdate.removed));
         else sender.sendMessage(TextComponent.fromLegacyText("§3Previous Rank: §eN/A"));
+
+        if (local) return;
         if (Permission.canModify(sender, rankUpdate.added, rankUpdate.removed)){
             sender.sendMessage(TextComponent.fromLegacyText("§2Successfully updated bungee permissions!"));
             if (rankUpdate.removed != null) perms.removeRank(rankUpdate.target, rankUpdate.removed);
