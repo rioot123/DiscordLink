@@ -35,7 +35,7 @@ public class Promote extends Command {
         UUID player = ((ProxiedPlayer) sender).getUniqueId();
         String target =args[0];
         String track = args.length < 2 ? "staff" : args[1];
-        DiscordLink.getInstance().getChannelHandler().registerCallback(secret, success->responseHandler((ProxiedPlayer) sender, target, track, success));
+        DiscordLink.getInstance().getChannelHandler().registerCallback(secret, success->responseHandler((ProxiedPlayer) sender, target, success));
         sendPacket(secret, player, target, track, ((ProxiedPlayer) sender).getServer());
     }
 
@@ -51,24 +51,21 @@ public class Promote extends Command {
         server.sendData(Settings.ROOT_CHANNEL, out.toByteArray());
     }
 
-    private void responseHandler(ProxiedPlayer sender, String name, String track, PermissionUtils.RankUpdate rankUpdate) {
+    private void responseHandler(ProxiedPlayer sender, String name, PermissionUtils.RankUpdate rankUpdate) {
         if (rankUpdate == null) {
             sender.sendMessage(TextComponent.fromLegacyText("§cYou do not have permission to promote this user."));
             return;
         }
         PermissionUtils perms = PermissionUtils.INSTANCE;
-        sender.sendMessage(TextComponent.fromLegacyText("§2Successfully §a§lpromoted §6" + name + " §2via Bungee!"));
-        if (rankUpdate.added != null) {
-            if (track.equalsIgnoreCase("staff")) perms.addRank(rankUpdate.target, rankUpdate.added);
-            sender.sendMessage(TextComponent.fromLegacyText("§bUpdated Rank: §e" + rankUpdate.added));
-        } else {
-            sender.sendMessage(TextComponent.fromLegacyText("§bUpdated Rank: §eN/A"));
-        }
-        if (rankUpdate.removed != null) {
-            if (track.equalsIgnoreCase("staff")) perms.removeRank(rankUpdate.target, rankUpdate.removed);
-            sender.sendMessage(TextComponent.fromLegacyText("§3Previous Rank: §6" + rankUpdate.removed));
-        } else {
-            sender.sendMessage(TextComponent.fromLegacyText("§3Previous Rank: §eN/A"));
+        sender.sendMessage(TextComponent.fromLegacyText("§2Successfully §a§lpromoted §6" + name + "."));
+        if (rankUpdate.added != null) sender.sendMessage(TextComponent.fromLegacyText("§bUpdated Rank: §e" + rankUpdate.added));
+        else sender.sendMessage(TextComponent.fromLegacyText("§bUpdated Rank: §eN/A"));
+        if (rankUpdate.removed != null) sender.sendMessage(TextComponent.fromLegacyText("§3Previous Rank: §6" + rankUpdate.removed));
+        else sender.sendMessage(TextComponent.fromLegacyText("§3Previous Rank: §eN/A"));
+        if (Permission.canModify(sender, rankUpdate.added, rankUpdate.removed)){
+            sender.sendMessage(TextComponent.fromLegacyText("§2Successfully updated bungee permissions!"));
+            if (rankUpdate.removed != null) perms.removeRank(rankUpdate.target, rankUpdate.removed);
+            if (rankUpdate.added != null) perms.addRank(rankUpdate.target, rankUpdate.added);
         }
     }
 }
