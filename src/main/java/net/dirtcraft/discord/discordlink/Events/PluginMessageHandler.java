@@ -14,14 +14,14 @@ import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.util.Identifiable;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 public class PluginMessageHandler implements RawDataListener {
     @Override
     @SuppressWarnings("NullableProblems")
     public void handlePayload(ChannelBuf data, RemoteConnection connection, Platform.Type side) {
-        System.out.println(Thread.currentThread().getName());
-        final String type = data.readUTF();
-        if (type.equalsIgnoreCase(Settings.PROMOTION_CHANNEL)) handlePromotionPayload(data);
+            final String type = data.readUTF();
+            if (type.equalsIgnoreCase(Settings.PROMOTION_CHANNEL)) handlePromotionPayload(data);
     }
 
     private void handlePromotionPayload(ChannelBuf in){
@@ -31,25 +31,27 @@ public class PluginMessageHandler implements RawDataListener {
         final String track = in.readUTF();
         final boolean promote = in.readBoolean();
 
-        Player sourcePlayer = Sponge.getServer().getPlayer(source).orElse(null);
-        if (sourcePlayer == null) return;
+        CompletableFuture.runAsync(()->{
+            Player sourcePlayer = Sponge.getServer().getPlayer(source).orElse(null);
+            if (sourcePlayer == null) return;
 
-        final UUID targetUUID = Sponge.getServiceManager()
-                .getRegistration(UserStorageService.class)
-                .map(ProviderRegistration::getProvider)
-                .flatMap(uss->uss.get(target))
-                .map(Identifiable::getUniqueId)
-                .orElse(null);
+            final UUID targetUUID = Sponge.getServiceManager()
+                    .getRegistration(UserStorageService.class)
+                    .map(ProviderRegistration::getProvider)
+                    .flatMap(uss->uss.get(target))
+                    .map(Identifiable::getUniqueId)
+                    .orElse(null);
 
-        final Optional<PermissionUtils.RankUpdate> success = PermissionUtils.INSTANCE.modifyRank(sourcePlayer, targetUUID, track, promote);
-        DiscordLink.getInstance().getChannel().sendTo(sourcePlayer, buff->{
-            buff.writeUTF(Settings.PROMOTION_CHANNEL);
-            buff.writeUTF(secret);
-            buff.writeBoolean(success.isPresent());
-            success.ifPresent(result->{
-                buff.writeUTF(result.target.toString());
-                buff.writeUTF(result.added == null? "null" : result.added);
-                buff.writeUTF(result.removed == null? "null" : result.removed);
+            final Optional<PermissionUtils.RankUpdate> success = PermissionUtils.INSTANCE.modifyRank(sourcePlayer, targetUUID, track, promote);
+            DiscordLink.getInstance().getChannel().sendTo(sourcePlayer, buff->{
+                buff.writeUTF(Settings.PROMOTION_CHANNEL);
+                buff.writeUTF(secret);
+                buff.writeBoolean(success.isPresent());
+                success.ifPresent(result->{
+                    buff.writeUTF(result.target.toString());
+                    buff.writeUTF(result.added == null? "null" : result.added);
+                    buff.writeUTF(result.removed == null? "null" : result.removed);
+                });
             });
         });
     }

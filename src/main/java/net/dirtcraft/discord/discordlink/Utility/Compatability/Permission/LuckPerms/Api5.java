@@ -70,6 +70,7 @@ public class Api5 extends PermissionUtils {
         Node previousNode = null;
         for (int i = groups.size(); i > 0; ) {
             final String group = groups.get(--i);
+            if (group.equalsIgnoreCase("default")) continue;
             final Node node = Node.builder("group." + group).context(contexts).build();
             if (targetNodes.contains(node, NodeEqualityPredicate.EXACT).asBoolean()) {
                 previousGroup = group;
@@ -92,6 +93,7 @@ public class Api5 extends PermissionUtils {
         Node previousNode = null;
         for (int i = groups.size(); i > 0; ) {
             final String group = groups.get(--i);
+            if (group.equalsIgnoreCase("default")) continue;
             final Node node = Node.builder("group." + group).context(contexts).build();
             if (!targetNodes.contains(node, NodeEqualityPredicate.EXACT).asBoolean()) {
                 previousGroup = group;
@@ -114,6 +116,7 @@ public class Api5 extends PermissionUtils {
     }
 
     private boolean hasPermission(Player source, String group){
+        if (group == null || group.equalsIgnoreCase("default")) return true;
         return source.hasPermission(PROMOTE_PERMISSION_GROUP_PREFIX + group);
     }
 }
