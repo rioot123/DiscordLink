@@ -5,7 +5,7 @@ import net.dirtcraft.discord.discordlink.API.GuildMember;
 import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.API.Roles;
 import net.dirtcraft.discord.discordlink.Exceptions.DiscordPermissionException;
-import net.dirtcraft.discord.discordlink.Compatability.PlatformUtils;
+import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUtils;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 
 import java.util.ArrayList;

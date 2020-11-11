@@ -3,11 +3,10 @@ package net.dirtcraft.discord.discordlink.Commands.Discord;
 import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommandExecutor;
 import net.dirtcraft.discord.discordlink.Commands.Sources.PrivateSender;
-import net.dirtcraft.discord.discordlink.Compatability.PlatformUser;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Exceptions.DiscordCommandException;
+import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUser;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 
 import java.util.List;
 import java.util.Optional;

@@ -1,9 +1,9 @@
 package net.dirtcraft.discord.discordlink.API;
 
-import net.dirtcraft.discord.discordlink.Compatability.PlatformPlayer;
-import net.dirtcraft.discord.discordlink.Compatability.PlatformUser;
 import net.dirtcraft.discord.discordlink.DiscordLink;
-import net.dirtcraft.discord.discordlink.Compatability.PlatformUtils;
+import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformPlayer;
+import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUser;
+import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUtils;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;

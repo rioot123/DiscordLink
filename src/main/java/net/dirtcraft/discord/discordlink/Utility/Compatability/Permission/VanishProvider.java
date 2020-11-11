@@ -1,5 +1,6 @@
-package net.dirtcraft.discord.discordlink.Compatability;
+package net.dirtcraft.discord.discordlink.Utility.Compatability.Permission;
 
+import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformPlayer;
 import org.bukkit.Bukkit;
 
 public interface VanishProvider {
@@ -7,7 +8,7 @@ public interface VanishProvider {
 
     class Essentials implements VanishProvider{
         com.earth2me.essentials.Essentials ess;
-        Essentials() throws Exception{
+        public Essentials() throws Exception{
              ess = (com.earth2me.essentials.Essentials) Bukkit.getPluginManager().getPlugin("Essentials");
              if (ess == null) throw new Exception("Could not load essentials. Player vanish values will not be considered.");
         }

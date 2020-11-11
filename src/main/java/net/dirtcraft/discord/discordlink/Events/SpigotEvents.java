@@ -1,16 +1,13 @@
 package net.dirtcraft.discord.discordlink.Events;
 
 import net.dirtcraft.discord.discordlink.API.GameChat;
-import net.dirtcraft.discord.discordlink.Compatability.PlatformPlayer;
-import net.dirtcraft.discord.discordlink.Compatability.PlatformUtils;
 import net.dirtcraft.discord.discordlink.Storage.Permissions;
 import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
-import net.dirtcraft.discord.discordlink.DiscordLink;
+import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformPlayer;
+import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUtils;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.milkbowl.vault.chat.Chat;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;

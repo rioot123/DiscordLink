@@ -3,11 +3,12 @@ package net.dirtcraft.discord.discordlink.Commands.Discord;
 import net.dirtcraft.discord.discordlink.API.GameChat;
 import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommandExecutor;
-import net.dirtcraft.discord.discordlink.Compatability.PlatformPlayer;
-import net.dirtcraft.discord.discordlink.Compatability.PlatformUtils;
+import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformPlayer;
+import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUtils;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.api.EmbedBuilder;
+
 import java.util.List;
 import java.util.stream.Collectors;
 

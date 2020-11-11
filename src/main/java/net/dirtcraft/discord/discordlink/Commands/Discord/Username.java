@@ -4,8 +4,8 @@ import net.dirtcraft.discord.discordlink.API.GameChat;
 import net.dirtcraft.discord.discordlink.API.GuildMember;
 import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommandExecutor;
-import net.dirtcraft.discord.discordlink.Compatability.PlatformUser;
 import net.dirtcraft.discord.discordlink.Exceptions.DiscordCommandException;
+import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUser;
 
 import java.util.List;
 import java.util.regex.Matcher;

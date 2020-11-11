@@ -1,4 +1,4 @@
-package net.dirtcraft.discord.discordlink.Compatability;
+package net.dirtcraft.discord.discordlink.Utility.Compatability.Platform;
 
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
