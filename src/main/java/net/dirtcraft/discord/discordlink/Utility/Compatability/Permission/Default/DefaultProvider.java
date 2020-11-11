@@ -1,7 +1,7 @@
 package net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.Default;
 
 import net.dirtcraft.discord.discordlink.API.GameChat;
-import net.dirtcraft.discord.discordlink.Utility.PermissionUtils;
+import net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.PermissionUtils;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.text.Text;

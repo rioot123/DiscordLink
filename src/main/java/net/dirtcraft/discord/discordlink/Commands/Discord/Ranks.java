@@ -5,7 +5,9 @@ import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommandExecutor;
 import net.dirtcraft.discord.discordlink.Exceptions.DiscordCommandException;
 import net.dirtcraft.discord.discordlink.Exceptions.DiscordPermissionException;
-import net.dirtcraft.discord.discordlink.Utility.PermissionUtils;
+import net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.PermissionUtils;
+import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUser;
+import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUtils;
 import org.spongepowered.api.GameState;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.User;
@@ -13,6 +15,7 @@ import org.spongepowered.api.service.user.UserStorageService;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public class Ranks implements DiscordCommandExecutor {
     private PermissionUtils provider;
@@ -26,18 +29,18 @@ public class Ranks implements DiscordCommandExecutor {
             provider = PermissionUtils.INSTANCE;
         }
 
-        Optional<User> player;
+        Optional<PlatformUser> player;
 
         if (args.isEmpty()){
-            player = source.getSpongeUser();
+            player = source.getPlayerData();
         } else {
             if (!source.isStaff()) throw new DiscordPermissionException();
-            player = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(args.get(0));
+            player = PlatformUtils.getPlayerOffline(UUID.fromString(args.get(0)));
         }
 
         if (!player.isPresent()) {
             String response = args.isEmpty()? "You are not correctly verified, or have not played on this server." : "Invalid user. Either the user does not exist or they have never played on this server.";
             GameChat.sendMessage(response, 30);
-        } else provider.execute(player.get());
+        } else provider.execute(player.map(PlatformUser::getUser).get());
     }
 }

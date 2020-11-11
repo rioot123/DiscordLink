@@ -4,7 +4,7 @@ import me.lucko.luckperms.api.LuckPermsApi;
 import me.lucko.luckperms.api.Node;
 import me.lucko.luckperms.api.context.ContextSet;
 import net.dirtcraft.discord.discordlink.API.GameChat;
-import net.dirtcraft.discord.discordlink.Utility.PermissionUtils;
+import net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.PermissionUtils;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;

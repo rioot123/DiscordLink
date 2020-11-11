@@ -1,4 +1,4 @@
-package net.dirtcraft.discord.discordlink.Utility;
+package net.dirtcraft.discord.discordlink.Utility.Compatability.Permission;
 
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.Default.DefaultProvider;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.LuckPerms.Api4;

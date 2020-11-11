@@ -2,7 +2,7 @@ package net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.LuckP
 
 
 import net.dirtcraft.discord.discordlink.API.GameChat;
-import net.dirtcraft.discord.discordlink.Utility.PermissionUtils;
+import net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.PermissionUtils;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.context.ImmutableContextSet;
@@ -116,7 +116,7 @@ public class Api5 extends PermissionUtils {
     }
 
     private boolean hasPermission(Player source, String group){
-        if (group == null || group.equalsIgnoreCase("default")) return true;
+        if (group == null) return true;
         return source.hasPermission(PROMOTE_PERMISSION_GROUP_PREFIX + group);
     }
 }

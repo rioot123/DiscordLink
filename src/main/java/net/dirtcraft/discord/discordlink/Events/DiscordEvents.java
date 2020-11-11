@@ -7,6 +7,7 @@ import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommandManager;
 import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.DiscordLink;
+import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUser;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -79,7 +80,7 @@ public class DiscordEvents extends ListenerAdapter {
 
     private static void discordToMc(MessageSource sender, String message){
         try {
-            final Optional<User> optUser = sender.getSpongeUser();
+            final Optional<User> optUser = sender.getPlayerData().map(PlatformUser::getUser);
             final String mcUsername = optUser.map(User::getName).orElse(null);
             final Text.Builder toBroadcast = Text.builder();
             final String username;

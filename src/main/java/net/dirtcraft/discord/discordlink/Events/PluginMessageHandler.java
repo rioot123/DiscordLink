@@ -2,7 +2,7 @@ package net.dirtcraft.discord.discordlink.Events;
 
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Storage.Settings;
-import net.dirtcraft.discord.discordlink.Utility.PermissionUtils;
+import net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.PermissionUtils;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;

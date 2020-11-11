@@ -1,6 +1,9 @@
 package net.dirtcraft.discord.discordlink.API;
 
 import net.dirtcraft.discord.discordlink.DiscordLink;
+import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformPlayer;
+import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUser;
+import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUtils;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -14,7 +17,7 @@ import org.spongepowered.api.service.user.UserStorageService;
 import java.util.*;
 
 public class GuildMember extends WrappedMember {
-    private User user;
+    private PlatformUser user;
     private boolean retrievedPlayer;
     private List<Roles> roles;
     private Roles highestRank;
@@ -27,12 +30,8 @@ public class GuildMember extends WrappedMember {
         if (member == null) return Optional.empty();
 
         final GuildMember profile = new GuildMember(member);
-        profile.user = Sponge.getServiceManager()
-                .provideUnchecked(UserStorageService.class)
-                .get(player)
-                .orElse(null);
+        profile.user = PlatformUtils.getPlayerOffline(player).orElse(null);
         profile.retrievedPlayer = true;
-
         return Optional.of(profile);
     }
 
@@ -52,22 +51,19 @@ public class GuildMember extends WrappedMember {
                 .forEach(roles::add);
     }
 
-    public Optional<Player> getPlayer(){
-        if (!retrievedPlayer){
-            final Optional<User> optUser = getSpongeUser();
-            return optUser.flatMap(User::getPlayer);
-        } else if (user == null) return Optional.empty();
-        else return user.getPlayer();
+    public Optional<PlatformPlayer> getPlayer(){
+        if (!retrievedPlayer) return getPlayerData().flatMap(PlatformUtils::getPlayer);
+        else return Optional.ofNullable(user).flatMap(PlatformUtils::getPlayer);
     }
 
-    public Optional<User> getSpongeUser(){
-        if (!retrievedPlayer){
-            final UserStorageService userStorage = Sponge.getGame().getServiceManager().provideUnchecked(UserStorageService.class);
+    public Optional<PlatformUser> getPlayerData(){
+        if (!retrievedPlayer) {
             final String playerId = DiscordLink.getInstance().getStorage().getUUIDfromDiscordID(member.getUser().getId());
-            final Optional<User> optUser = playerId == null ? Optional.empty() : userStorage.get(UUID.fromString(playerId));
-            user = optUser.orElse(null);
+            final Optional<PlatformUser> optData = Optional.ofNullable(playerId)
+                    .map(UUID::fromString)
+                    .flatMap(PlatformUtils::getPlayerOffline);
             retrievedPlayer = true;
-            return optUser;
+            return optData;
         } else return Optional.ofNullable(user);
     }
 

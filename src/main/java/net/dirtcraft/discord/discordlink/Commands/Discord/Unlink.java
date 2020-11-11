@@ -9,6 +9,7 @@ import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.Storage.Database;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Exceptions.DiscordCommandException;
+import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUser;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -35,7 +36,7 @@ public class Unlink implements DiscordCommandExecutor {
             if (donorRole !=  null && source.getRoles().contains(donorRole)) {
                 guild.removeRoleFromMember(source, donorRole).queue();
             }
-            GameChat.sendEmbed("Successfully executed command:", "Successfully unlinked " + source.getSpongeUser().map(User::getName).orElse("your account") + ".");
+            GameChat.sendEmbed("Successfully executed command:", "Successfully unlinked " + source.getPlayerData().flatMap(PlatformUser::getName).orElse("your account") + ".");
             return;
         }
         if (!source.hasRole(Roles.ADMIN)) throw new DiscordCommandException("You do not have permission to use this command on other users.");
@@ -46,10 +47,10 @@ public class Unlink implements DiscordCommandExecutor {
         if (!matcher.matches() || !(member = Utility.getMemberById(matcher.group(1))).isPresent()) throw new DiscordCommandException("Invalid Discord ID");
 
         final GuildMember player = new GuildMember(member.get());
-        final Optional<User> user = player.getSpongeUser();
+        final Optional<PlatformUser> user = player.getPlayerData();
         String response;
         if (user.isPresent()) {
-            response = user.get().getName();
+            response = user.flatMap(PlatformUser::getName).get();
         } else {
             response = storage.getLastKnownUsername(matcher.group(1));
             if (response == null) response = storage.getUUIDfromDiscordID(matcher.group(1));
