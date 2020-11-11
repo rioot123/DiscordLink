@@ -4,6 +4,7 @@ import net.dirtcraft.discord.discordlink.API.*;
 import net.dirtcraft.discord.discordlink.Commands.Sources.WrappedConsole;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
+import net.dirtcraft.discord.discordlink.Utility.Permission.PermissionUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -16,7 +17,6 @@ import java.awt.*;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 

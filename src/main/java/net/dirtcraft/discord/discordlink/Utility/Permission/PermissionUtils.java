@@ -1,9 +1,9 @@
-package net.dirtcraft.discord.discordlink.Utility;
+package net.dirtcraft.discord.discordlink.Utility.Permission;
 
+import net.dirtcraft.discord.discordlink.Utility.Permission.Default.DefaultProvider;
+import net.dirtcraft.discord.discordlink.Utility.Permission.Luckperms.Api5;
 import net.dirtcraft.discord.discordlink.Utility.Platform.PlatformPlayer;
 import net.dirtcraft.discord.discordlink.Utility.Platform.PlatformUser;
-import net.dirtcraft.discord.discordlink.Utility.Default.DefaultProvider;
-import net.dirtcraft.discord.discordlink.Utility.Luckperms.Api5;
 
 import javax.annotation.Nullable;
 import java.util.Optional;

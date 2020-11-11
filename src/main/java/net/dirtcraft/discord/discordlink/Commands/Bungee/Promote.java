@@ -2,11 +2,10 @@ package net.dirtcraft.discord.discordlink.Commands.Bungee;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
-import net.dirtcraft.discord.discordlink.API.GameChats;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Storage.Permission;
 import net.dirtcraft.discord.discordlink.Storage.Settings;
-import net.dirtcraft.discord.discordlink.Utility.PermissionUtils;
+import net.dirtcraft.discord.discordlink.Utility.Permission.PermissionUtils;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -61,9 +60,9 @@ public class Promote extends Command {
         PermissionUtils perms = PermissionUtils.INSTANCE;
         sender.sendMessage(TextComponent.fromLegacyText("§2Successfully §a§lpromoted §6" + name + "."));
         if (rankUpdate.added != null) sender.sendMessage(TextComponent.fromLegacyText("§bUpdated Rank: §e" + rankUpdate.added));
-        else sender.sendMessage(TextComponent.fromLegacyText("§bUpdated Rank: §eN/A"));
+        else sender.sendMessage(TextComponent.fromLegacyText("§bUpdated Rank: §edefault"));
         if (rankUpdate.removed != null) sender.sendMessage(TextComponent.fromLegacyText("§3Previous Rank: §6" + rankUpdate.removed));
-        else sender.sendMessage(TextComponent.fromLegacyText("§3Previous Rank: §eN/A"));
+        else sender.sendMessage(TextComponent.fromLegacyText("§3Previous Rank: §6default"));
         if (Permission.canModify(sender, rankUpdate.added, rankUpdate.removed)){
             sender.sendMessage(TextComponent.fromLegacyText("§2Successfully updated bungee permissions!"));
             if (rankUpdate.removed != null) perms.removeRank(rankUpdate.target, rankUpdate.removed);
