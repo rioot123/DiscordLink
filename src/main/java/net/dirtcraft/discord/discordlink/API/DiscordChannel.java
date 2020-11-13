@@ -51,11 +51,11 @@ public class DiscordChannel {
         return sendMessage(message).whenComplete((msg, ex)-> msg.delete().queueAfter(delay, TimeUnit.SECONDS));
     }
 
-    public void sendMessage(String header, String message) {
+    public void sendMessage(MessageSource source, String header, String message) {
         header = header == null? "" : header;
         MessageEmbed embed = Utility.embedBuilder()
                 .addField(header, message, false)
-                //.setFooter(event.getAuthor().getAsTag(), event.getAuthor().getAvatarUrl())
+                .setFooter("Requested By: " + source.getUser().getAsTag(), source.getUser().getAvatarUrl())
                 .build();
         sendMessage(embed);
     }

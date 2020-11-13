@@ -67,7 +67,7 @@ public class MessageSource extends GuildMember implements DiscordResponder {
         header = header == null? "" : header;
         MessageEmbed embed = Utility.embedBuilder()
                 .addField(header, message, false)
-                //.setFooter(event.getAuthor().getAsTag(), event.getAuthor().getAvatarUrl())
+                .setFooter("Requested By: " + getUser().getAsTag(), getUser().getAvatarUrl())
                 .build();
         sendCommandResponse(embed);
     }
@@ -77,7 +77,7 @@ public class MessageSource extends GuildMember implements DiscordResponder {
         message = message == null? "" : message;
         MessageEmbed embed = Utility.embedBuilder()
                 .addField(header, message, false)
-                //.setFooter(event.getAuthor().getAsTag(), event.getAuthor().getAvatarUrl())
+                .setFooter(getUser().getAsTag(), getUser().getAvatarUrl())
                 .build();
         sendCommandResponse(embed, duration);
     }

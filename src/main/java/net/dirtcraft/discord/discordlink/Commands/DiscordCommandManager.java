@@ -119,6 +119,7 @@ public class DiscordCommandManager extends DiscordCommandTree {
             if (!cmd.hasPermission(member)) return;
             String title = pre + alias + " " + cmd.getUsage();
             embed.addField(title, cmd.getDescription(), false);
+            embed.setFooter("Requested By: " + member.getUser().getAsTag(), member.getUser().getAvatarUrl());
         });
         member.sendCommandResponse(embed.build());
     }

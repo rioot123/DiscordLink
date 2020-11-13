@@ -25,12 +25,12 @@ public abstract class ConsoleSource implements org.spongepowered.api.command.sou
 
     @Override
     public void sendMessages(Iterable<Text> messages) {
-        for (Text message : messages) sendMessages(message);
+        for (Text message : messages) sendMessage(message);
     }
 
     @Override
     public void sendMessages(Text... messages) {
-        for (Text message : messages) sendMessages(message);
+        for (Text message : messages) sendMessage(message);
     }
 
     @Override
