@@ -1,22 +1,13 @@
 package net.dirtcraft.discord.discordlink.Commands.Discord;
 
-import io.github.nucleuspowered.nucleus.api.NucleusAPI;
-import io.github.nucleuspowered.nucleus.api.service.NucleusAFKService;
-import net.dirtcraft.discord.discordlink.API.GameChat;
 import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommandExecutor;
-import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformPlayer;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUtils;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.api.EmbedBuilder;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.entity.living.player.Player;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,7 +25,7 @@ public class PlayerList implements DiscordCommandExecutor {
         else if (!players.isEmpty()) embed.addField("__**" + players.size() + "** players online__", String.join("\n", players), false);
         else embed.setDescription("There are no players playing **" + SpongeDiscordLib.getServerName() + "**!");
         embed.setFooter("Requested By: " + source.getUser().getAsTag(), source.getUser().getAvatarUrl());
-        GameChat.sendMessage(embed.build());
+        source.sendCommandResponse(embed.build());
     }
 
 

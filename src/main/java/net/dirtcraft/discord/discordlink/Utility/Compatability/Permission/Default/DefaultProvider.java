@@ -1,6 +1,6 @@
 package net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.Default;
 
-import net.dirtcraft.discord.discordlink.API.GameChat;
+import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.PermissionUtils;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
@@ -12,8 +12,8 @@ import java.util.UUID;
 
 public class DefaultProvider extends PermissionUtils {
     @Override
-    public void execute(User user) {
-        GameChat.sendMessage("This version of luckperms is not supported!");
+    public void execute(MessageSource source, User user) {
+        source.sendCommandResponse("This version of luckperms is not supported!");
     }
 
     public Optional<RankUpdate> modifyRank(@Nullable Player source, @Nullable UUID targetUUID, @Nullable String trackName, boolean promote) {

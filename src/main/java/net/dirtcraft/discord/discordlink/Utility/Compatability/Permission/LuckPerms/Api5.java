@@ -1,7 +1,7 @@
 package net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.LuckPerms;
 
 
-import net.dirtcraft.discord.discordlink.API.GameChat;
+import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.PermissionUtils;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
@@ -29,14 +29,14 @@ public class Api5 extends PermissionUtils {
     private final ImmutableContextSet contexts = api.getContextManager().getStaticContext();
 
     @Override
-    public void execute(User player) {
+    public void execute(MessageSource source, User player) {
         UserManager userManager = api.getUserManager();
         CompletableFuture<net.luckperms.api.model.user.User> userFuture = userManager.loadUser(player.getUniqueId());
         userFuture.whenComplete((user, throwable) -> {
             String local = getGroups(user, contexts, false);
             String remote = getGroups(user, contexts, true);
             String perms = "__**Local**__\n" + local + "\n\n__**Other Servers**__\n" + remote;
-            GameChat.sendEmbed(player.getName() + "'s Groups:", perms);
+            source.sendCommandResponse(player.getName() + "'s Groups:", perms);
         });
     }
 

@@ -1,5 +1,6 @@
 package net.dirtcraft.discord.discordlink.Utility.Compatability.Permission;
 
+import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.Default.DefaultProvider;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.LuckPerms.Api4;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.LuckPerms.Api5;
@@ -14,7 +15,7 @@ public abstract class PermissionUtils {
 
     public final static PermissionUtils INSTANCE = getRank();
 
-    public abstract void execute(User player);
+    public abstract void execute(MessageSource source, User player);
 
     public abstract Optional<RankUpdate> modifyRank(@Nullable Player source, @Nullable UUID targetUUID, @Nullable String trackName, boolean promote);
 

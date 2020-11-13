@@ -1,6 +1,5 @@
 package net.dirtcraft.discord.discordlink.Commands.Discord;
 
-import net.dirtcraft.discord.discordlink.API.GameChat;
 import net.dirtcraft.discord.discordlink.API.GuildMember;
 import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommandExecutor;
@@ -8,7 +7,6 @@ import net.dirtcraft.discord.discordlink.Exceptions.DiscordCommandException;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUser;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dv8tion.jda.api.entities.Member;
-import org.spongepowered.api.entity.living.player.User;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +26,6 @@ public class Username implements DiscordCommandExecutor {
         final GuildMember player = new GuildMember(member.get());
         final Optional<PlatformUser> user = player.getPlayerData();
         if (!user.isPresent()) throw new DiscordCommandException("The user was not verified!");
-        GameChat.sendEmbed("Minecraft Username:", user.flatMap(PlatformUser::getName).get());
+        source.sendCommandResponse("Minecraft Username:", user.flatMap(PlatformUser::getName).get());
     }
 }

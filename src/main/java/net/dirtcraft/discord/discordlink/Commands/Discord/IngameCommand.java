@@ -2,7 +2,7 @@ package net.dirtcraft.discord.discordlink.Commands.Discord;
 
 import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommandExecutor;
-import net.dirtcraft.discord.discordlink.Commands.Sources.PrivateSender;
+import net.dirtcraft.discord.discordlink.Commands.Sources.ConsoleSource;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.scheduler.Task;
@@ -17,9 +17,10 @@ public class IngameCommand implements DiscordCommandExecutor {
     }
     @Override
     public void execute(MessageSource source, String command, List<String> args) {
-        PrivateSender sender = new PrivateSender(source, this.command);
+        String runCommand = this.command + " " + String.join(" ", args);
+        ConsoleSource sender = source.getCommandSource(runCommand);
         Task.builder()
-                .execute( () -> Sponge.getCommandManager().process(sender, this.command))
+                .execute( () -> Sponge.getCommandManager().process(sender, runCommand))
                 .submit(DiscordLink.getInstance());
     }
 }

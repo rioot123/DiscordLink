@@ -1,9 +1,9 @@
 package net.dirtcraft.discord.discordlink.Utility;
 
 import net.dirtcraft.discord.discordlink.API.*;
-import net.dirtcraft.discord.discordlink.Commands.Sources.WrappedConsole;
-import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
+import net.dirtcraft.discord.discordlink.Commands.Sources.ConsoleSource;
 import net.dirtcraft.discord.discordlink.DiscordLink;
+import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
 import net.dirtcraft.discord.spongediscordlib.DiscordUtil;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -32,7 +32,7 @@ public class Utility {
 
     public static Optional<Member> getMemberById(String id){
         try {
-            return Optional.of(GameChat.getGuild().retrieveMemberById(id).complete());
+            return Optional.of(GameChats.getGuild().retrieveMemberById(id).complete());
         } catch (Exception e){
             return Optional.empty();
         }
@@ -40,7 +40,7 @@ public class Utility {
 
     public static Optional<Member> getMemberById(long id){
         try {
-            return Optional.of(GameChat.getGuild().retrieveMemberById(id).complete());
+            return Optional.of(GameChats.getGuild().retrieveMemberById(id).complete());
         } catch (Exception e){
             return Optional.empty();
         }
@@ -48,7 +48,7 @@ public class Utility {
 
     public static Optional<Member> getMember(User user){
         try {
-            return Optional.of(GameChat.getGuild().retrieveMember(user).complete());
+            return Optional.of(GameChats.getGuild().retrieveMember(user).complete());
         } catch (Exception e){
             return Optional.empty();
         }
@@ -65,7 +65,7 @@ public class Utility {
     }
 
     public static void setTopic() {
-        TextChannel channel = GameChat.getChannel();
+        TextChannel channel = GameChats.getDefaultChannel();
         if (SpongeDiscordLib.getServerName().toLowerCase().contains("pixel")) {
             String name = SpongeDiscordLib.getServerName().split(" ")[1];
             String code = SpongeDiscordLib.getServerName().toLowerCase().split(" ")[1];
@@ -96,10 +96,10 @@ public class Utility {
         DiscordUtil.setStatus(Activity.ActivityType.STREAMING, SpongeDiscordLib.getServerName(), "https://www.twitch.tv/dirtcraft/");
     }
 
-    public static boolean toConsole(String command, MessageSource sender, Action type) {
+    public static boolean toConsole(DiscordChannel chat, String command, MessageSource sender, Action type) {
         if (ignored.stream().anyMatch(command::startsWith)) return false;
         if (canUseCommand(sender, command)) {
-            final WrappedConsole commandSender = type.getCommandSource(sender, command);
+            final ConsoleSource commandSender = type.getCommandSource(chat, sender, command);
             toConsole(commandSender, command);
             return true;
         } else {
@@ -108,7 +108,7 @@ public class Utility {
         }
     }
 
-    public static void toConsole(WrappedConsole commandSender, String command) {
+    public static void toConsole(ConsoleSource commandSender, String command) {
         Task.builder()
                 .execute(() -> Sponge.getCommandManager().process(commandSender, command))
                 .submit(DiscordLink.getInstance());
@@ -120,12 +120,12 @@ public class Utility {
     }
 
     public static void sendPermissionError(MessageSource event){
-        GameChat.sendMessage("<@" + event.getUser().getId() + ">, you do **not** have permission to use this command!", 5);
+        event.sendCommandResponse("<@" + event.getUser().getId() + ">, you do **not** have permission to use this command!", 5);
         logCommand(event, "__Tried Executing Command__");
     }
 
     public static void sendCommandError(MessageSource event, String msg){
-        GameChat.sendMessage("<@" + event.getUser().getId() + ">, " + msg, 5);
+        event.sendCommandResponse("<@" + event.getUser().getId() + ">, " + msg, 5);
         logCommand(event, "__Tried Executing Command__");
     }
 

@@ -3,7 +3,7 @@ package net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.LuckP
 import me.lucko.luckperms.api.LuckPermsApi;
 import me.lucko.luckperms.api.Node;
 import me.lucko.luckperms.api.context.ContextSet;
-import net.dirtcraft.discord.discordlink.API.GameChat;
+import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.PermissionUtils;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.entity.living.player.Player;
@@ -24,7 +24,7 @@ public class Api4 extends PermissionUtils {
     private ContextSet contexts = api.getContextManager().getStaticContexts().getContexts();
 
     @Override
-    public void execute(User player) {
+    public void execute(MessageSource source, User player) {
         me.lucko.luckperms.api.manager.UserManager userManager = api.getUserManager();
         CompletableFuture<me.lucko.luckperms.api.User> userFuture = userManager.loadUser(player.getUniqueId());
         userFuture.whenComplete((user, throwable)->{
@@ -34,7 +34,7 @@ public class Api4 extends PermissionUtils {
                     .map(n->n.getPermission() + (n.appliesGlobally()? " [G]" : ""))
                     .map(n->n.substring(6))
                     .collect(Collectors.toList());
-            GameChat.sendEmbed(player.getName() + "'s Groups:", String.join("\n", perms));
+            source.sendCommandResponse(player.getName() + "'s Groups:", String.join("\n", perms));
         });
     }
 

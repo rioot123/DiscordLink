@@ -1,10 +1,7 @@
 package net.dirtcraft.discord.discordlink.API;
 
-
-import net.dirtcraft.discord.discordlink.Commands.Sources.GamechatSender;
-import net.dirtcraft.discord.discordlink.Commands.Sources.PrivateSender;
-import net.dirtcraft.discord.discordlink.Commands.Sources.ScheduledSender;
-import net.dirtcraft.discord.discordlink.Commands.Sources.WrappedConsole;
+import net.dirtcraft.discord.discordlink.Commands.Sources.ConsoleSource;
+import net.dirtcraft.discord.discordlink.Commands.Sources.DiscordResponder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.Arrays;
@@ -61,16 +58,12 @@ public enum Action {
         return prefix;
     }
 
-    public WrappedConsole getCommandSource(GuildMember sender, String command){
+    public ConsoleSource getCommandSource(DiscordChannel chat, MessageSource sender, String command){
         if (this.sender == Sender.PRIVATE) {
-            return new PrivateSender(sender, command);
+            return DiscordResponder.getSender(sender);
         } else {
-            return new GamechatSender(sender, command);
+            return DiscordResponder.getSender(chat.getCommandResponder(sender, command));
         }
-    }
-
-    public ScheduledSender getSender(){
-        return null;
     }
 
     public static String filterConsolePrefixes(String command){

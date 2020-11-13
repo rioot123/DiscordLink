@@ -1,11 +1,10 @@
 package net.dirtcraft.discord.discordlink.Commands;
 
-import net.dirtcraft.discord.discordlink.API.GameChat;
 import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.API.Roles;
 import net.dirtcraft.discord.discordlink.Commands.Discord.*;
-import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.Exceptions.DiscordCommandException;
+import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dv8tion.jda.api.EmbedBuilder;
 
@@ -108,7 +107,7 @@ public class DiscordCommandManager extends DiscordCommandTree {
             String message = e.getMessage() != null? e.getMessage() : "an error occurred while executing the command.";
             Utility.sendCommandError(member, message);
         } finally {
-            member.getMessage().delete().queue();
+            if (!member.isPrivateMessage()) member.getMessage().delete().queue();
         }
     }
 
@@ -121,6 +120,6 @@ public class DiscordCommandManager extends DiscordCommandTree {
             String title = pre + alias + " " + cmd.getUsage();
             embed.addField(title, cmd.getDescription(), false);
         });
-        GameChat.sendMessage(embed.build());
+        member.sendCommandResponse(embed.build());
     }
 }

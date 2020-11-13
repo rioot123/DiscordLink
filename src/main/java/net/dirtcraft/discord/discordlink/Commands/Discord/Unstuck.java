@@ -3,15 +3,12 @@ package net.dirtcraft.discord.discordlink.Commands.Discord;
 import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.API.Roles;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommandExecutor;
-import net.dirtcraft.discord.discordlink.Commands.Sources.GamechatSender;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Exceptions.DiscordCommandException;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUser;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUtils;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.service.user.UserStorageService;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,7 +22,7 @@ public class Unstuck implements DiscordCommandExecutor {
         Task.builder() //-
                 .execute(() -> {
                     String command = String.format("spawn other %s", player.getName());
-                    Sponge.getCommandManager().process(new GamechatSender(source, command), command);
+                    Sponge.getCommandManager().process(source.getCommandSource(command), command);
                 }).submit(DiscordLink.getInstance());
     }
 }

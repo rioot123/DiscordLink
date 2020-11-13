@@ -1,8 +1,8 @@
 package net.dirtcraft.discord.discordlink.Commands.Sponge;
 
-import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
-import net.dirtcraft.discord.discordlink.Storage.Database;
 import net.dirtcraft.discord.discordlink.DiscordLink;
+import net.dirtcraft.discord.discordlink.Storage.Database;
+import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.api.entities.Guild;

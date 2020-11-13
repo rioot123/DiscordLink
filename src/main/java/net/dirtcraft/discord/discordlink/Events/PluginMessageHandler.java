@@ -13,7 +13,8 @@ import org.spongepowered.api.service.ProviderRegistration;
 import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.util.Identifiable;
 
-import java.util.*;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public class PluginMessageHandler implements RawDataListener {
