@@ -3,6 +3,9 @@ package net.dirtcraft.discord.discordlink.Events;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Storage.Settings;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.PermissionUtils;
+import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformPlayer;
+import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUtils;
+import net.dirtcraft.discord.discordlink.Utility.Utility;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
@@ -23,6 +26,7 @@ public class PluginMessageHandler implements RawDataListener {
     public void handlePayload(ChannelBuf data, RemoteConnection connection, Platform.Type side) {
             final String type = data.readUTF();
             if (type.equalsIgnoreCase(Settings.PROMOTION_CHANNEL)) handlePromotionPayload(data);
+            else if (type.equalsIgnoreCase(Settings.ROLES_CHANNEL)) handleRolesPayload(data);
     }
 
     private void handlePromotionPayload(ChannelBuf in){
@@ -54,6 +58,15 @@ public class PluginMessageHandler implements RawDataListener {
                     buff.writeUTF(result.removed == null? "null" : result.removed);
                 });
             });
+        });
+    }
+
+    private void handleRolesPayload(ChannelBuf in){
+        final UUID target = UUID.fromString(in.readUTF());
+        CompletableFuture.runAsync(()->{
+            Sponge.getServer().getPlayer(target)
+                    .map(PlatformUtils::getPlayer)
+                    .ifPresent(Utility::setRoles);
         });
     }
 }

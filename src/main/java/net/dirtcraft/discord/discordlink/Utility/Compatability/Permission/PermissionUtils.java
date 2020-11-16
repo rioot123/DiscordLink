@@ -15,7 +15,11 @@ public abstract class PermissionUtils {
 
     public final static PermissionUtils INSTANCE = getRank();
 
-    public abstract void execute(MessageSource source, User player);
+    public abstract void printUserGroups(MessageSource source, User player);
+
+    public abstract void printUserKits(MessageSource source, User player);
+
+    public abstract void setPlayerPrefix(User target, String prefix);
 
     public abstract Optional<RankUpdate> modifyRank(@Nullable Player source, @Nullable UUID targetUUID, @Nullable String trackName, boolean promote);
 

@@ -4,6 +4,7 @@ import net.dirtcraft.discord.discordlink.API.GameChats;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Storage.Database;
 import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
+import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUtils;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -51,6 +52,7 @@ public class SpongeEvents {
 
     @Listener
     public void onPlayerJoin(ClientConnectionEvent.Join event, @Root Player player) {
+        Utility.setRoles(PlatformUtils.getPlayer(player));
         if (player.get(Keys.VANISH).orElse(false)) return;
         if (player.hasPlayedBefore()) {
             String prefix = TextSerializers.FORMATTING_CODE.stripCodes(player.getOption("prefix").orElse(""));

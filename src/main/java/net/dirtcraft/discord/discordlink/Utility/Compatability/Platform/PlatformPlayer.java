@@ -37,4 +37,8 @@ public class PlatformPlayer {
     public boolean hasPlayedBefore(){
         return player.hasPlayedBefore();
     }
+
+    public boolean hasPermission(String group){
+        return player.hasPermission(group);
+    }
 }

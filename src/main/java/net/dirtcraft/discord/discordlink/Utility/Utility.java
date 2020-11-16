@@ -3,7 +3,9 @@ package net.dirtcraft.discord.discordlink.Utility;
 import net.dirtcraft.discord.discordlink.API.*;
 import net.dirtcraft.discord.discordlink.Commands.Sources.ConsoleSource;
 import net.dirtcraft.discord.discordlink.DiscordLink;
+import net.dirtcraft.discord.discordlink.Storage.Permission;
 import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
+import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformPlayer;
 import net.dirtcraft.discord.spongediscordlib.DiscordUtil;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -90,6 +92,29 @@ public class Utility {
         channel.getManager()
                 .setTopic("ModPack: **" + SpongeDiscordLib.getServerName() + "** — IP: " + code + ".dirtcraft.gg")
                 .queue();
+    }
+
+    public static void setRoles(PlatformPlayer player){
+        CompletableFuture.runAsync(()->{
+            Optional<GuildMember> optPlayer = GuildMember.fromPlayerId(player.getUUID());
+            if (!optPlayer.isPresent()) return;
+            GuildMember member = optPlayer.get();
+            Guild guild = GameChats.getGuild();
+
+            if (player.hasPermission(Permission.ROLES_MANAGER)) setRoleIfAbsent(guild, member, Roles.DIRTY);
+            else if (player.hasPermission(Permission.ROLES_ADMIN)) setRoleIfAbsent(guild, member, Roles.ADMIN);
+            else if (player.hasPermission(Permission.ROLES_MODERATOR)) setRoleIfAbsent(guild, member, Roles.MOD);
+            else if (player.hasPermission(Permission.ROLES_HELPER)) setRoleIfAbsent(guild, member, Roles.HELPER);
+            if (player.hasPermission(Permission.ROLES_STAFF)) setRoleIfAbsent(guild, member, Roles.STAFF);
+            if (player.hasPermission(Permission.ROLES_DONOR)) setRoleIfAbsent(guild, member, Roles.DONOR);
+            setRoleIfAbsent(guild, member, Roles.VERIFIED);
+        });
+    }
+
+    private static void setRoleIfAbsent(Guild guild, GuildMember member, Roles role){
+        Role discordRole = role.getRole();
+        if (discordRole == null || member.hasRole(role)) return;
+        guild.addRoleToMember(member, discordRole).submit();
     }
 
     public static void setStatus() {

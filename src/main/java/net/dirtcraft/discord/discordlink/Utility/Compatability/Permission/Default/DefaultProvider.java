@@ -12,8 +12,18 @@ import java.util.UUID;
 
 public class DefaultProvider extends PermissionUtils {
     @Override
-    public void execute(MessageSource source, User user) {
+    public void printUserGroups(MessageSource source, User user) {
         source.sendCommandResponse("This version of luckperms is not supported!");
+    }
+
+    @Override
+    public void printUserKits(MessageSource source, User player) {
+        source.sendCommandResponse("This version of luckperms is not supported!");
+    }
+
+    @Override
+    public void setPlayerPrefix(User target, String prefix) {
+        
     }
 
     public Optional<RankUpdate> modifyRank(@Nullable Player source, @Nullable UUID targetUUID, @Nullable String trackName, boolean promote) {

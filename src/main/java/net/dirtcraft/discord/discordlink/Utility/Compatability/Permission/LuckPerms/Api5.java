@@ -2,7 +2,6 @@ package net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.LuckP
 
 
 import net.dirtcraft.discord.discordlink.API.MessageSource;
-import net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.PermissionUtils;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.context.ImmutableContextSet;
@@ -24,19 +23,35 @@ import java.util.stream.Collectors;
 
 import static net.dirtcraft.discord.discordlink.Storage.Permission.PROMOTE_PERMISSION_GROUP_PREFIX;
 
-public class Api5 extends PermissionUtils {
+public class Api5 extends LuckPermissions {
     private final LuckPerms api = LuckPermsProvider.get();
     private final ImmutableContextSet contexts = api.getContextManager().getStaticContext();
 
     @Override
-    public void execute(MessageSource source, User player) {
+    public void printUserGroups(MessageSource source, User player) {
         UserManager userManager = api.getUserManager();
         CompletableFuture<net.luckperms.api.model.user.User> userFuture = userManager.loadUser(player.getUniqueId());
         userFuture.whenComplete((user, throwable) -> {
             String local = getGroups(user, contexts, false);
             String remote = getGroups(user, contexts, true);
+            local = local.equals("") ? "None found." : local;
+            remote = remote.equals("") ? "None found." : remote;
             String perms = "__**Local**__\n" + local + "\n\n__**Other Servers**__\n" + remote;
             source.sendCommandResponse(player.getName() + "'s Groups:", perms);
+        });
+    }
+
+    @Override
+    public void printUserKits(MessageSource source, User player) {
+        UserManager userManager = api.getUserManager();
+        CompletableFuture<net.luckperms.api.model.user.User> userFuture = userManager.loadUser(player.getUniqueId());
+        userFuture.whenComplete((user, throwable) -> {
+            String local = getKits(user, contexts, false);
+            String remote = getKits(user, contexts, true);
+            local = local.equals("") ? "None found." : local;
+            remote = remote.equals("") ? "None found." : remote;
+            String perms = "__**Local**__\n" + local + "\n\n__**Other Servers**__\n" + remote;
+            source.sendCommandResponse(player.getName() + "'s Kits:", perms);
         });
     }
 
@@ -45,6 +60,18 @@ public class Api5 extends PermissionUtils {
                 .filter(node->node.getType() == NodeType.INHERITANCE && !node.isNegated())
                 .filter(node -> node.getContexts().isSatisfiedBy(contexts) ^ negate)
                 .map(n -> "**" + n.getKey().substring(6) + "**" + n.getContexts()
+                        .getAnyValue("server")
+                        .map(s->negate?" *["+s+"]*":"")
+                        .orElse(" *[global]*"))
+                .collect(Collectors.joining("\n"));
+    }
+
+    private String getKits(net.luckperms.api.model.user.User user, ImmutableContextSet contexts, boolean negate){
+        return user.getDistinctNodes().parallelStream()
+                .filter(node->node.getType() == NodeType.PERMISSION && !node.isNegated())
+                .filter(node->node.getKey().startsWith("nucleus.kits."))
+                .filter(node -> node.getContexts().isSatisfiedBy(contexts) ^ negate)
+                .map(n -> "**" + n.getKey().substring(13) + "**" + n.getContexts()
                         .getAnyValue("server")
                         .map(s->negate?" *["+s+"]*":"")
                         .orElse(" *[global]*"))
@@ -118,5 +145,9 @@ public class Api5 extends PermissionUtils {
     private boolean hasPermission(Player source, String group){
         if (group == null) return true;
         return source.hasPermission(PROMOTE_PERMISSION_GROUP_PREFIX + group);
+    }
+
+    public Optional<String> getServerContext(){
+        return contexts.getAnyValue("server");
     }
 }

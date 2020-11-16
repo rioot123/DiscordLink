@@ -18,7 +18,7 @@ public class NotifyBase extends DiscordCommandTree {
         DiscordCommand time = DiscordCommand.builder()
                 .setDescription("Sets when the boot failure threshold is reached, In minutes")
                 .setPreBootEnabled(true)
-                .setRequiredRoles(Roles.DIRTY)
+                .setRequiredRoles(Roles.ADMIN)
                 .setCommandUsage("[<number>]")
                 .setCommandExecutor(new Time())
                 .build();

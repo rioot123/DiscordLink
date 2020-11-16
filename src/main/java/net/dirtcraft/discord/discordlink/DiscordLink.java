@@ -1,11 +1,13 @@
 package net.dirtcraft.discord.discordlink;
 
 import com.google.inject.Inject;
+import net.dirtcraft.discord.discordlink.Commands.Sponge.Prefix;
 import net.dirtcraft.discord.discordlink.Commands.Sponge.UnVerify;
 import net.dirtcraft.discord.discordlink.Commands.Sponge.Verify;
 import net.dirtcraft.discord.discordlink.Events.*;
 import net.dirtcraft.discord.discordlink.Storage.ConfigManager;
 import net.dirtcraft.discord.discordlink.Storage.Database;
+import net.dirtcraft.discord.discordlink.Storage.Permission;
 import net.dirtcraft.discord.discordlink.Storage.Settings;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
@@ -111,8 +113,23 @@ public class DiscordLink extends ServerBootHandler {
                 .executor(new UnVerify(storage))
                 .build();
 
+        CommandSpec prefix = CommandSpec.builder()
+                .permission(Permission.PREFIX_USE)
+                .description(Text.of("Sets a custom prefix. -a flag for arrow colour, -c flag for bracket colour. -i to ignore donor star."))
+                .executor(new Prefix())
+                .arguments(
+                        GenericArguments.flags()
+                                .flag("i")
+                                .valueFlag(GenericArguments.string(Text.of("ArrowColor")), "a")
+                                .valueFlag(GenericArguments.string(Text.of("BracketColor")), "c")
+                                .buildWith(GenericArguments.seq(
+                                        GenericArguments.user(Text.of("Target")),
+                                        GenericArguments.remainingJoinedStrings(Text.of("Prefix")))))
+                .build();
+
         Sponge.getCommandManager().register(this, verify, "verify", "link");
         Sponge.getCommandManager().register(this, unverify, "unverify", "unlink");
+        Sponge.getCommandManager().register(this, prefix, "prefix");
     }
 
     public void saveConfig(){

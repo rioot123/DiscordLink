@@ -69,6 +69,12 @@ public class DiscordCommandManager extends DiscordCommandTree {
                 .setRequiredRoles(Roles.VERIFIED)
                 .build();
 
+        DiscordCommand kits = DiscordCommand.builder()
+                .setDescription("Reveals a players kits.")
+                .setCommandExecutor(new Kits())
+                .setRequiredRoles(Roles.VERIFIED)
+                .build();
+
         DiscordCommand sync = DiscordCommand.builder()
                 .setDescription("Runs LP Sync to re-sync the perms")
                 .setCommandExecutor(new IngameCommand("lp sync"))
@@ -86,6 +92,13 @@ public class DiscordCommandManager extends DiscordCommandTree {
                 .setCommandExecutor(new NotifyBase())
                 .build();
 
+        DiscordCommand prefix = DiscordCommand.builder()
+                .setDescription("Sets prefixes")
+                .setCommandUsage("<title>")
+                .setRequiredRoles(Roles.STAFF)
+                .setCommandExecutor(new Prefix())
+                .build();
+
         register(list, "list");
         register(stop, "stop");
         register(halt, "halt");
@@ -97,11 +110,13 @@ public class DiscordCommandManager extends DiscordCommandTree {
         register(sync, "sync");
         register(unverify, "unverify", "unlink");
         register(notify, "notify");
+        register(prefix, "prefix");
+        register(kits, "kits");
     }
 
     public void process(MessageSource member, String args){
         try {
-            String[] command = args == null || defaultAliases.contains(args)? new String[0] : args.toLowerCase().split(" ");
+            String[] command = args == null || defaultAliases.contains(args)? new String[0] : args.split(" ");
             execute(member, null, new ArrayList<>(Arrays.asList(command)));
         } catch (Exception e){
             String message = e.getMessage() != null? e.getMessage() : "an error occurred while executing the command.";
