@@ -3,7 +3,6 @@ package net.dirtcraft.discord.discordlink.Events;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Storage.Settings;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.PermissionUtils;
-import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformPlayer;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUtils;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import org.spongepowered.api.Platform;
