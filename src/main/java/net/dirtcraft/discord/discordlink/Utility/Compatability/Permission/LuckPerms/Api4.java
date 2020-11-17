@@ -1,13 +1,18 @@
 package net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.LuckPerms;
 
+import me.lucko.luckperms.api.Contexts;
 import me.lucko.luckperms.api.LuckPermsApi;
 import me.lucko.luckperms.api.Node;
 import me.lucko.luckperms.api.Track;
+import me.lucko.luckperms.api.caching.MetaContexts;
+import me.lucko.luckperms.api.caching.MetaData;
 import me.lucko.luckperms.api.context.ContextSet;
 import net.dirtcraft.discord.discordlink.API.MessageSource;
+import net.dirtcraft.discord.discordlink.Utility.Utility;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.service.permission.PermissionService;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -84,26 +89,31 @@ public class Api4 extends LuckPermissions {
     }
 
     private Optional<RankUpdate> demoteTarget(Player source, me.lucko.luckperms.api.User targetUser, Track track) {
-        List<String> groups = track.getGroups();
-        SortedSet<? extends Node> targetNodes = targetUser.getPermissions();
-        String previousGroup = "default";
-       Node previousNode = null;
-        for (int i = groups.size(); i > 0; ) {
-            final String group = groups.get(--i);
-            if (group.equalsIgnoreCase("default")) continue;
-            final Node node =  api.buildNode("group." + group).setExtraContext(contexts).build();
-            if (targetNodes.contains(node)) {
-                previousGroup = group;
-                previousNode = node;
-            } else if (previousNode != null && hasPermission(source, previousGroup)) {
-                setRank(targetUser, node, previousNode);
-                return Optional.of(new RankUpdate(targetUser.getUuid(), group, previousGroup));
+        try {
+            List<String> groups = track.getGroups();
+            SortedSet<? extends Node> targetNodes = targetUser.getPermissions();
+            String previousGroup = "default";
+            Node previousNode = null;
+            for (int i = groups.size(); i > 0; ) {
+                final String group = groups.get(--i);
+                if (group.equalsIgnoreCase("default")) continue;
+                final Node node = api.buildNode("group." + group).setServer(getServerContext()).build();
+                if (targetNodes.contains(node)) {
+                    previousGroup = group;
+                    previousNode = node;
+                } else if (previousNode != null && hasPermission(source, previousGroup)) {
+                    setRank(targetUser, node, previousNode);
+                    return Optional.of(new RankUpdate(targetUser.getUuid(), group, previousGroup));
+                }
             }
+            if (hasPermission(source, previousGroup)) {
+                setRank(targetUser, null, previousNode);
+                return Optional.of(new RankUpdate(targetUser.getUuid(), null, previousGroup));
+            } else return Optional.empty();
+        } catch (Throwable e){
+            e.printStackTrace();
+            return Optional.empty();
         }
-        if (hasPermission(source, previousGroup)) {
-            setRank(targetUser, null, previousNode);
-            return Optional.of(new RankUpdate(targetUser.getUuid(), null, previousGroup));
-        } else return Optional.empty();
     }
 
     private Optional<RankUpdate> promoteTarget(Player source, me.lucko.luckperms.api.User targetUser, Track track) {
@@ -114,7 +124,7 @@ public class Api4 extends LuckPermissions {
         for (int i = groups.size(); i > 0; ) {
             final String group = groups.get(--i);
             if (group.equalsIgnoreCase("default")) continue;
-            final Node node = api.buildNode("group." + group).setExtraContext(contexts).build();
+            final Node node = api.buildNode("group." + group).setServer(getServerContext()).build();
             if (!targetNodes.contains(node)) {
                 previousGroup = group;
                 previousNode = node;
@@ -139,7 +149,13 @@ public class Api4 extends LuckPermissions {
         return source.hasPermission(PROMOTE_PERMISSION_GROUP_PREFIX + group);
     }
 
-    public Optional<String> getServerContext(){
-        return contexts.getAnyValue("server");
+    public String getServerContext(){
+        return contexts.getAnyValue("server").orElse("global");
+    }
+
+    public Optional<String> getPrefix(UUID uuid){
+        return Optional.ofNullable(api.getUserManager().getUser(uuid))
+                .map(u->u.getCachedData().getMetaData(Contexts.global().setContexts(contexts)))
+                .map(MetaData::getPrefix);
     }
 }

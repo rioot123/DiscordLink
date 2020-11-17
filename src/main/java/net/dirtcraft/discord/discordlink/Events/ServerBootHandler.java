@@ -1,6 +1,6 @@
 package net.dirtcraft.discord.discordlink.Events;
 
-import net.dirtcraft.discord.discordlink.API.GameChats;
+import net.dirtcraft.discord.discordlink.API.Channels;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
@@ -81,8 +81,8 @@ public class ServerBootHandler {
                 .build();
         if (future != null) future = future
                 .whenComplete((message, throwable) -> message.delete().queue())
-                .thenApply(message -> GameChats.getDefaultChannel().sendMessage(embed).complete());
-        else future = GameChats.getDefaultChannel().sendMessage(embed).submit();
+                .thenApply(message -> Channels.getDefaultChannel().sendMessage(embed).complete());
+        else future = Channels.getDefaultChannel().sendMessage(embed).submit();
     }
 
     private void sendMessage(RestAction<PrivateChannel> channelRestAction){

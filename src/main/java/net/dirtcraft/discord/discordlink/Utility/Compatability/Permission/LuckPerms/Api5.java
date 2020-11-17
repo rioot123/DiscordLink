@@ -2,6 +2,7 @@ package net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.LuckP
 
 
 import net.dirtcraft.discord.discordlink.API.MessageSource;
+import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.context.ImmutableContextSet;
@@ -147,7 +148,12 @@ public class Api5 extends LuckPermissions {
         return source.hasPermission(PROMOTE_PERMISSION_GROUP_PREFIX + group);
     }
 
-    public Optional<String> getServerContext(){
-        return contexts.getAnyValue("server");
+    public String getServerContext(){
+        return contexts.getAnyValue("server").orElse("global");
+    }
+
+    public Optional<String> getPrefix(UUID uuid){
+        return Optional.ofNullable(api.getUserManager().getUser(uuid))
+                .map(u-> u.getCachedData().getMetaData().getPrefix());
     }
 }

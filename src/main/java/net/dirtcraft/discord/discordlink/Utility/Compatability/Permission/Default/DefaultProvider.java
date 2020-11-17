@@ -26,6 +26,11 @@ public class DefaultProvider extends PermissionUtils {
         
     }
 
+    @Override
+    public Optional<String> getPrefix(UUID uuid) {
+        return Optional.empty();
+    }
+
     public Optional<RankUpdate> modifyRank(@Nullable Player source, @Nullable UUID targetUUID, @Nullable String trackName, boolean promote) {
         if (source != null) source.sendMessage(Text.of("This version of luckperms is not supported!"));
         return Optional.empty();

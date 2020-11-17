@@ -1,5 +1,6 @@
 package net.dirtcraft.discord.discordlink.Storage;
 
+import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
@@ -38,6 +39,12 @@ public class PluginConfiguration {
 
         @Setting(value = "Discord-Server-ID")
         public static String discordServerID = "269639757351354368";
+
+        @Setting(value = "Discord-Server-ID")
+        public static String gamechatChannelID = SpongeDiscordLib.getGamechatChannelID();
+
+        @Setting(value = "Discord-Server-ID")
+        public static String serverLogChannelID = "566095634008899585";
 
     }
 

@@ -13,6 +13,8 @@ import java.util.UUID;
 
 public abstract class PermissionUtils {
 
+    public static String VERSION;
+
     public final static PermissionUtils INSTANCE = getRank();
 
     public abstract void printUserGroups(MessageSource source, User player);
@@ -21,17 +23,22 @@ public abstract class PermissionUtils {
 
     public abstract void setPlayerPrefix(User target, String prefix);
 
+    public abstract Optional<String> getPrefix(UUID uuid);
+
     public abstract Optional<RankUpdate> modifyRank(@Nullable Player source, @Nullable UUID targetUUID, @Nullable String trackName, boolean promote);
 
     private static PermissionUtils getRank(){
         try {
             Class.forName("net.luckperms.api.LuckPerms");
+            VERSION = "LuckPerms API 5";
             return new Api5();
         } catch (ClassNotFoundException ignored){}
         try {
             Class.forName("me.lucko.luckperms.api.LuckPermsApi");
+            VERSION = "LuckPerms API 4";
             return new Api4();
         } catch (ClassNotFoundException ignored){}
+        VERSION = "None";
         return new DefaultProvider();
     }
 

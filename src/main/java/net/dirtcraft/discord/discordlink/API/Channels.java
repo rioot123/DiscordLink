@@ -8,21 +8,24 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
 
-public class GameChats {
+public class Channels {
 
-    private static final DiscordChannel defaultChannel = new DiscordChannel(Long.parseLong(SpongeDiscordLib.getGamechatChannelID()));
+    private static final Channel logChannel = new Channel(Long.parseLong(PluginConfiguration.Main.serverLogChannelID));
+    private static final Channel defaultChannel = new Channel(Long.parseLong(PluginConfiguration.Main.gamechatChannelID));
     private static final long guild = getDefaultChannel() != null ? getDefaultChannel().getGuild().getIdLong() : -1;
 
     public static TextChannel getDefaultChannel(){
         return DiscordLink.getJDA().getTextChannelById(defaultChannel.getId());
     }
 
-    public static DiscordChannel getDefaultChat(){
+    public static Channel getDefaultChat(){
         return defaultChannel;
     }
 
+    public static Channel getLogChannel() {return null;}
+
     public static boolean isGamechat(MessageChannel channel){
-        return channel.getIdLong() == GameChats.defaultChannel.getId();
+        return channel.getIdLong() == Channels.defaultChannel.getId();
     }
 
     public static Guild getGuild(){
@@ -30,7 +33,7 @@ public class GameChats {
     }
 
     public static void sendPlayerMessage(String prefix, String playerName, String message) {
-        final DiscordChannel gamechat = getDefaultChat();
+        final Channel gamechat = getDefaultChat();
         final String output = PluginConfiguration.Format.serverToDiscord
                 .replace("{prefix}", prefix)
                 .replace("{username}", playerName)

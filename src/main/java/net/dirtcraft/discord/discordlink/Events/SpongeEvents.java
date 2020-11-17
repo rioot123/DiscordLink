@@ -1,6 +1,6 @@
 package net.dirtcraft.discord.discordlink.Events;
 
-import net.dirtcraft.discord.discordlink.API.GameChats;
+import net.dirtcraft.discord.discordlink.API.Channels;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Storage.Database;
 import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
@@ -33,7 +33,7 @@ public class SpongeEvents {
 
     @Listener
     public void onServerStarted(GameStartedServerEvent event) {
-        GameChats.getDefaultChat().sendMessage(
+        Channels.getDefaultChat().sendMessage(
                 Utility.embedBuilder()
                 .setColor(Color.GREEN)
                 .setDescription(PluginConfiguration.Format.serverStart
@@ -43,7 +43,7 @@ public class SpongeEvents {
 
     @Listener
     public void onServerStopping(GameStoppingServerEvent event) {
-        GameChats.getDefaultChat().sendMessage(
+        Channels.getDefaultChat().sendMessage(
                 Utility.embedBuilder()
                         .setDescription(PluginConfiguration.Format.serverStop
                                 .replace("{modpack}", modpack)
@@ -55,9 +55,9 @@ public class SpongeEvents {
         Utility.setRoles(PlatformUtils.getPlayer(player));
         if (player.get(Keys.VANISH).orElse(false)) return;
         if (player.hasPlayedBefore()) {
-            String prefix = TextSerializers.FORMATTING_CODE.stripCodes(player.getOption("prefix").orElse(""));
+            String prefix = TextSerializers.FORMATTING_CODE.stripCodes(player.getOption("prefix").orElse(PlatformUtils.getPlayer(player).getPrefix().orElse("")));
 
-            GameChats.getDefaultChat().sendMessage(PluginConfiguration.Format.playerJoin
+            Channels.getDefaultChat().sendMessage(PluginConfiguration.Format.playerJoin
                     .replace("{username}", player.getName())
                     .replace("{prefix}", prefix)
             );
@@ -68,7 +68,7 @@ public class SpongeEvents {
                             .replace("{username}", player.getName()))
                     .build();
 
-            GameChats.getDefaultChat().sendMessage(embed);
+            Channels.getDefaultChat().sendMessage(embed);
         }
     }
 
@@ -77,7 +77,7 @@ public class SpongeEvents {
         if (player.get(Keys.VANISH).orElse(false)) return;
         String prefix = TextSerializers.FORMATTING_CODE.stripCodes(player.getOption("prefix").orElse(""));
 
-        GameChats.getDefaultChat().sendMessage(PluginConfiguration.Format.playerDisconnect
+        Channels.getDefaultChat().sendMessage(PluginConfiguration.Format.playerDisconnect
                         .replace("{username}", player.getName())
                         .replace("{prefix}", prefix)
                 );

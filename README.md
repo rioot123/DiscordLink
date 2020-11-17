@@ -24,6 +24,13 @@ Changelog
     - Overhaul of the sender system, and wrapped console senders. 
     - Overhaul of how discord commands send their responses.
     - made !ranks in LP API 4.0 identical to API 5.0
+    - made discord link set the ranks on join
+    - added a packet handler for re-configuring ranks on discord.
+    - !list now shows prefix and highlights staff.
+    - track promotion handler support for bungee module
+    - !version command
+    - bot can now verify users via DM  or message in gamechat (will delete/ignore message and DM them)
+    - ability to grab server log channel from discord link.
 
   - 1.4.0
     - Updated to new JDA 4.2.0 release

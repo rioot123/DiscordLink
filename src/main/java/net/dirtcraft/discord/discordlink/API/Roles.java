@@ -32,7 +32,7 @@ public enum Roles {
     }
 
     @Nullable public Role getRole(){
-        return GameChats.getGuild().getRoleById(id);
+        return Channels.getGuild().getRoleById(id);
     }
 
     @NonNull public String getName(){

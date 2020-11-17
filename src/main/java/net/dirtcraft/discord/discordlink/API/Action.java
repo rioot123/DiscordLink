@@ -58,7 +58,7 @@ public enum Action {
         return prefix;
     }
 
-    public ConsoleSource getCommandSource(DiscordChannel chat, MessageSource sender, String command){
+    public ConsoleSource getCommandSource(Channel chat, MessageSource sender, String command){
         if (this.sender == Sender.PRIVATE) {
             return DiscordResponder.getSender(sender);
         } else {

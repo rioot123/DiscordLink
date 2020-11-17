@@ -1,6 +1,6 @@
 package net.dirtcraft.discord.discordlink.Commands.Discord;
 
-import net.dirtcraft.discord.discordlink.API.GameChats;
+import net.dirtcraft.discord.discordlink.API.Channels;
 import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommandExecutor;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -20,7 +20,7 @@ public class StopServer implements DiscordCommandExecutor {
         try {
             if (!source.isPrivateMessage()) source.getMessage().delete().queue(s->{},e->{});
             else source.sendCommandResponse("Forced Reboot Scheduled.", "Attempting to reboot the server.");
-            GameChats.getDefaultChat().sendMessage(source, "Forced Reboot Scheduled.", "Attempting to reboot the server.");
+            Channels.getDefaultChat().sendMessage(source, "Forced Reboot Scheduled.", "Attempting to reboot the server.");
             Thread.sleep(555);
         } catch (Throwable ignored){
 

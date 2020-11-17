@@ -21,6 +21,7 @@ import java.awt.*;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
@@ -34,7 +35,7 @@ public class Utility {
 
     public static Optional<Member> getMemberById(String id){
         try {
-            return Optional.of(GameChats.getGuild().retrieveMemberById(id).complete());
+            return Optional.of(Channels.getGuild().retrieveMemberById(id).complete());
         } catch (Exception e){
             return Optional.empty();
         }
@@ -42,7 +43,7 @@ public class Utility {
 
     public static Optional<Member> getMemberById(long id){
         try {
-            return Optional.of(GameChats.getGuild().retrieveMemberById(id).complete());
+            return Optional.of(Channels.getGuild().retrieveMemberById(id).complete());
         } catch (Exception e){
             return Optional.empty();
         }
@@ -50,7 +51,7 @@ public class Utility {
 
     public static Optional<Member> getMember(User user){
         try {
-            return Optional.of(GameChats.getGuild().retrieveMember(user).complete());
+            return Optional.of(Channels.getGuild().retrieveMember(user).complete());
         } catch (Exception e){
             return Optional.empty();
         }
@@ -67,7 +68,7 @@ public class Utility {
     }
 
     public static void setTopic() {
-        TextChannel channel = GameChats.getDefaultChannel();
+        TextChannel channel = Channels.getDefaultChannel();
         if (SpongeDiscordLib.getServerName().toLowerCase().contains("pixel")) {
             String name = SpongeDiscordLib.getServerName().split(" ")[1];
             String code = SpongeDiscordLib.getServerName().toLowerCase().split(" ")[1];
@@ -99,7 +100,7 @@ public class Utility {
             Optional<GuildMember> optPlayer = GuildMember.fromPlayerId(player.getUUID());
             if (!optPlayer.isPresent()) return;
             GuildMember member = optPlayer.get();
-            Guild guild = GameChats.getGuild();
+            Guild guild = Channels.getGuild();
 
             if (player.hasPermission(Permission.ROLES_MANAGER)) setRoleIfAbsent(guild, member, Roles.DIRTY);
             else if (player.hasPermission(Permission.ROLES_ADMIN)) setRoleIfAbsent(guild, member, Roles.ADMIN);
@@ -111,7 +112,7 @@ public class Utility {
         });
     }
 
-    private static void setRoleIfAbsent(Guild guild, GuildMember member, Roles role){
+    public static void setRoleIfAbsent(Guild guild, GuildMember member, Roles role){
         Role discordRole = role.getRole();
         if (discordRole == null || member.hasRole(role)) return;
         guild.addRoleToMember(member, discordRole).submit();
@@ -121,7 +122,7 @@ public class Utility {
         DiscordUtil.setStatus(Activity.ActivityType.STREAMING, SpongeDiscordLib.getServerName(), "https://www.twitch.tv/dirtcraft/");
     }
 
-    public static boolean toConsole(DiscordChannel chat, String command, MessageSource sender, Action type) {
+    public static boolean toConsole(Channel chat, String command, MessageSource sender, Action type) {
         if (ignored.stream().anyMatch(command::startsWith)) return false;
         if (canUseCommand(sender, command)) {
             final ConsoleSource commandSender = type.getCommandSource(chat, sender, command);
@@ -207,5 +208,16 @@ public class Utility {
             }
         }
         if (sb.length() > 0) destination.accept(sb.toString());
+    }
+
+    public static String getSaltString() {
+        String SALTCHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+        StringBuilder salt = new StringBuilder();
+        Random rnd = new Random();
+        while (salt.length() < 6) { // length of the random string.
+            int index = (int) (rnd.nextFloat() * SALTCHARS.length());
+            salt.append(SALTCHARS.charAt(index));
+        }
+        return salt.toString();
     }
 }

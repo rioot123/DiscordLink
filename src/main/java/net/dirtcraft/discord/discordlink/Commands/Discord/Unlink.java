@@ -1,6 +1,6 @@
 package net.dirtcraft.discord.discordlink.Commands.Discord;
 
-import net.dirtcraft.discord.discordlink.API.GameChats;
+import net.dirtcraft.discord.discordlink.API.Channels;
 import net.dirtcraft.discord.discordlink.API.GuildMember;
 import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.API.Roles;
@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
 public class Unlink implements DiscordCommandExecutor {
     @Override
     public void execute(MessageSource source, String command, List<String> args) throws DiscordCommandException {
-        Guild guild = GameChats.getGuild();
+        Guild guild = Channels.getGuild();
         Database storage = DiscordLink.getInstance().getStorage();
         if (args.isEmpty()){
             DiscordLink.getInstance().getStorage().deleteRecord(source.getUser().getId());

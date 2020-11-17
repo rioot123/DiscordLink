@@ -3,6 +3,7 @@ package net.dirtcraft.discord.discordlink.API;
 import net.dirtcraft.discord.discordlink.Commands.Sources.DiscordResponder;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
+import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -11,17 +12,17 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
-public class DiscordChannel {
+public class Channel {
 
     private final long channel;
     private final boolean isPrivate;
 
-    public DiscordChannel(long channel){
+    public Channel(long channel){
         this.channel = channel;
         this.isPrivate = false;
     }
 
-    public DiscordChannel(long channel, boolean isPrivate){
+    public Channel(long channel, boolean isPrivate){
         this.channel = channel;
         this.isPrivate = isPrivate;
     }
@@ -56,6 +57,23 @@ public class DiscordChannel {
         MessageEmbed embed = Utility.embedBuilder()
                 .addField(header, message, false)
                 .setFooter("Requested By: " + source.getUser().getAsTag(), source.getUser().getAvatarUrl())
+                .build();
+        sendMessage(embed);
+    }
+
+    public void sendMessage(String header, String message) {
+        header = header == null? "" : header;
+        MessageEmbed embed = Utility.embedBuilder()
+                .addField(header, message, false)
+                .build();
+        sendMessage(embed);
+    }
+
+    public void sendLog(String header, String message) {
+        header = header == null? "" : header;
+        MessageEmbed embed = Utility.embedBuilder()
+                .addField(header, message, false)
+                .setFooter("modpack: " + SpongeDiscordLib.getServerName())
                 .build();
         sendMessage(embed);
     }

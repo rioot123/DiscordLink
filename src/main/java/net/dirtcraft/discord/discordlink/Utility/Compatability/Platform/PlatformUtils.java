@@ -14,6 +14,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class PlatformUtils {
+    public static final String VERSION = "Sponge-" + Sponge.getPlatform().getMinecraftVersion().getName();
+
     public static Optional<PlatformUser> getPlayerOffline(UUID uuid){
         return Sponge.getServiceManager().provide(UserStorageService.class)
                 .flatMap(uss->uss.get(uuid))
@@ -47,4 +49,5 @@ public class PlatformUtils {
     public static boolean isGameReady(){
         return Sponge.getGame().getState() == GameState.SERVER_STARTED;
     }
+
 }

@@ -99,19 +99,26 @@ public class DiscordCommandManager extends DiscordCommandTree {
                 .setCommandExecutor(new Prefix())
                 .build();
 
-        register(list, "list");
+        DiscordCommand version = DiscordCommand.builder()
+                .setDescription("Shows the current version")
+                .setRequiredRoles(Roles.DIRTY)
+                .setCommandExecutor(new Version())
+                .build();
+
+        register(list, "list", "players");
         register(stop, "stop");
         register(halt, "halt");
         register(seen, "seen");
         register(unstuck, "unstuck", "spawn");
         register(username, "username");
         register(discord, "discord");
-        register(ranks, "ranks");
+        register(ranks, "ranks", "groups", "parents");
         register(sync, "sync");
         register(unverify, "unverify", "unlink");
         register(notify, "notify");
         register(prefix, "prefix");
         register(kits, "kits");
+        register(version, "version", "info");
     }
 
     public void process(MessageSource member, String args){

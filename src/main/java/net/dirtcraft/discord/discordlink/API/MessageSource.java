@@ -11,11 +11,11 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class MessageSource extends GuildMember implements DiscordResponder {
     private final Message message;
-    private final DiscordChannel source;
+    private final Channel source;
     public MessageSource(MessageReceivedEvent event){
-        super(GameChats.getGuild().retrieveMember(event.getAuthor()).complete());
+        super(Channels.getGuild().retrieveMember(event.getAuthor()).complete());
         this.message = event.getMessage();
-        this.source = new DiscordChannel(event.getChannel().getIdLong(), event.getMessage().isFromType(ChannelType.PRIVATE));
+        this.source = new Channel(event.getChannel().getIdLong(), event.getMessage().isFromType(ChannelType.PRIVATE));
     }
 
     public Message getMessage() {
@@ -80,5 +80,9 @@ public class MessageSource extends GuildMember implements DiscordResponder {
                 .setFooter(getUser().getAsTag(), getUser().getAvatarUrl())
                 .build();
         sendCommandResponse(embed, duration);
+    }
+
+    public void sendPrivateMessage(MessageEmbed message){
+        getUser().openPrivateChannel().queue(dm -> dm.sendMessage(message).queue());
     }
 }
