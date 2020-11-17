@@ -47,7 +47,7 @@ public class Prefix implements CommandExecutor {
             } else if (target != src && !src.hasPermission(Permission.PREFIX_OTHERS)) {
                 src.sendMessage(Text.of("§cYou do not have permission to set other players prefixes."));
                 return;
-            } else if (title.length() > 16 && !src.hasPermission(Permission.PREFIX_BRACKETS)){
+            } else if (title.length() > 20 && !src.hasPermission(Permission.PREFIX_LONG)){
                 src.sendMessage(Text.of("§cThe prefix specified is too long."));
                 return;
             } else if (!caratColor.equalsIgnoreCase("&a&l") && !src.hasPermission(Permission.PREFIX_ARROW)){
