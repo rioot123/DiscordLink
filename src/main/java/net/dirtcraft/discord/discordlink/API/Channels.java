@@ -22,7 +22,9 @@ public class Channels {
         return defaultChannel;
     }
 
-    public static Channel getLogChannel() {return null;}
+    public static Channel getLogChannel() {
+        return logChannel;
+    }
 
     public static boolean isGamechat(MessageChannel channel){
         return channel.getIdLong() == Channels.defaultChannel.getId();
