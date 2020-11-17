@@ -37,6 +37,10 @@ public class Prefix implements CommandExecutor {
             if (title == null) {
                 src.sendMessage(Text.of("§cYou must specify a prefix."));
                 return;
+            } else if (title.equalsIgnoreCase("none")){
+                PermissionUtils.INSTANCE.clearPlayerPrefix(target);
+                src.sendMessage(Text.of("§cPrefix cleared."));
+                return;
             } else if (target == null) {
                 src.sendMessage(Text.of("§cYou must specify a target."));
                 return;
