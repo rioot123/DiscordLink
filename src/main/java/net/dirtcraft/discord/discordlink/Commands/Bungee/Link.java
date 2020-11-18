@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 
@@ -29,7 +30,7 @@ public class Link extends Command {
         if (!(sender instanceof ProxiedPlayer) || args.length < 1) return;
         ProxiedPlayer player = (ProxiedPlayer) sender;
         String code = args[0];
-        CompletableFuture.runAsync(()-> player.chat(verify(player, code)));
+        CompletableFuture.runAsync(()-> player.sendMessage(TextComponent.fromLegacyText(verify(player, code))));
     }
 
     private String verify(ProxiedPlayer player, String code) {

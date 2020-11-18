@@ -46,8 +46,8 @@ public class DiscordLink extends Plugin {
 
             jda.addEventListener(new DiscordChatHandler());
             jda.addEventListener(new DiscordJoinHandler());
-            this.getProxy().getPluginManager().registerCommand(this, new Link());
-            this.getProxy().getPluginManager().registerCommand(this, new Unlink());
+            //this.getProxy().getPluginManager().registerCommand(this, new Link());
+            //this.getProxy().getPluginManager().registerCommand(this, new Unlink());
             this.getProxy().getPluginManager().registerCommand(this, new Discord());
             this.getProxy().getPluginManager().registerCommand(this, new Promote());
             this.getProxy().getPluginManager().registerCommand(this, new Demote());
