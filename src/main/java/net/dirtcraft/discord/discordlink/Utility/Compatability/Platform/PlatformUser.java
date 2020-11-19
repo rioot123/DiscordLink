@@ -1,4 +1,4 @@
-package net.dirtcraft.discord.discordlink.Utility.Platform;
+package net.dirtcraft.discord.discordlink.Utility.Compatability.Platform;
 
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;

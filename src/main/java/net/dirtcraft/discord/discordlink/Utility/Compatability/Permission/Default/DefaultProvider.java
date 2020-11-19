@@ -1,8 +1,8 @@
-package net.dirtcraft.discord.discordlink.Utility.Permission.Default;
+package net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.Default;
 
-import net.dirtcraft.discord.discordlink.Utility.Permission.PermissionUtils;
-import net.dirtcraft.discord.discordlink.Utility.Platform.PlatformPlayer;
-import net.dirtcraft.discord.discordlink.Utility.Platform.PlatformUser;
+import net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.PermissionUtils;
+import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformPlayer;
+import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUser;
 
 import javax.annotation.Nullable;
 import java.util.Optional;

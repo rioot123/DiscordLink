@@ -22,14 +22,14 @@ public class ResponseScheduler {
         timer.scheduleAtFixedRate(new Messenger(), 1250, 1250);
     }
 
-    public static void submit(ScheduledSender provider, String message) {
+    public static void submit(DiscordResponder provider, String message) {
         instance.tasks.add(new Message(provider, message));
     }
 
     private static class Message {
-        final ScheduledSender provider;
+        final DiscordResponder provider;
         final String message;
-        private Message(ScheduledSender provider, String message){
+        private Message(DiscordResponder provider, String message){
             this.message = message;
             this.provider = provider;
         }
@@ -38,7 +38,7 @@ public class ResponseScheduler {
     private class Messenger extends TimerTask {
         @Override
         public void run() {
-            Multimap<ScheduledSender, String> messages = ArrayListMultimap.create();
+            Multimap<DiscordResponder, String> messages = ArrayListMultimap.create();
             while (!tasks.isEmpty()){
                 Message message = tasks.poll();
                 messages.put(message.provider, message.message);
@@ -46,7 +46,7 @@ public class ResponseScheduler {
             messages.keySet().forEach(provider -> dispatchMessages(provider, messages.get(provider)));
         }
 
-        private void dispatchMessages(ScheduledSender provider, Collection<String> messages){
+        private void dispatchMessages(DiscordResponder provider, Collection<String> messages){
             StringBuilder output = new StringBuilder();
             for (String message : messages){
                 if (provider.sanitise()) message = Utility.sanitizeMinecraftText(message);
@@ -60,39 +60,6 @@ public class ResponseScheduler {
                 }
             }
             if (output.length() > 0) provider.sendDiscordResponse(output.toString());
-        }
-    }
-
-    public static void liteBansCallback(WrappedConsole console, String username){
-        instance.registerLiteBansCallback(console, username);
-    }
-
-    private void registerLiteBansCallback(WrappedConsole console, String username){
-        LiteBanListener liteBanListener = new LiteBanListener(console, username);
-        Events.get().register(liteBanListener);
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                Events.get().unregister(liteBanListener);
-            }
-        }, 60_000);
-    }
-
-
-    private static class LiteBanListener extends Events.Listener {
-        final WrappedConsole console;
-        final String username;
-
-        private LiteBanListener(WrappedConsole console, String username) {
-            this.username = username;
-            this.console = console;
-        }
-
-        @Override
-        public void broadcastSent(@NotNull String message, @Nullable String type) {
-            if (!message.matches("(?i)^([&§][0-9a-f])?" + username + ".*")) return;
-            Events.get().unregister(this);
-            console.sendMessage(message);
         }
     }
 }

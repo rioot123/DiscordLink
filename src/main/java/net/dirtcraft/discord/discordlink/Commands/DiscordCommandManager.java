@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 
 public class DiscordCommandManager extends DiscordCommandTree {
 
@@ -38,7 +39,7 @@ public class DiscordCommandManager extends DiscordCommandTree {
     }
 
     @Override
-    public void defaultResponse(MessageSource member, String command, java.util.List<String> args) {
+    public void defaultResponse(MessageSource member, String command, List<String> args) {
         EmbedBuilder embed = Utility.embedBuilder();
         String pre = PluginConfiguration.Main.discordCommand;
         getCommandMap().forEach((alias, cmd)->{
@@ -46,7 +47,7 @@ public class DiscordCommandManager extends DiscordCommandTree {
             String title = pre + alias + " " + cmd.getUsage();
             embed.addField(title, cmd.getDescription(), false);
         });
-        member.getGamechat().sendMessage(embed.build());
+        member.sendCommandResponse(embed.build());
     }
 
 }

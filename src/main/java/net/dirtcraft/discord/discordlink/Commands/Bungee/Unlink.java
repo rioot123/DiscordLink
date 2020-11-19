@@ -1,7 +1,8 @@
 package net.dirtcraft.discord.discordlink.Commands.Bungee;
 
-import net.dirtcraft.discord.discordlink.API.GameChats;
+import net.dirtcraft.discord.discordlink.API.Channels;
 import net.dirtcraft.discord.discordlink.API.GuildMember;
+import net.dirtcraft.discord.discordlink.API.Roles;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Storage.Database;
 import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
@@ -10,39 +11,38 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 
 import java.util.concurrent.CompletableFuture;
 
 public class Unlink extends Command {
-    public Unlink() {
+    private final Database storage;
+    public Unlink(Database storage) {
         super("unverify");
+        this.storage = storage;
     }
 
     @Override
     public void execute(CommandSender sender, String[] args) {
         if (!(sender instanceof ProxiedPlayer)) return;
         ProxiedPlayer player = (ProxiedPlayer) sender;
-        CompletableFuture.runAsync(()-> player.chat(unverify(player)));
+        CompletableFuture.runAsync(()-> player.sendMessage(execute(player)));
     }
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    private String unverify(ProxiedPlayer player) {
-        final Database storage = DiscordLink.getInstance().getStorage();
-        GuildMember discord = GuildMember.fromPlayerId(player.getUniqueId()).orElse(null);
-        User user = discord == null ? null : discord.getUser();
-        storage.deleteRecord(player.getUniqueId());
-        if (user == null) return Utility.formatColourCodes("&cYour account is not verified!");
-
-        final Role verifiedRole = GameChats.getGuild().getRoleById(PluginConfiguration.Roles.verifiedRoleID);
-        final Role donorRole = GameChats.getGuild().getRoleById(PluginConfiguration.Roles.donatorRoleID);
-        final Guild guild = GameChats.getGuild();
-
-        if (verifiedRole != null && discord.isVerified()) guild.removeRoleFromMember(discord, verifiedRole);
-        if (donorRole != null && discord.isDonor()) guild.removeRoleFromMember(discord, donorRole);
-
-        return Utility.formatColourCodes("&7The account &6" + user.getName() + "&8#&7" + user.getName() + " has been &cunverified");
-
+    private BaseComponent[] execute(ProxiedPlayer player){
+        Database.VerificationData data = storage.getVerificationData(player.getUniqueId()).orElse(null);
+        if (data == null){
+            return Utility.format("&cYour account is not verified!");
+        } else {
+            data.deleteRecord();
+            Guild guild = Channels.getGuild();
+            String response = data.getDiscordUser()
+                    .map(user->"&7The account &6" + user.getName() + "&8#&7" + user.getDiscriminator() + " has been &cunverified")
+                    .orElse("&7Your account has been &cunverified");
+            data.getGuildMember().ifPresent(member-> Utility.removeRoleIfPresent(guild, member, Roles.VERIFIED));
+            return Utility.format(response);
+        }
     }
 }

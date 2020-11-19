@@ -43,7 +43,7 @@ public class SpongeDiscordLib {
     }
 
     public static String getBotToken() {
-        return PluginConfiguration.Main.botToken;
+        return PluginConfiguration.Main.discordCommand;
     }
 
     private JDA initJDA() {
@@ -63,6 +63,10 @@ public class SpongeDiscordLib {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public static String getServerName() {
+        return "BungeeCord";
     }
 
     private static boolean initTimeExceeded(){

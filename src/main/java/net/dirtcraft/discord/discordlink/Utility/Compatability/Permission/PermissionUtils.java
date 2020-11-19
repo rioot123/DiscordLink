@@ -1,15 +1,17 @@
-package net.dirtcraft.discord.discordlink.Utility.Permission;
+package net.dirtcraft.discord.discordlink.Utility.Compatability.Permission;
 
-import net.dirtcraft.discord.discordlink.Utility.Permission.Default.DefaultProvider;
-import net.dirtcraft.discord.discordlink.Utility.Permission.Luckperms.Api5;
-import net.dirtcraft.discord.discordlink.Utility.Platform.PlatformPlayer;
-import net.dirtcraft.discord.discordlink.Utility.Platform.PlatformUser;
+import net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.Default.DefaultProvider;
+import net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.Luckperms.Api5;
+import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformPlayer;
+import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUser;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.UUID;
 
 public abstract class PermissionUtils {
+
+    public static String VERSION;
 
     public final static PermissionUtils INSTANCE = getRank();
 
@@ -24,8 +26,10 @@ public abstract class PermissionUtils {
     private static PermissionUtils getRank(){
         try {
             Class.forName("net.luckperms.api.LuckPerms");
+            VERSION = "LuckPerms API 5";
             return new Api5();
         } catch (ClassNotFoundException ignored){}
+        VERSION = "None";
         return new DefaultProvider();
     }
 

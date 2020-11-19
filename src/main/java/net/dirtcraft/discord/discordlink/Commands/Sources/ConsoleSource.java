@@ -7,14 +7,10 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 
-public abstract class WrappedConsole implements CommandSender, ScheduledSender {
+@SuppressWarnings("deprecation")
+public abstract class ConsoleSource implements CommandSender, DiscordResponder {
 
     private CommandSender actualSource = ProxyServer.getInstance().getConsole();
-
-    @Override
-    public void sendMessage(@NotNull String message) {
-        ResponseScheduler.submit(this, message);
-    }
 
     @Override
     public void sendMessages(@NotNull String... messages) {
@@ -23,12 +19,12 @@ public abstract class WrappedConsole implements CommandSender, ScheduledSender {
 
     @Override
     public void sendMessage(BaseComponent... message) {
-        ResponseScheduler.submit(this, BaseComponent.toPlainText(message));
+        sendMessage(BaseComponent.toPlainText(message));
     }
 
     @Override
     public void sendMessage(BaseComponent message) {
-        ResponseScheduler.submit(this, BaseComponent.toPlainText(message));
+        sendMessage(BaseComponent.toPlainText(message));
     }
 
     @Override

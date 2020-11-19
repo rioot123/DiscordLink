@@ -36,17 +36,17 @@ public class PluginConfiguration {
         @Setting(value = "Console-Manager-Prefix", comment = "Prefix to use bungee command (Full Access, Set different from non-proxy Discord-Link)")
         public static String bungeePublic = "$";
 
-        @Setting(value = "Bot-Prefix", comment = "Prefix to use bot commands (Managers+, Set different from non-proxy Discord-Link)")
-        public static String discordCommand = "~$";
-
-        @Setting(value = "Discord Bot Token")
-        public static String botToken = "";
+        @Setting(value = "Bot-Prefix", comment = "Prefix to use bot commands")
+        public static String discordCommand = "$dlink";
 
         @Setting(value = "Gamechat Category ID")
         public static long GAMECHAT_CATEGORY_ID = 516473998478016512L;
 
         @Setting(value = "Sanction Log Channel ID", comment = "Channel for sanction messages from litebans (OPTIONAL)")
-        public static long SANCTION_CHANNEL_ID = 768343841106559026L;
+        public static long defaultChannelID = 768343841106559026L;
+
+        @Setting(value = "Discord-Server-ID")
+        public static long serverLogChannelID = 566095634008899585L;
 
         @Setting(value = "Discord Server Invite")
         public static String DISCORD_INVITE = "https://discord.com/invite/mqQX9f";
@@ -75,7 +75,10 @@ public class PluginConfiguration {
         public static String adminRoleID = "531631265443479562";
 
         @Setting(value = "Moderator-Role-ID")
-        public static String modRoleID = "332701183477284867";
+        public static String moderatorRoleID = "332701183477284867";
+
+        @Setting(value = "Helper-Role-ID")
+        public static String helperRoleID = "563538434333999108";
 
         @Setting(value = "Staff-Role-ID")
         public static String staffRoleID = "549039481450397699";

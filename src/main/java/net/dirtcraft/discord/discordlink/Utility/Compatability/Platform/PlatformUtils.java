@@ -1,10 +1,10 @@
-package net.dirtcraft.discord.discordlink.Utility.Platform;
+package net.dirtcraft.discord.discordlink.Utility.Compatability.Platform;
 
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Storage.Database;
-import net.dirtcraft.discord.discordlink.Utility.APIHelper;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.scheduler.GroupedThreadFactory;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,6 +12,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class PlatformUtils {
+    public static final String VERSION = "BungeeCord-" + ProxyServer.getInstance().getVersion();
 
     public static Optional<PlatformUser> getPlayerOffline(UUID uuid) {
         Database database = DiscordLink.getInstance().getStorage();

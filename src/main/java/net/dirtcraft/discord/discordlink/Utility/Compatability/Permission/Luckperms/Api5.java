@@ -1,9 +1,9 @@
-package net.dirtcraft.discord.discordlink.Utility.Permission.Luckperms;
+package net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.Luckperms;
 
 
-import net.dirtcraft.discord.discordlink.Utility.Permission.PermissionUtils;
-import net.dirtcraft.discord.discordlink.Utility.Platform.PlatformPlayer;
-import net.dirtcraft.discord.discordlink.Utility.Platform.PlatformUser;
+import net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.PermissionUtils;
+import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformPlayer;
+import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUser;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.context.ImmutableContextSet;

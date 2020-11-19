@@ -1,12 +1,12 @@
 package net.dirtcraft.discord.discordlink.API;
 
 
-import net.dirtcraft.discord.discordlink.Commands.Sources.GamechatSender;
-import net.dirtcraft.discord.discordlink.Commands.Sources.PrivateSender;
-import net.dirtcraft.discord.discordlink.Commands.Sources.WrappedConsole;
+import net.dirtcraft.discord.discordlink.Commands.Sources.DiscordResponder;
+import net.dirtcraft.discord.discordlink.Commands.Sources.ConsoleSource;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.stream.Collectors;
 
 import static net.dirtcraft.discord.discordlink.Storage.PluginConfiguration.Main.*;
@@ -33,7 +33,16 @@ public enum Action {
         return Arrays.stream(values())
                 .filter(cmd->rawMessage.startsWith(cmd.prefix))
                 .filter(cmd->cmd != CHAT)
-                .findFirst().orElse(CHAT);
+                .max(Comparator.comparingInt(Action::length))
+                .orElse(CHAT);
+    }
+
+    public static String filterConsolePrefixes(String command){
+        String prefixes = Arrays.stream(values())
+                .filter(Action::isConsole)
+                .map(Action::getPrefix)
+                .collect(Collectors.joining("|"));
+        return command.replaceAll("^(" + prefixes + ")", "");
     }
 
     public String getCommand(MessageReceivedEvent event){
@@ -64,20 +73,16 @@ public enum Action {
         return prefix;
     }
 
-    public WrappedConsole getSender(MessageSource sender, String command){
+    public ConsoleSource getCommandSource(MessageSource sender, String command){
         if (this.sender == Sender.PRIVATE) {
-            return new PrivateSender(sender, command);
+            return DiscordResponder.getSender(sender);
         } else {
-            return new GamechatSender(sender, command);
+            return DiscordResponder.getSender(sender.getChannel().getCommandResponder(sender, command));
         }
     }
 
-    public static String filterConsolePrefixes(String command){
-        String prefixes = Arrays.stream(values())
-                .filter(Action::isConsole)
-                .map(Action::getPrefix)
-                .collect(Collectors.joining("|"));
-        return command.replaceAll("^(" + prefixes + ")", "");
+    private int length() {
+        return prefix.length();
     }
 
     public enum Sender{

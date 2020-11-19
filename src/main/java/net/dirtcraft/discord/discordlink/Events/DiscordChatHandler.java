@@ -1,17 +1,19 @@
 package net.dirtcraft.discord.discordlink.Events;
 
-import net.dirtcraft.discord.discordlink.API.Action;
-import net.dirtcraft.discord.discordlink.API.GameChats;
-import net.dirtcraft.discord.discordlink.API.MessageSource;
+import net.dirtcraft.discord.discordlink.API.*;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommandManager;
-import net.dirtcraft.discord.discordlink.Utility.Platform.PlatformUtils;
+import net.dirtcraft.discord.discordlink.DiscordLink;
+import net.dirtcraft.discord.discordlink.Storage.Database;
+import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUtils;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import java.util.concurrent.CompletableFuture;
 
 import static net.dirtcraft.discord.discordlink.Utility.Utility.logCommand;
@@ -21,15 +23,17 @@ public class DiscordChatHandler extends ListenerAdapter {
     private final DiscordCommandManager commandManager = new DiscordCommandManager();
 
     @Override
-    public void onMessageReceived(@NotNull MessageReceivedEvent event) {
-        if (event.getAuthor().isBot() || hasAttachment(event)) return;
+    public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
+        boolean gamechat = Channels.isGamechat(event.getChannel());
+        boolean privateDm = event.getChannelType() == ChannelType.PRIVATE;
+        if (!gamechat && !privateDm || event.getAuthor().isBot() || hasAttachment(event)) return;
         CompletableFuture.runAsync(()->{
             try {
                 final MessageSource sender = new MessageSource(event);
-                if (event.getChannelType() == ChannelType.PRIVATE) processPrivateMessage(sender, event);
-                else if (GameChats.getChat(event.getTextChannel()).isPresent()) processGuildMessage(sender, event);
-            } catch (Throwable e){
-                System.out.println("Exception while processing gamechat message!");
+                if (!sender.isVerified() && !sender.isStaff()) processUnverifiedMessage(sender, event);
+                else if (privateDm) processPrivateMessage(sender, event);
+                else processGuildMessage(sender, event);
+            } catch (Exception e){
                 e.printStackTrace();
                 Utility.dmExceptionAsync(e, 248056002274918400L);
             }
@@ -50,9 +54,33 @@ public class DiscordChatHandler extends ListenerAdapter {
 
     public void processPrivateMessage(MessageSource sender, MessageReceivedEvent event) {
         if (!PlatformUtils.isGameReady()) return;
-        final Action intent = Action.PRIVATE_COMMAND;
+        final Action intent = Action.fromMessageRaw(event.getMessage().getContentRaw()) == Action.DISCORD_COMMAND? Action.DISCORD_COMMAND: Action.PRIVATE_COMMAND;
         final String message = Action.filterConsolePrefixes(event.getMessage().getContentRaw());
-        if (toConsole(message, sender, intent)) logCommand(sender, "__Executed Private Command via DM__");
+        if (intent == Action.DISCORD_COMMAND) commandManager.process(sender, intent.getCommand(event));
+        else if (toConsole(message, sender, intent)) logCommand(sender, "__Executed Private Command via DM__");
+    }
+
+    public void processUnverifiedMessage(MessageSource sender, MessageReceivedEvent event){
+        if (event.getChannelType() != ChannelType.PRIVATE) event.getMessage().delete().queue();
+        Database database = DiscordLink.getInstance().getStorage();
+        Database.VerificationData data = database.getVerificationData(sender.getId()).orElse(null);
+        if (data != null && data.getUUID().isPresent()) {
+            Utility.setRoleIfAbsent(Channels.getGuild(), sender, Roles.VERIFIED);
+            sender.sendCommandResponse("Verified role was missing, But you appear to be verified so it has been added again. Please send message or command again.");
+        } else if (data != null && data.getCode().isPresent()) {
+            String code = data.getCode().get();
+            String message = "You need to be verified in order to use the gamechat or send commands.\n";
+            message += "Please enter /verify " + code + " in-game to verify your account.";
+            MessageEmbed embed = Utility.embedBuilder().addField("Error", message, false).build();
+            sender.sendPrivateMessage(embed);
+        } else {
+            String code = Utility.getSaltString();
+            database.createRecord(sender.getId(), code);
+            String message = "You need to be verified in order to use the gamechat or send commands.\n";
+            message += "Please enter /verify " + code + " in-game to verify your account.";
+            MessageEmbed embed = Utility.embedBuilder().addField("Error", message, false).build();
+            sender.sendPrivateMessage(embed);
+        }
     }
 
     private boolean hasAttachment(MessageReceivedEvent event) {

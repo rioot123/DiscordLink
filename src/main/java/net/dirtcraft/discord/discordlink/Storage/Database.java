@@ -1,6 +1,14 @@
 package net.dirtcraft.discord.discordlink.Storage;
 
 import net.dirtcraft.discord.dirtdatabaselib.DirtDatabaseLib;
+import net.dirtcraft.discord.discordlink.API.GuildMember;
+import net.dirtcraft.discord.discordlink.DiscordLink;
+import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUser;
+import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUtils;
+import net.dirtcraft.discord.discordlink.Utility.Utility;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.requests.RestAction;
 
 import javax.annotation.Nullable;
 import java.sql.*;
@@ -8,72 +16,45 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public class Database {
 
-    private Connection getConnection() {
-        return DirtDatabaseLib.getConnection("playerdata", null);
-    }
-
-    public boolean isVerified(long discordId) {
-        ResultSet rs = null;
+    @Nullable
+    public String getLastKnownUsername(String uuid) {
         try (Connection connection = getConnection();
-             PreparedStatement ps = connection.prepareStatement("SELECT * FROM verification WHERE discordid = ? AND uuid IS NOT NULL")) {
-            ps.setString(1, String.valueOf(discordId));
-            rs = ps.executeQuery();
+             PreparedStatement ps = connection.prepareStatement("SELECT Username FROM votedata WHERE UUID = ?")) {
 
-            return rs.next() && rs.getString("uuid").length() == 36;
-        } catch (SQLException exception) {
-            exception.printStackTrace();
-            return  false;
-        } finally {
-            if (rs != null) {
-                try {rs.close();} catch (SQLException ignored) {}
-            }
-        }
-    }
-
-    public boolean isVerified(UUID uuid) {
-        boolean result;
-        try (Connection connection = getConnection();
-             PreparedStatement ps = connection.prepareStatement("SELECT * FROM verification WHERE uuid = ?")) {
-
-            ps.setString(1, uuid.toString());
-
-            ResultSet rs = ps.executeQuery();
-
-            result = rs.next();
-
-            rs.close();
-
-        } catch (SQLException exception) {
-            exception.printStackTrace();
-            result = false;
-        }
-
-        return result;
-    }
-
-    public boolean validCode(String code) {
-        boolean result;
-        try (Connection connection = getConnection();
-             PreparedStatement ps = connection.prepareStatement("SELECT * FROM verification WHERE code = ?")) {
-            ps.setString(1, code);
+            ps.setString(1, uuid);
             ResultSet rs = ps.executeQuery();
 
             if (!rs.next()) {
                 rs.close();
-                return false;
+                return null;
             } else {
-                result = rs.getString("uuid") == null;
+                String username = rs.getString("Username");
                 rs.close();
+                return username;
             }
 
-            return result;
 
         } catch (SQLException exception) {
             exception.printStackTrace();
-            return false;
+            return null;
+        }
+    }
+
+    public void createRecord(String discordID, String code) {
+        try (Connection connection = getConnection();
+             PreparedStatement ps = connection.prepareStatement("INSERT INTO verification (discordid, code) VALUES (?, ?)")) {
+
+            ps.setString(1, discordID);
+            ps.setString(2, code);
+
+            ps.execute();
+
+        } catch (SQLException exception) {
+            exception.printStackTrace();
         }
     }
 
@@ -114,40 +95,18 @@ public class Database {
         }
     }
 
-    @Nullable
-    public String getDiscordUser(UUID uuid) {
+    public Optional<VerificationData> getPendingData(String code) {
         try (Connection connection = getConnection();
-             PreparedStatement ps = connection.prepareStatement("SELECT discordid FROM verification WHERE uuid = ?")) {
-            ps.setString(1, uuid.toString());
+             PreparedStatement ps = connection.prepareStatement("SELECT * FROM verification WHERE code = ?")) {
 
-            ResultSet rs = ps.executeQuery();
+            ps.setString(1, code);
 
-            if (!rs.next()) {
-                rs.close();
-                return null;
-            } else {
-                String discordID = rs.getString("discordid");
-                rs.close();
-                return discordID;
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.next()) return Optional.empty();
+                String uuid = rs.getString("uuid");
+                String discordId = rs.getString("discordid");
+                return Optional.of(new VerificationData(uuid, discordId, code));
             }
-
-        } catch (SQLException exception) {
-            exception.printStackTrace();
-            return null;
-        }
-    }
-
-    public Optional<UUID> getUUID(String discordId) {
-        try (Connection connection = getConnection();
-             PreparedStatement ps = connection.prepareStatement("SELECT uuid FROM verification WHERE discordid = ?")) {
-
-            ps.setString(1, discordId);
-            ResultSet rs = ps.executeQuery();
-
-            if (!rs.next()) return Optional.empty();
-            final String uuid = rs.getString("uuid");
-
-            return Optional.of(UUID.fromString(uuid));
 
         } catch (SQLException exception) {
             exception.printStackTrace();
@@ -155,50 +114,48 @@ public class Database {
         }
     }
 
-    @Nullable
-    public String getUUIDfromDiscordID(String discordID) {
+    public Optional<VerificationData> getVerificationData(String discordID) {
         try (Connection connection = getConnection();
-             PreparedStatement ps = connection.prepareStatement("SELECT uuid FROM verification WHERE discordid = ?")) {
+             PreparedStatement ps = connection.prepareStatement("SELECT * FROM verification WHERE discordid = ?")) {
 
             ps.setString(1, discordID);
-            ResultSet rs = ps.executeQuery();
 
-            if (!rs.next()) {
-                rs.close();
-                return null;
-            } else {
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.next()) return Optional.empty();
+                String code = rs.getString("code");
                 String uuid = rs.getString("uuid");
-                rs.close();
-                return uuid;
+                String discordId = rs.getString("discordid");
+                return Optional.of(new VerificationData(uuid, discordId, code));
             }
-
-        } catch (SQLException exception) {
-            exception.printStackTrace();
-            return null;
-        }
-    }
-
-    public Optional<VoterData> getPlayerVoteData(UUID uuid){
-        try (Connection connection = getConnection();
-             PreparedStatement ps = connection.prepareStatement("SELECT * FROM votedata WHERE UUID = ?")) {
-
-            ps.setString(1, uuid.toString());
-            ResultSet rs = ps.executeQuery();
-
-            if (!rs.next()) return Optional.empty();
-
-            final int votes = rs.getInt("Votes");
-            final Timestamp lastVote = rs.getTimestamp("Last_Vote");
-            final String username = rs.getString("Username");
-
-            rs.close();
-
-            return Optional.of(new VoterData(uuid, votes, username, lastVote));
 
         } catch (SQLException exception) {
             exception.printStackTrace();
             return Optional.empty();
         }
+    }
+
+    public Optional<VerificationData> getVerificationData(UUID id) {
+        try (Connection connection = getConnection();
+             PreparedStatement ps = connection.prepareStatement("SELECT * FROM verification WHERE uuid = ?")) {
+
+            ps.setString(1, id.toString());
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.next()) return Optional.empty();
+                String code = rs.getString("code");
+                String uuid = rs.getString("uuid");
+                String discordId = rs.getString("discordid");
+                return Optional.of(new VerificationData(uuid, discordId, code));
+            }
+
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+            return Optional.empty();
+        }
+    }
+
+    private Connection getConnection() {
+        return DirtDatabaseLib.getConnection("playerdata", null);
     }
 
     public void updateUsername(UUID uuid, String username)  {
@@ -228,6 +185,88 @@ public class Database {
 
         } catch (SQLException exception) {
             exception.printStackTrace();
+        }
+    }
+
+    public Optional<VoterData> getPlayerVoteData(UUID uuid){
+        try (Connection connection = getConnection();
+             PreparedStatement ps = connection.prepareStatement("SELECT * FROM votedata WHERE UUID = ?")) {
+
+            ps.setString(1, uuid.toString());
+            ResultSet rs = ps.executeQuery();
+
+            if (!rs.next()) return Optional.empty();
+
+            final int votes = rs.getInt("Votes");
+            final Timestamp lastVote = rs.getTimestamp("Last_Vote");
+            final String username = rs.getString("Username");
+
+            rs.close();
+
+            return Optional.of(new VoterData(uuid, votes, username, lastVote));
+
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+            return Optional.empty();
+        }
+    }
+
+    public class VerificationData {
+        final UUID uuid;
+        final Long discordId;
+        final String code;
+
+        VerificationData(String uuid, String discord, String code) {
+            this.discordId = discord == null ? null : Long.parseLong(discord);
+            this.uuid = uuid == null ? null : UUID.fromString(uuid);
+            this.code = code;
+        }
+
+        public Optional<UUID> getUUID() {
+            return Optional.ofNullable(uuid);
+        }
+
+        public Optional<Long> getDiscordId() {
+            return Optional.ofNullable(discordId);
+        }
+
+        public Optional<String> getCode() {
+            return Optional.ofNullable(code);
+        }
+
+        public Optional<User> getDiscordUser() {
+            return getDiscordId()
+                    .map(DiscordLink.getJDA()::retrieveUserById)
+                    .map(RestAction::submit)
+                    .map(CompletableFuture::join);
+        }
+
+        public Optional<PlatformUser> getMinecraftUser() {
+            return getUUID().flatMap(PlatformUtils::getPlayerOffline);
+        }
+
+        public Optional<Member> getMember() {
+            return getDiscordId().flatMap(Utility::getMemberById);
+        }
+
+        public Optional<GuildMember> getGuildMember() {
+            return getMember().map(GuildMember::new);
+        }
+
+        public Optional<String> getName() {
+            Optional<String> name = getMinecraftUser().flatMap(PlatformUser::getName);
+            if (name.isPresent()) return name;
+            else return getUUID()
+                    .map(UUID::toString)
+                    .map(Database.this::getLastKnownUsername);
+        }
+
+        public void deleteRecord() {
+            if (getUUID().isPresent()) {
+                getUUID().ifPresent(Database.this::deleteRecord);
+            } else getDiscordId()
+                    .map(String::valueOf)
+                    .ifPresent(Database.this::deleteRecord);
         }
     }
 

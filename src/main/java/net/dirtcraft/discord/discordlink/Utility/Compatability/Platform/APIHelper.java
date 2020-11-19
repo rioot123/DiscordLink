@@ -1,4 +1,4 @@
-package net.dirtcraft.discord.discordlink.Utility;
+package net.dirtcraft.discord.discordlink.Utility.Compatability.Platform;
 
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
