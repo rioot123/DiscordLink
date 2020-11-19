@@ -61,7 +61,7 @@ public class Prefix implements DiscordCommandExecutor {
     }
 
     private String getChevron(User user, List<String> args){
-        String carat = !ignoreDonor(args) && user.hasPermission(Permission.ROLES_DONOR) && user.hasPermission(Permission.ROLES_STAFF)? "&l✯" : "&l»";
+        String carat = !ignoreDonor(args) && !user.hasPermission(Permission.ROLES_STAFF) && user.hasPermission(Permission.ROLES_DONOR)? "&l✯" : "&l»";
         ListIterator<String> argsIterator = args.listIterator();
         String chevronColour = "&a";
         while (argsIterator.hasNext()){

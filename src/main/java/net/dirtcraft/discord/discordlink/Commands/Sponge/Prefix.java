@@ -89,6 +89,6 @@ public class Prefix implements CommandExecutor {
     }
 
     private boolean isValidColor(String input){
-        return input.matches("(?i)([§&][0-9a-frlonm])+") && input.length() < 9;
+        return input.matches("(?i)([§&][0-9a-frlonm]){1,5}");
     }
 }

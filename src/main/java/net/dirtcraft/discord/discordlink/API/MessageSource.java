@@ -38,6 +38,10 @@ public class MessageSource extends GuildMember implements DiscordResponder {
         return false;
     }
 
+    public Channel getChannel(){
+        return source;
+    }
+
     public ConsoleSource getCommandSource(String command){
         DiscordResponder responder = source.getCommandResponder(this, command);
         return DiscordResponder.getSender(responder);
