@@ -96,8 +96,8 @@ public class Link extends Command {
     private void sendPacket(ProxiedPlayer player){
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
         out.writeUTF(Settings.ROLES_CHANNEL);
-        out.writeUTF(UUID.randomUUID().toString()); // Verification
         out.writeUTF(player.getUniqueId().toString());
+        player.getServer().sendData(Settings.ROOT_CHANNEL, out.toByteArray());
     }
 
 

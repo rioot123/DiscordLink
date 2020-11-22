@@ -75,6 +75,12 @@ public class Channel {
         sendMessage(embed);
     }
 
+    @Override
+    public boolean equals(Object other){
+        return other instanceof Channel &&
+                ((Channel) other).getId() == getId();
+    }
+
     public DiscordResponder getCommandResponder(MessageSource member, String command){
         return new DiscordResponder() {
             @Override

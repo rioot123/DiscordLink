@@ -4,6 +4,7 @@ import net.dirtcraft.discord.discordlink.API.*;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommandManager;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Storage.Database;
+import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformChat;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUtils;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dv8tion.jda.api.entities.ChannelType;
@@ -24,8 +25,8 @@ public class DiscordChatHandler extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
-        boolean gamechat = Channels.isGamechat(event.getChannel());
         boolean privateDm = event.getChannelType() == ChannelType.PRIVATE;
+        boolean gamechat = Channels.isGamechat(event.getChannel()) || Channels.isDefault(event.getChannel());
         if (!gamechat && !privateDm || event.getAuthor().isBot() || hasAttachment(event)) return;
         CompletableFuture.runAsync(()->{
             try {
@@ -44,11 +45,16 @@ public class DiscordChatHandler extends ListenerAdapter {
         final String rawMessage = event.getMessage().getContentRaw();
         final Action intent = Action.fromMessageRaw(rawMessage);
 
-        if (intent.isBotCommand()) commandManager.process(sender, intent.getCommand(event));
-        else if (intent.isConsole() || intent.isBungee()) {
-            boolean executed = toConsole(intent.getCommand(event), sender, intent);
-            if (executed && intent.isPrivate()) Utility.logCommand(sender, "__Executed Private Command__");
-            event.getMessage().delete().queue(s->{},e->{});
+        if (intent.isChat()){
+            if (!Channels.isDefault(event.getChannel())) return;
+            PlatformChat.INSTANCE.discordToMCAsync(sender, event.getMessage().getContentDisplay());
+        } else if (intent.isBotCommand()){
+            if (!Channels.isDefault(event.getChannel())) return;
+            commandManager.process(sender, intent.getCommand(event));
+        } else if (intent.isConsole() || intent.isBungee()) {
+            Utility.CommandResult executed = toConsole(intent.getCommand(event), sender, intent);
+            if (executed == Utility.CommandResult.SUCCESS && intent.isPrivate()) Utility.logCommand(sender, "__Executed Private Command__");
+            if (executed != Utility.CommandResult.IGNORED) event.getMessage().delete().queue();
         }
     }
 
@@ -57,7 +63,7 @@ public class DiscordChatHandler extends ListenerAdapter {
         final Action intent = Action.fromMessageRaw(event.getMessage().getContentRaw()) == Action.DISCORD_COMMAND? Action.DISCORD_COMMAND: Action.PRIVATE_COMMAND;
         final String message = Action.filterConsolePrefixes(event.getMessage().getContentRaw());
         if (intent == Action.DISCORD_COMMAND) commandManager.process(sender, intent.getCommand(event));
-        else if (toConsole(message, sender, intent)) logCommand(sender, "__Executed Private Command via DM__");
+        else if (toConsole(message, sender, intent) == Utility.CommandResult.SUCCESS) logCommand(sender, "__Executed Private Command via DM__");
     }
 
     public void processUnverifiedMessage(MessageSource sender, MessageReceivedEvent event){

@@ -31,6 +31,7 @@ import static net.dirtcraft.discord.discordlink.Storage.PluginConfiguration.Comm
 
 public class Utility {
 
+    public static final String DETECT_URL_REGEX = "((https?|ftp|gopher|telnet|file):((//)|(\\\\))+[\\w\\d:#@%/;$()~_?\\+-=\\\\\\.&]*)";
     public static final String STRIP_CODE_REGEX = "(?i)[§&][0-9a-fklmnor]";
 
     public static Optional<Member> getMemberById(String id){
@@ -75,7 +76,13 @@ public class Utility {
     public static void setRoles(PlatformPlayer player, GuildMember member) {
         Guild guild = Channels.getGuild();
         if (player.hasPermission(Permission.ROLES_DONOR)) setRoleIfAbsent(guild, member, Roles.DONOR);
-        if (!member.getRoles().contains(Roles.STAFF.getRole())) tryChangeNickname(guild, member, player.getName());
+        if (!member.hasRole(Roles.DIRTY) && player.hasPermission(Permission.ROLES_MANAGER)) setRoleIfAbsent(guild, member, Roles.DIRTY);
+        else if (!member.hasRole(Roles.ADMIN) && player.hasPermission(Permission.ROLES_ADMIN)) setRoleIfAbsent(guild, member, Roles.ADMIN);
+        else if (!member.hasRole(Roles.MOD) && player.hasPermission(Permission.ROLES_MODERATOR)) setRoleIfAbsent(guild, member, Roles.MOD);
+        else if (!member.hasRole(Roles.HELPER) && player.hasPermission(Permission.ROLES_HELPER)) setRoleIfAbsent(guild, member, Roles.HELPER);
+        if (!member.hasRole(Roles.STAFF) && player.hasPermission(Permission.ROLES_STAFF)) setRoleIfAbsent(guild, member, Roles.STAFF);
+        if (!member.hasRole(Roles.STAFF)) tryChangeNickname(guild, member, player.getName());
+
         setRoleIfAbsent(guild, member, Roles.VERIFIED);
     }
 
@@ -102,20 +109,24 @@ public class Utility {
         } catch (Exception ignored){ }
     }
 
-    public static boolean toConsole(String command, MessageSource sender, Action type) {
-        if (!canUseCommand(sender, type)){
-            sendCommandError(sender, command);
-            return false;
-        } else if (isSanction(command)){
+    public static CommandResult toConsole(String command, MessageSource sender, Action type) {
+        if (!canUseCommand(sender, type)) {
+            sendPermissionError(sender);
+            return CommandResult.FAILURE;
+        } else if (isSanction(command)) {
             SanctionUtils.INSTANCE.sanction(sender, command, false);
-            return true;
-        } else if (type.isBungee() || isWhitelisted(command)){
+            return CommandResult.SUCCESS;
+        } else if (type.isBungee() || isWhitelisted(command)) {
             ConsoleSource console = type.getCommandSource(sender, command);
             toConsole(console, command);
-            return true;
+            return CommandResult.SUCCESS;
+        } else if (sender.getChannel() == SanctionUtils.CHANNEL) {
+            sendPermissionError(sender);
+            return CommandResult.FAILURE;
         } else {
-            return false;
+            return CommandResult.IGNORED;
         }
+
     }
 
     public static void toConsole(ConsoleSource commandSender, String command) {
@@ -157,6 +168,10 @@ public class Utility {
 
     public static String formatColourCodes(String s){
         return s.replaceAll("&([0-9a-fA-FrlonmkRLONMK])", "§$1");
+    }
+
+    public static String removeColourCodes(String s){
+        return s.replaceAll("[§&].", "");
     }
 
     public static void sendPermissionErrorMessage(Channel chat, MessageReceivedEvent event){
@@ -249,5 +264,11 @@ public class Utility {
             salt.append(SALTCHARS.charAt(index));
         }
         return salt.toString();
+    }
+
+    public enum CommandResult{
+        SUCCESS,
+        FAILURE,
+        IGNORED
     }
 }

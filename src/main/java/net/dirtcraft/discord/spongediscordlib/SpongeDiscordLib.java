@@ -43,7 +43,7 @@ public class SpongeDiscordLib {
     }
 
     public static String getBotToken() {
-        return PluginConfiguration.Main.discordCommand;
+        return PluginConfiguration.Main.botToken;
     }
 
     private JDA initJDA() {

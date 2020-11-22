@@ -3,6 +3,7 @@ package net.dirtcraft.discord.discordlink.Commands;
 import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.API.Roles;
 import net.dirtcraft.discord.discordlink.Commands.Discord.StopServer;
+import net.dirtcraft.discord.discordlink.Commands.Discord.Version;
 import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -23,7 +24,14 @@ public class DiscordCommandManager extends DiscordCommandTree {
                 .setRequiredRoles(Roles.DIRTY)
                 .build();
 
-        register(halt, "halt");
+        DiscordCommand version = DiscordCommand.builder()
+                .setDescription("Shows version info.")
+                .setCommandExecutor(new Version())
+                .setRequiredRoles(Roles.DIRTY)
+                .build();
+
+        register(halt, "proxy-halt");
+        register(version, "version");
     }
 
     public void process(MessageSource member, String args){

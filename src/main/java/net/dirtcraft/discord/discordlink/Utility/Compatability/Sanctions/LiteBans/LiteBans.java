@@ -22,10 +22,12 @@ import java.util.concurrent.CompletableFuture;
 
 public class LiteBans extends SanctionUtils {
     private final Timer timer = new Timer();
-    private final Channel sanctions = Channels.getDefaultChat();
-    private final DiscordResponder responder = sanctions.getChatResponder();
+    private final Channel sanctions;
+    private final DiscordResponder responder;
 
-    public LiteBans() {
+    public LiteBans(Channel channel) {
+        this.sanctions = channel;
+        this.responder = sanctions.getChatResponder();
         Events.get().register(new Events.Listener() {
             @Override
             public void broadcastSent(@NotNull String message, @Nullable String type) {
@@ -50,17 +52,17 @@ public class LiteBans extends SanctionUtils {
         final Optional<SanctionCommand> cmd;
         if (sanction != null) {
             PluginManager manager = ProxyServer.getInstance().getPluginManager();
-            liteBansCallback(sender, sanction.executorName);
+            if (!source.getChannel().equals(sanctions)) liteBansCallback(sender, sanction.executorName);
             manager.dispatchCommand(sender, sanction.command);
         } else if (bypass && (cmd = formatSanctionCommand(command, source.getEffectiveName())).isPresent()) {
             PluginManager manager = ProxyServer.getInstance().getPluginManager();
             sender.sendMessage("Failed to find UUID/IGN. Sending as " + cmd.get().executorName);
-            liteBansCallback(sender, "Console");
+            if (!source.getChannel().equals(sanctions)) liteBansCallback(sender, "Console");
             manager.dispatchCommand(sender, cmd.get().command);
         } else if (bypass) {
             PluginManager manager = ProxyServer.getInstance().getPluginManager();
             sender.sendMessage("Failed to find UUID/IGN. Sending as CONSOLE");
-            liteBansCallback(sender, "Console");
+            if (!source.getChannel().equals(sanctions)) liteBansCallback(sender, "Console");
             manager.dispatchCommand(sender, command);
         } else {
             sender.sendMessage("Failed to execute \"" + command + "\"\nUUID/IGN not found. (Are you verified?)");
@@ -102,7 +104,6 @@ public class LiteBans extends SanctionUtils {
             return Optional.of(new SanctionCommand(formatted, name));
         }
     }
-
 
     private static class LiteBanListener extends Events.Listener {
         final ConsoleSource console;

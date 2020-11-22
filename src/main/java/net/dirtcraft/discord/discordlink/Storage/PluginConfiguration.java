@@ -20,10 +20,8 @@ public class PluginConfiguration {
     @Setting private Format format = new Format();
     @Setting private Promotion promotion = new Promotion();
 
-
     @ConfigSerializable
     public static class Main {
-
         @Setting(value = "Silent-Whitelisted-Console-Prefix", comment = "Prefix to use private console command (Whitelisted, Same as non-proxy Discord-Link)")
         public static String consolePrivate = "#/";
 
@@ -37,7 +35,7 @@ public class PluginConfiguration {
         public static String bungeePublic = "$";
 
         @Setting(value = "Bot-Prefix", comment = "Prefix to use bot commands")
-        public static String discordCommand = "$dlink";
+        public static String discordCommand = "!";
 
         @Setting(value = "Gamechat Category ID")
         public static long GAMECHAT_CATEGORY_ID = 516473998478016512L;
@@ -50,11 +48,40 @@ public class PluginConfiguration {
 
         @Setting(value = "Discord Server Invite")
         public static String DISCORD_INVITE = "https://discord.com/invite/mqQX9f";
+
+        @Setting(value = "Discord Bot Token")
+        public static String botToken = "";
+    }
+
+    @ConfigSerializable
+    public static class Format {
+        @Setting(value = "Discord-To-Server", comment = "Message format from Discord to server")
+        public static String discordToServer = "&9&l» &7[&9Discord&7] &7{username}&8:&r {message}";
+
+        @Setting(value = "Server-To-Discord", comment = "Message format from server to Discord")
+        public static String serverToDiscord = "**{prefix} {username}**: {message}";
+
+        @Setting(value = "Server-Start", comment = "Message to Discord when the server has started")
+        public static String serverStart = "**{modpack}** has successfully started!";
+
+        @Setting(value = "Server-Stop", comment = "Message to Discord when the server is stopping")
+        public static String serverStop = "**{modpack}** is now restarting...";
+
+        @Setting(value = "Player-Join", comment = "Message to Discord when a player joins the server")
+        public static String playerJoin = "`{prefix} {username} has joined the game`";
+
+        @Setting(value = "New-Player-Join", comment = "Message to Discord when a NEW player joins the server")
+        public static String newPlayerJoin = "Welcome **{username}** to DirtCraft!";
+
+        @Setting(value = "Player-Disconnect", comment = "Message to Discord when a player leaves the server")
+        public static String playerDisconnect = "`{prefix} {username} has left the game`";
+
+        @Setting(value = "Invite-Discord", comment = "Message send to invite player.")
+        public static String discordInvite = "&6Join us on discord! &9&l{url}&6.";
     }
 
     @ConfigSerializable
     public static class Embed {
-
         @Setting(value = "Title")
         public static String title = "<:redbulletpoint:539273059631104052>**DirtCraft ChatBot**<:redbulletpoint:539273059631104052>";
 
@@ -64,7 +91,6 @@ public class PluginConfiguration {
 
     @ConfigSerializable
     public static class Roles {
-
         @Setting(value = "Owner-Role-ID")
         public static String ownerRoleID = "307551061156298762";
 
@@ -122,11 +148,6 @@ public class PluginConfiguration {
                 "unwarn",
                 "kick"
         );
-    }
-    @ConfigSerializable
-    public static class Format {
-        @Setting(value = "Invite-Discord", comment = "Message send to invite player.")
-        public static String discordInvite = "&6Join us on discord! &9&l{url}&6.";
     }
 
     @ConfigSerializable

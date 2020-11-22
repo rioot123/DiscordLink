@@ -2,6 +2,7 @@ package net.dirtcraft.discord.discordlink;
 
 import net.dirtcraft.discord.dirtdatabaselib.SQLManager;
 import net.dirtcraft.discord.discordlink.Commands.Bungee.*;
+import net.dirtcraft.discord.discordlink.Events.BungeeEventHandler;
 import net.dirtcraft.discord.discordlink.Events.DiscordChatHandler;
 import net.dirtcraft.discord.discordlink.Events.DiscordJoinHandler;
 import net.dirtcraft.discord.discordlink.Events.PluginMessageHandler;
@@ -9,6 +10,7 @@ import net.dirtcraft.discord.discordlink.Exceptions.DependantNotLoadedException;
 import net.dirtcraft.discord.discordlink.Storage.ConfigManager;
 import net.dirtcraft.discord.discordlink.Storage.Database;
 import net.dirtcraft.discord.discordlink.Storage.Settings;
+import net.dirtcraft.discord.discordlink.Utility.Compatability.Sanctions.SanctionUtils;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.api.JDA;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -46,13 +48,15 @@ public class DiscordLink extends Plugin {
 
             jda.addEventListener(new DiscordChatHandler());
             jda.addEventListener(new DiscordJoinHandler());
-            //this.getProxy().getPluginManager().registerCommand(this, new Link());
-            //this.getProxy().getPluginManager().registerCommand(this, new Unlink());
-            this.getProxy().getPluginManager().registerCommand(this, new Discord());
+            this.getProxy().getPluginManager().registerCommand(this, new Link(storage));
+            this.getProxy().getPluginManager().registerCommand(this, new Unlink(storage));
+            //this.getProxy().getPluginManager().registerCommand(this, new Discord());
             this.getProxy().getPluginManager().registerCommand(this, new Promote());
             this.getProxy().getPluginManager().registerCommand(this, new Demote());
+            getProxy().getPluginManager().registerListener(this, new BungeeEventHandler());
             getProxy().getPluginManager().registerListener(this, channelHandler);
             getProxy().registerChannel(Settings.ROOT_CHANNEL);
+            SanctionUtils utils = SanctionUtils.INSTANCE;
 
             logger.info("Discord Link initialized");
         } catch (DependantNotLoadedException e){
