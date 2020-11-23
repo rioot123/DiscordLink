@@ -1,6 +1,9 @@
 package net.dirtcraft.discord.discordlink.Events;
 
-import net.dirtcraft.discord.discordlink.API.*;
+import net.dirtcraft.discord.discordlink.API.Action;
+import net.dirtcraft.discord.discordlink.API.Channels;
+import net.dirtcraft.discord.discordlink.API.MessageSource;
+import net.dirtcraft.discord.discordlink.API.Roles;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommandManager;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Storage.Database;
