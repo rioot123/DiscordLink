@@ -37,7 +37,7 @@ public class Prefix implements DiscordCommandExecutor {
         String color = getColor(args);
         if (args.isEmpty()) throw new DiscordCommandException("You must specify a prefix");
         else if (args.size() == 1 && args.get(0).equalsIgnoreCase("none")){
-            PermissionUtils.INSTANCE.clearPlayerPrefix(target);
+            PermissionUtils.INSTANCE.clearPlayerPrefix(source, target);
         }
         String rankPrefix = staffPrefixMap.entrySet().stream()
                 .filter(p->target.hasPermission(p.getKey()))
@@ -48,7 +48,7 @@ public class Prefix implements DiscordCommandExecutor {
         String title = String.join(" ", args);
 
         String prefix = String.format("%s %s[%s%s]&r", arrow, rankPrefix, title, color).replaceAll("\\?\"", "");
-        PermissionUtils.INSTANCE.setPlayerPrefix(target, prefix);
+        PermissionUtils.INSTANCE.setPlayerPrefix(source, target, prefix);
     }
 
     private Optional<User> getTarget(Subject source, List<String> args) {
@@ -61,7 +61,7 @@ public class Prefix implements DiscordCommandExecutor {
     }
 
     private String getChevron(User user, List<String> args){
-        String carat = !ignoreDonor(args) && !user.hasPermission(Permission.ROLES_STAFF) && user.hasPermission(Permission.ROLES_DONOR)? "&l✯" : "&l»";
+        String carat = !ignoreDonor(args) && user.hasPermission(Permission.ROLES_DONOR) ? "&l✯" : "&l»";
         ListIterator<String> argsIterator = args.listIterator();
         String chevronColour = "&a";
         while (argsIterator.hasNext()){

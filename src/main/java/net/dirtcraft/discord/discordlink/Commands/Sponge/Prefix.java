@@ -1,5 +1,6 @@
 package net.dirtcraft.discord.discordlink.Commands.Sponge;
 
+import net.dirtcraft.discord.discordlink.Commands.Sources.ConsoleSource;
 import net.dirtcraft.discord.discordlink.Storage.Permission;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.PermissionUtils;
 import net.dirtcraft.discord.discordlink.Utility.Pair;
@@ -12,7 +13,10 @@ import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.text.Text;
 
 import javax.annotation.Nonnull;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -24,6 +28,7 @@ public class Prefix implements CommandExecutor {
             new Pair<>(Permission.ROLES_HELPER,    "&5&lH"),
             new Pair<>(Permission.ROLES_BUILDER,   "&6&lB")
     ).collect(Collectors.toMap(Pair::getKey, Pair::getValue));
+    private final Set<String> forbidden = new HashSet<>(Arrays.asList("staff", "helper", "mod", "moderator", "admin", "manager", "owner"));
 
     @Nonnull
     @Override
@@ -38,7 +43,7 @@ public class Prefix implements CommandExecutor {
                 src.sendMessage(Text.of("§cYou must specify a prefix."));
                 return;
             } else if (title.equalsIgnoreCase("none")){
-                PermissionUtils.INSTANCE.clearPlayerPrefix(target);
+                PermissionUtils.INSTANCE.clearPlayerPrefix(getSource(src), target);
                 src.sendMessage(Text.of("§cPrefix cleared."));
                 return;
             } else if (target == null) {
@@ -49,6 +54,9 @@ public class Prefix implements CommandExecutor {
                 return;
             } else if (title.length() > 20 && !src.hasPermission(Permission.PREFIX_LONG)){
                 src.sendMessage(Text.of("§cThe prefix specified is too long."));
+                return;
+            } else if (isNotAllowed(title) && src.hasPermission(Permission.ROLES_STAFF)){
+                src.sendMessage(Text.of("§cThat prefix is not allowed."));
                 return;
             } else if (!caratColor.equalsIgnoreCase("&a&l") && !src.hasPermission(Permission.PREFIX_ARROW)){
                 src.sendMessage(Text.of("§cYou do not have permission to change the arrow colour."));
@@ -74,21 +82,32 @@ public class Prefix implements CommandExecutor {
             String prefix = String.format("%s %s[%s%s]&r", chevron, rankPrefix, title, bracketColor)
                     .replaceAll("\\?\"", "");
 
-            PermissionUtils.INSTANCE.setPlayerPrefix(target, prefix);
+            PermissionUtils.INSTANCE.setPlayerPrefix(getSource(src), target, prefix);
         });
 
         return CommandResult.success();
     }
 
     private String getChevron(User user, String colour, boolean ignoreDonor){
-        final String carat = !ignoreDonor
-                && user.hasPermission(Permission.ROLES_DONOR)
-                && user.hasPermission(Permission.ROLES_STAFF)?
-                "&l✯" : "&l»";
+        final String carat = !ignoreDonor && user.hasPermission(Permission.ROLES_DONOR) ? "&l✯" : "&l»";
         return colour + carat;
     }
 
     private boolean isValidColor(String input){
         return input.matches("(?i)([§&][0-9a-frlonm]){1,5}");
+    }
+
+    private boolean isNotAllowed(String title){
+        String raw = title.replaceAll("(?i)([§&][0-9a-frlonm])", "").toLowerCase();
+        return forbidden.contains(raw);
+    }
+
+    private ConsoleSource getSource(CommandSource source){
+        return new ConsoleSource(){
+            @Override
+            public void sendMessage(@Nonnull Text message) {
+                source.sendMessage(message);
+            }
+        };
     }
 }

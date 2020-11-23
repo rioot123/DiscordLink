@@ -43,11 +43,8 @@ public class PluginConfiguration {
         @Setting(value = "Bot-Prefix", comment = "Prefix to use bot commands")
         public static String discordCommand = "!";
 
-        @Setting(value = "Discord-Server-ID")
-        public static String discordServerID = "269639757351354368";
-
-        @Setting(value = "Discord-Server-ID")
-        public static String defaultChannelID = SpongeDiscordLib.getGamechatChannelID();
+        @Setting(value = "defaultChannelId")
+        public static Long defaultChannelID = Long.parseLong(SpongeDiscordLib.getGamechatChannelID());
 
         @Setting(value = "Discord-Server-ID")
         public static String serverLogChannelID = "566095634008899585";

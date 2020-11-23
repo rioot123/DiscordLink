@@ -11,11 +11,11 @@ import net.dv8tion.jda.api.entities.TextChannel;
 public class Channels {
     private static final JDA jda = DiscordLink.getJDA();
     private static final Channel logChannel = new Channel(Long.parseLong(PluginConfiguration.Main.serverLogChannelID));
-    private static final Channel defaultChannel = new Channel(Long.parseLong(PluginConfiguration.Main.defaultChannelID));
+    private static final Channel defaultChannel = new Channel(PluginConfiguration.Main.defaultChannelID);
     private static final long guild = getDefaultChannel() != null ? getDefaultChannel().getGuild().getIdLong() : -1;
 
     public static TextChannel getDefaultChannel(){
-        return DiscordLink.getJDA().getTextChannelById(defaultChannel.getId());
+        return jda.getTextChannelById(defaultChannel.getId());
     }
 
     public static Channel getDefaultChat(){
