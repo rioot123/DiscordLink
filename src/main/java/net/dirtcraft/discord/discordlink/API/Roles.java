@@ -17,15 +17,15 @@ public enum Roles {
     NITRO   (nitroRoleID,    false,'a',"Nitro Booster"   ),
     DONOR   (donatorRoleID,  false,'6',"Donor"           ),
     VERIFIED(verifiedRoleID, false,'7',"Verified"        ),
-    NONE    (null,       false,'7',"None"            );
+    NONE    (-1,         false,'7',"None"            );
 
-    private final long id;
+    public long id;
     private final String name;
     private final char color;
     private final boolean isStaff;
 
-    Roles(String id, boolean isStaff, char color, @NonNull String name){
-        this.id = id == null ? -1 : Long.parseLong(id);
+    Roles(long id, boolean isStaff, char color, @NonNull String name){
+        this.id = id;
         this.name = name;
         this.color = color;
         this.isStaff = isStaff;

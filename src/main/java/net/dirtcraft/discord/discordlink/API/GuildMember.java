@@ -1,10 +1,7 @@
 package net.dirtcraft.discord.discordlink.API;
 
-import net.dirtcraft.discord.discordlink.Commands.Sources.ResponseScheduler;
-import net.dirtcraft.discord.discordlink.Commands.Sources.ConsoleSource;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Storage.Database;
-import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformPlayer;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUser;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUtils;
@@ -12,12 +9,9 @@ import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
-import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.plugin.PluginManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 
 public class GuildMember extends WrappedMember {
     private PlatformUser user;
@@ -105,8 +99,7 @@ public class GuildMember extends WrappedMember {
         return highestRank.getStyle();
     }
 
-    @NonNull
-    public Roles getHighestRank(){
+    @NonNull public Roles getHighestRank(){
         return highestRank;
     }
 }

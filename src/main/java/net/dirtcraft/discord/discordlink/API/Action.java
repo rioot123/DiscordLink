@@ -1,15 +1,14 @@
 package net.dirtcraft.discord.discordlink.API;
 
-
-import net.dirtcraft.discord.discordlink.Commands.Sources.DiscordResponder;
 import net.dirtcraft.discord.discordlink.Commands.Sources.ConsoleSource;
+import net.dirtcraft.discord.discordlink.Commands.Sources.DiscordResponder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 
-import static net.dirtcraft.discord.discordlink.Storage.PluginConfiguration.Main.*;
+import static net.dirtcraft.discord.discordlink.Storage.PluginConfiguration.Prefixes.*;
 
 public enum Action {
     CHAT            ( "\n",    Sender.NONE,     Type.CHAT_MESSAGE    ),
@@ -29,20 +28,20 @@ public enum Action {
         this.type = type;
     }
 
-    public static Action fromMessageRaw(String rawMessage){
-        return Arrays.stream(values())
-                .filter(cmd->rawMessage.startsWith(cmd.prefix))
-                .filter(cmd->cmd != CHAT)
-                .max(Comparator.comparingInt(Action::length))
-                .orElse(CHAT);
-    }
-
     public static String filterConsolePrefixes(String command){
         String prefixes = Arrays.stream(values())
                 .filter(Action::isConsole)
                 .map(Action::getPrefix)
                 .collect(Collectors.joining("|"));
         return command.replaceAll("^(" + prefixes + ")", "");
+    }
+
+    public static Action fromMessageRaw(String rawMessage){
+        return Arrays.stream(values())
+                .filter(cmd->rawMessage.startsWith(cmd.prefix))
+                .filter(cmd->cmd != CHAT)
+                .max(Comparator.comparingInt(Action::length))
+                .orElse(CHAT);
     }
 
     public String getCommand(MessageReceivedEvent event){

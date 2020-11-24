@@ -36,26 +36,26 @@ public class DiscordCommandManager extends DiscordCommandTree {
 
     public void process(MessageSource member, String args){
         try {
-            String[] command = args == null || defaultAliases.contains(args)? new String[0] : args.toLowerCase().split(" ");
+            String[] command = args == null || defaultAliases.contains(args)? new String[0] : args.split(" ");
             execute(member, null, new ArrayList<>(Arrays.asList(command)));
         } catch (Exception e){
             String message = e.getMessage() != null? e.getMessage() : "an error occurred while executing the command.";
             Utility.sendCommandError(member, message);
         } finally {
-            member.getMessage().delete().queue();
+            if (!member.isPrivateMessage()) member.getMessage().delete().queue();
         }
     }
 
     @Override
     public void defaultResponse(MessageSource member, String command, List<String> args) {
         EmbedBuilder embed = Utility.embedBuilder();
-        String pre = PluginConfiguration.Main.discordCommand;
+        String pre = PluginConfiguration.Prefixes.discordCommand;
         getCommandMap().forEach((alias, cmd)->{
             if (!cmd.hasPermission(member)) return;
             String title = pre + alias + " " + cmd.getUsage();
             embed.addField(title, cmd.getDescription(), false);
+            embed.setFooter("Requested By: " + member.getUser().getAsTag(), member.getUser().getAvatarUrl());
         });
         member.sendCommandResponse(embed.build());
     }
-
 }

@@ -1,4 +1,3 @@
-
 package net.dirtcraft.discord.discordlink.API;
 
 
@@ -9,6 +8,8 @@ import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+
+import java.io.File;
 
 public class MessageSource extends GuildMember implements DiscordResponder {
     private final Message message;
@@ -89,5 +90,12 @@ public class MessageSource extends GuildMember implements DiscordResponder {
 
     public void sendPrivateMessage(MessageEmbed message){
         getUser().openPrivateChannel().queue(dm -> dm.sendMessage(message).queue());
+    }
+
+    public void sendPrivateFile(File file){
+        getUser().openPrivateChannel()
+                .flatMap(a->a.sendFile(file))
+                .submit();
+
     }
 }

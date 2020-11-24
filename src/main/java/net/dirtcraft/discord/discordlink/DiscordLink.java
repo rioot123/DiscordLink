@@ -1,7 +1,13 @@
 package net.dirtcraft.discord.discordlink;
 
 import net.dirtcraft.discord.dirtdatabaselib.SQLManager;
-import net.dirtcraft.discord.discordlink.Commands.Bungee.*;
+import net.dirtcraft.discord.discordlink.API.Channel;
+import net.dirtcraft.discord.discordlink.API.Channels;
+import net.dirtcraft.discord.discordlink.Commands.Bungee.Demote;
+import net.dirtcraft.discord.discordlink.Commands.Bungee.Link;
+import net.dirtcraft.discord.discordlink.Commands.Bungee.Promote;
+import net.dirtcraft.discord.discordlink.Commands.Bungee.SettingsBase;
+import net.dirtcraft.discord.discordlink.Commands.Bungee.Unlink;
 import net.dirtcraft.discord.discordlink.Events.BungeeEventHandler;
 import net.dirtcraft.discord.discordlink.Events.DiscordChatHandler;
 import net.dirtcraft.discord.discordlink.Events.DiscordJoinHandler;
@@ -9,10 +15,12 @@ import net.dirtcraft.discord.discordlink.Events.PluginMessageHandler;
 import net.dirtcraft.discord.discordlink.Exceptions.DependantNotLoadedException;
 import net.dirtcraft.discord.discordlink.Storage.ConfigManager;
 import net.dirtcraft.discord.discordlink.Storage.Database;
+import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.Storage.Settings;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Sanctions.SanctionUtils;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.api.JDA;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Plugin;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
@@ -21,6 +29,7 @@ import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 public class DiscordLink extends Plugin {
@@ -53,10 +62,19 @@ public class DiscordLink extends Plugin {
             //this.getProxy().getPluginManager().registerCommand(this, new Discord());
             this.getProxy().getPluginManager().registerCommand(this, new Promote());
             this.getProxy().getPluginManager().registerCommand(this, new Demote());
+            this.getProxy().getPluginManager().registerCommand(this, new SettingsBase());
             getProxy().getPluginManager().registerListener(this, new BungeeEventHandler());
             getProxy().getPluginManager().registerListener(this, channelHandler);
             getProxy().registerChannel(Settings.ROOT_CHANNEL);
             SanctionUtils utils = SanctionUtils.INSTANCE;
+            ProxyServer.getInstance().getScheduler().schedule(this,()->{
+                Channel playerCount = Channels.getPlayerCountChannel();
+                if (playerCount.isValid()){
+                    String count = String.valueOf(ProxyServer.getInstance().getOnlineCount());
+                    String channelName = PluginConfiguration.Format.playerCount.replaceAll("(?i)\\{count}", count);
+                    playerCount.setName(channelName);
+                }
+            }, 0, 8, TimeUnit.MINUTES);
 
             logger.info("Discord Link initialized");
         } catch (DependantNotLoadedException e){
@@ -74,6 +92,10 @@ public class DiscordLink extends Plugin {
 
     public void saveConfig(){
         configManager.save();
+    }
+
+    public void reloadConfig(){
+        configManager.load();
     }
 
     public Database getStorage(){

@@ -2,10 +2,7 @@ package net.dirtcraft.discord.discordlink.Commands.Sources;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import litebans.api.Events;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Queue;
@@ -16,10 +13,10 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class ResponseScheduler {
     public static final ResponseScheduler instance = new ResponseScheduler();
     final Queue<Message> tasks = new ConcurrentLinkedQueue<>();
-    final Timer timer = new Timer();
 
     private ResponseScheduler() {
-        timer.scheduleAtFixedRate(new Messenger(), 1250, 1250);
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new Messenger(), 1000, 1000);
     }
 
     public static void submit(DiscordResponder provider, String message) {
@@ -49,7 +46,7 @@ public class ResponseScheduler {
         private void dispatchMessages(DiscordResponder provider, Collection<String> messages){
             StringBuilder output = new StringBuilder();
             for (String message : messages){
-                if (provider.sanitise()) message = Utility.sanitizeMinecraftText(message);
+                if (provider.sanitise()) message = Utility.sanitiseMinecraftText(message);
                 else message = Utility.stripColorCodes(message);
                 if (output.length() + message.length() > provider.getCharLimit()){
                     provider.sendDiscordResponse(output.toString());

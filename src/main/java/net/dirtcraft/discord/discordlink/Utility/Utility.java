@@ -120,7 +120,7 @@ public class Utility {
             ConsoleSource console = type.getCommandSource(sender, command);
             toConsole(console, command);
             return CommandResult.SUCCESS;
-        } else if (sender.getChannel() == SanctionUtils.CHANNEL) {
+        } else if (sender.getChannel().equals(Channels.getDefaultChat())) {
             sendPermissionError(sender);
             return CommandResult.FAILURE;
         } else {
@@ -186,7 +186,7 @@ public class Utility {
                 .queue();
     }
 
-    public static String sanitizeMinecraftText(String s){
+    public static String sanitiseMinecraftText(String s){
         return s.replaceAll(STRIP_CODE_REGEX, "")
                 .replaceAll("([_*~`>|\\\\])", "\\\\$1")
                 .replace("@everyone", "")

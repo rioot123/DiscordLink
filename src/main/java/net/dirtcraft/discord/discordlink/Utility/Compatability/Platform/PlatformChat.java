@@ -94,7 +94,7 @@ public class PlatformChat {
         final BaseComponent[] hoverElement = tooltip.stream().map(TextComponent::new).toArray(BaseComponent[]::new);
 
         formattedMessage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverElement));
-        formattedMessage.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, PluginConfiguration.Main.DISCORD_INVITE));
+        formattedMessage.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, PluginConfiguration.Main.inviteLink));
         return formattedMessage;
     }
 }

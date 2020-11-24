@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.entities.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
-public class Channel {
+public class Channel implements DiscordResponder {
     private final long channel;
     private final boolean isPrivate;
 
@@ -26,6 +26,7 @@ public class Channel {
 
     public MessageChannel getChannel(){
         final JDA jda = DiscordLink.getJDA();
+        if (channel < 1) return null;
         return isPrivate? jda.getPrivateChannelById(channel) : jda.getTextChannelById(channel);
     }
 
@@ -34,11 +35,15 @@ public class Channel {
     }
 
     public CompletableFuture<Message> sendMessage(MessageEmbed embed) {
-        return getChannel().sendMessage(embed).submit();
+        MessageChannel channel = getChannel();
+        if (channel instanceof TextChannel) return channel.sendMessage(embed).submit();
+        else return CompletableFuture.supplyAsync(()->null);
     }
 
     public CompletableFuture<Message> sendMessage(String message) {
-        return getChannel().sendMessage(message).submit();
+        MessageChannel channel = getChannel();
+        if (channel instanceof TextChannel) return channel.sendMessage(message).submit();
+        else return CompletableFuture.supplyAsync(()->null);
     }
 
     public CompletableFuture<Message> sendMessage(String message, int delay){
@@ -75,10 +80,41 @@ public class Channel {
         sendMessage(embed);
     }
 
+    public DiscordResponder getChatResponder(){
+        return this;
+    }
+
+    public boolean isValid(){
+        return channel > 0;
+    }
+
+    public void setName(String name){
+        GuildChannel channel = Channels.getGuild().getGuildChannelById(this.channel);
+        if (channel != null) channel.getManager()
+                .setName(name)
+                .submit();
+    }
+
     @Override
     public boolean equals(Object other){
         return other instanceof Channel &&
                 ((Channel) other).getId() == getId();
+    }
+
+    @Override
+    public void sendDiscordResponse(String message) {
+        if (message.length() > getCharLimit()) return;
+        sendMessage(message);
+    }
+
+    @Override
+    public int getCharLimit(){
+        return 1996;
+    }
+
+    @Override
+    public boolean sanitise(){
+        return false;
     }
 
     public DiscordResponder getCommandResponder(MessageSource member, String command){
@@ -101,24 +137,6 @@ public class Channel {
 
             public boolean sanitise(){
                 return true;
-            }
-        };
-    }
-
-    public DiscordResponder getChatResponder(){
-        return new DiscordResponder() {
-            @Override
-            public void sendDiscordResponse(String message) {
-                if (message.length() > getCharLimit()) return;
-                sendMessage(message);
-            }
-
-            public int getCharLimit(){
-                return 1996;
-            }
-
-            public boolean sanitise(){
-                return false;
             }
         };
     }

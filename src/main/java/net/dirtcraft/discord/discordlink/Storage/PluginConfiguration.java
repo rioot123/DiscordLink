@@ -15,42 +15,58 @@ public class PluginConfiguration {
     @Setting private Main main = new Main();
     @Setting private Embed embed = new Embed();
     @Setting private Roles roles = new Roles();
+    @Setting private Format format = new Format();
     @Setting private Command command = new Command();
     @Setting private Database database = new Database();
-    @Setting private Format format = new Format();
+    @Setting private Prefixes Prefixes = new Prefixes();
+    @Setting private Channels channels = new Channels();
     @Setting private Promotion promotion = new Promotion();
 
     @ConfigSerializable
-    public static class Main {
-        @Setting(value = "Silent-Whitelisted-Console-Prefix", comment = "Prefix to use private console command (Whitelisted, Same as non-proxy Discord-Link)")
+    public static class Prefixes {
+        @Setting(comment = "Prefix to use private console command (Whitelisted, Same as non-proxy Discord-Link)")
         public static String consolePrivate = "#/";
 
-        @Setting(value = "Whitelisted-Console-Prefix", comment = "Prefix to use bungee command (Whitelisted, Same as non-proxy Discord-Link)")
+        @Setting(comment = "Prefix to use bungee command (Whitelisted, Same as non-proxy Discord-Link)")
         public static String consolePublic = "/";
 
-        @Setting(value = "Silent-Manager-Console-Prefix", comment = "Prefix to use private console command (Full Access, Set different from non-proxy Discord-Link)")
+        @Setting(comment = "Prefix to use private console command (Full Access, Set different from non-proxy Discord-Link)")
         public static String bungeePrivate = "#$";
 
-        @Setting(value = "Console-Manager-Prefix", comment = "Prefix to use bungee command (Full Access, Set different from non-proxy Discord-Link)")
+        @Setting(comment = "Prefix to use bungee command (Full Access, Set different from non-proxy Discord-Link)")
         public static String bungeePublic = "$";
 
-        @Setting(value = "Bot-Prefix", comment = "Prefix to use bot commands")
+        @Setting(comment = "Prefix to use bot commands")
         public static String discordCommand = "!";
+    }
 
-        @Setting(value = "Gamechat Category ID")
-        public static long GAMECHAT_CATEGORY_ID = 516473998478016512L;
+    @ConfigSerializable
+    public static class Main {
+        @Setting public static String inviteLink = "https://discord.com/invite/mqQX9f";
+        @Setting public static String botToken = "";
+    }
 
-        @Setting(value = "Sanction Log Channel ID", comment = "Channel for sanction messages from litebans (OPTIONAL)")
-        public static long defaultChannelID = 768343841106559026L;
+    @ConfigSerializable
+    public static class Channels {
+        @Setting public static long litebansChannel = 768343841106559026L;
+        @Setting public static long gamechatChannel = 768343841106559026L;
+        @Setting public static long gamechatCategory = 516473998478016512L;
+        @Setting public static long serverLogChannel = 566095634008899585L;
+        @Setting public static long commandLogChannel = 768343841106559026L;
+        @Setting public static long playerCountChannel = -1L;
+    }
 
-        @Setting(value = "Discord-Server-ID")
-        public static long serverLogChannelID = 566095634008899585L;
-
-        @Setting(value = "Discord Server Invite")
-        public static String DISCORD_INVITE = "https://discord.com/invite/mqQX9f";
-
-        @Setting(value = "Discord Bot Token")
-        public static String botToken = "";
+    @ConfigSerializable
+    public static class Roles {
+        @Setting public static long ownerRoleID = 307551061156298762L;
+        @Setting public static long dirtyRoleID = 591732856443895808L;
+        @Setting public static long adminRoleID = 531631265443479562L;
+        @Setting public static long moderatorRoleID = 332701183477284867L;
+        @Setting public static long helperRoleID = 563538434333999108L;
+        @Setting public static long staffRoleID = 549039481450397699L;
+        @Setting public static long verifiedRoleID = 578447006662524940L;
+        @Setting public static long donatorRoleID = 591145069810155530L;
+        @Setting public static long nitroRoleID = 581195961813172225L;
     }
 
     @ConfigSerializable
@@ -76,6 +92,9 @@ public class PluginConfiguration {
         @Setting(value = "Player-Disconnect", comment = "Message to Discord when a player leaves the server")
         public static String playerDisconnect = "`{prefix} {username} has left the game`";
 
+        @Setting(value = "Player-Count", comment = "Player Count Channel Name.")
+        public static String playerCount = "Players Online: {count}";
+
         @Setting(value = "Invite-Discord", comment = "Message send to invite player.")
         public static String discordInvite = "&6Join us on discord! &9&l{url}&6.";
     }
@@ -87,36 +106,6 @@ public class PluginConfiguration {
 
         @Setting(value = "Timestamp")
         public static boolean timestamp = true;
-    }
-
-    @ConfigSerializable
-    public static class Roles {
-        @Setting(value = "Owner-Role-ID")
-        public static String ownerRoleID = "307551061156298762";
-
-        @Setting(value = "Dirty-Role-ID")
-        public static String dirtyRoleID = "591732856443895808";
-
-        @Setting(value = "Admin-Role-ID")
-        public static String adminRoleID = "531631265443479562";
-
-        @Setting(value = "Moderator-Role-ID")
-        public static String moderatorRoleID = "332701183477284867";
-
-        @Setting(value = "Helper-Role-ID")
-        public static String helperRoleID = "563538434333999108";
-
-        @Setting(value = "Staff-Role-ID")
-        public static String staffRoleID = "549039481450397699";
-
-        @Setting(value = "Verified-Role-ID")
-        public static String verifiedRoleID = "578447006662524940";
-
-        @Setting(value = "Donator-Role-ID")
-        public static String donatorRoleID = "591145069810155530";
-
-        @Setting(value = "Nitro-Role-ID")
-        public static String nitroRoleID = "581195961813172225";
     }
 
     @ConfigSerializable

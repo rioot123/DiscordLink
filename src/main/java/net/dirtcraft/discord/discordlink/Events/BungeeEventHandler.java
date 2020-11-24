@@ -29,9 +29,8 @@ public class BungeeEventHandler implements Listener {
             GuildMember member = GuildMember.fromPlayerId(platformPlayer.getUUID()).orElse(null);
             if (member == null) return;
             Utility.setRoles(platformPlayer, member);
+            //todo update username for vote data.
         });
-
-        //todo update username for vote data.
 
     }
 

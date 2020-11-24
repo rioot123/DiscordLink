@@ -2,7 +2,6 @@ package net.dirtcraft.discord.discordlink.Utility.Compatability.Sanctions.LiteBa
 
 import litebans.api.Events;
 import net.dirtcraft.discord.discordlink.API.Channel;
-import net.dirtcraft.discord.discordlink.API.Channels;
 import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.Commands.Sources.ConsoleSource;
 import net.dirtcraft.discord.discordlink.Commands.Sources.DiscordResponder;
@@ -22,8 +21,8 @@ import java.util.concurrent.CompletableFuture;
 
 public class LiteBans extends SanctionUtils {
     private final Timer timer = new Timer();
-    private final Channel sanctions;
-    private final DiscordResponder responder;
+    private Channel sanctions;
+    private DiscordResponder responder;
 
     public LiteBans(Channel channel) {
         this.sanctions = channel;
@@ -45,6 +44,12 @@ public class LiteBans extends SanctionUtils {
                     e.printStackTrace();
                     return null;
                 });
+    }
+
+    @Override
+    public void updateChannel(long id) {
+        sanctions = new Channel(id);
+        responder = sanctions.getChatResponder();
     }
 
     private void executeSanction(SanctionCommand sanction, MessageSource source, String command, boolean bypass) {

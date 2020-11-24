@@ -23,6 +23,8 @@ public class Permission {
     public static final String ROLES_STAFF = "discordlink.roles.staff";
     public static final String ROLES_DONOR = "discordlink.roles.donor";
 
+    public static final String SETTINGS_MODIFY = "discordlink.settings.modify";
+
     public static boolean canModify(CommandSender sender, String... group){
         return Arrays.stream(group)
                 .filter(Objects::nonNull)

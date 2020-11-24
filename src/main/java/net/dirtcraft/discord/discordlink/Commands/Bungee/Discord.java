@@ -13,7 +13,7 @@ public class Discord extends Command {
     @Override
     @SuppressWarnings("deprecation")
     public void execute(CommandSender commandSender, String[] strings) {
-        String message = Utility.formatColourCodes(PluginConfiguration.Format.discordInvite.replace("{url}", PluginConfiguration.Main.DISCORD_INVITE));
+        String message = Utility.formatColourCodes(PluginConfiguration.Format.discordInvite.replace("{url}", PluginConfiguration.Main.inviteLink));
         commandSender.sendMessage(message);
     }
 }
