@@ -4,9 +4,9 @@ import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommandExecutor;
 import net.dirtcraft.discord.discordlink.Exceptions.DiscordCommandException;
 import net.dirtcraft.discord.discordlink.Storage.Permission;
+import net.dirtcraft.discord.discordlink.Storage.Settings;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.PermissionUtils;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUser;
-import net.dirtcraft.discord.discordlink.Utility.Pair;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.permission.Subject;
@@ -16,16 +16,8 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Prefix implements DiscordCommandExecutor {
-    private final Map<String, String> staffPrefixMap = Stream.of(
-            new Pair<>(Permission.ROLES_ADMIN,     "&4&lA"),
-            new Pair<>(Permission.ROLES_MODERATOR, "&9&lM"),
-            new Pair<>(Permission.ROLES_HELPER,    "&5&lH"),
-            new Pair<>(Permission.ROLES_BUILDER,   "&6&lB")
-    ).collect(Collectors.toMap(Pair::getKey, Pair::getValue));
 
     @Override
     public void execute(MessageSource source, String command, List<String> args) throws DiscordCommandException {
@@ -39,7 +31,7 @@ public class Prefix implements DiscordCommandExecutor {
         else if (args.size() == 1 && args.get(0).equalsIgnoreCase("none")){
             PermissionUtils.INSTANCE.clearPlayerPrefix(source, target);
         }
-        String rankPrefix = staffPrefixMap.entrySet().stream()
+        String rankPrefix = Settings.STAFF_PREFIX.entrySet().stream()
                 .filter(p->target.hasPermission(p.getKey()))
                 .map(Map.Entry::getValue)
                 .findFirst()
