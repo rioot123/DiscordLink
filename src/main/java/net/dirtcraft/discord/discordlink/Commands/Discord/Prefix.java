@@ -31,7 +31,7 @@ public class Prefix implements DiscordCommandExecutor {
         else if (args.size() == 1 && args.get(0).equalsIgnoreCase("none")){
             PermissionUtils.INSTANCE.clearPlayerPrefix(source, target);
         }
-        String rankPrefix = Settings.STAFF_PREFIX.entrySet().stream()
+        String rankPrefix = Settings.STAFF_PREFIXES.entrySet().stream()
                 .filter(p->target.hasPermission(p.getKey()))
                 .map(Map.Entry::getValue)
                 .findFirst()
