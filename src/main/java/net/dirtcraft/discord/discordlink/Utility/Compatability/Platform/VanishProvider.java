@@ -1,6 +1,5 @@
-package net.dirtcraft.discord.discordlink.Utility.Compatability.Permission;
+package net.dirtcraft.discord.discordlink.Utility.Compatability.Platform;
 
-import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformPlayer;
 import org.bukkit.Bukkit;
 
 public interface VanishProvider {

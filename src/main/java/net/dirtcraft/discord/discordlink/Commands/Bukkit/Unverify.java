@@ -1,6 +1,6 @@
 package net.dirtcraft.discord.discordlink.Commands.Bukkit;
 
-import net.dirtcraft.discord.discordlink.API.GameChat;
+import net.dirtcraft.discord.discordlink.API.Channels;
 import net.dirtcraft.discord.discordlink.API.GuildMember;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Storage.Database;
@@ -34,9 +34,9 @@ public class Unverify implements CommandExecutor {
         storage.deleteRecord(player.getUniqueId());
         if (user == null) return Utility.formatColourCodes("&cYour account is not verified!");
 
-        final Role verifiedRole = GameChat.getGuild().getRoleById(PluginConfiguration.Roles.verifiedRoleID);
-        final Role donorRole = GameChat.getGuild().getRoleById(PluginConfiguration.Roles.donatorRoleID);
-        final Guild guild = GameChat.getGuild();
+        final Role verifiedRole = Channels.getGuild().getRoleById(PluginConfiguration.Roles.verifiedRoleID);
+        final Role donorRole = Channels.getGuild().getRoleById(PluginConfiguration.Roles.donatorRoleID);
+        final Guild guild = Channels.getGuild();
 
         if (discord.isVerified()) guild.removeRoleFromMember(discord, verifiedRole);
         if (discord.isDonor()) guild.removeRoleFromMember(discord, donorRole);

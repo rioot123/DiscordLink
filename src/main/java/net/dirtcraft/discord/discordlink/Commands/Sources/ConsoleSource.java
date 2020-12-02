@@ -14,16 +14,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
 
-public abstract class WrappedConsole implements ConsoleCommandSender, ScheduledSender {
+public abstract class ConsoleSource implements ConsoleCommandSender {
 
     private ConsoleCommandSender actualSource = Bukkit.getConsoleSender();
 
-    WrappedConsole(){
-    }
-
-    @Override
-    public void sendMessage(@NotNull String message) {
-        ResponseScheduler.submit(this, message);
+    ConsoleSource(){
     }
 
     @Override

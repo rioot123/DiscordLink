@@ -1,6 +1,6 @@
 package net.dirtcraft.discord.discordlink.Commands.Discord;
 
-import net.dirtcraft.discord.discordlink.API.GameChat;
+import net.dirtcraft.discord.discordlink.API.Channels;
 import net.dirtcraft.discord.discordlink.API.GuildMember;
 import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.API.Roles;
@@ -17,16 +17,17 @@ import net.dv8tion.jda.api.entities.Role;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Unlink implements DiscordCommandExecutor {
     @Override
     public void execute(MessageSource source, String command, List<String> args) throws DiscordCommandException {
-        Guild guild = GameChat.getGuild();
+        Guild guild = Channels.getGuild();
         Database storage = DiscordLink.getInstance().getStorage();
         if (args.isEmpty()){
-            storage.deleteRecord(source.getUser().getId());
+            DiscordLink.getInstance().getStorage().deleteRecord(source.getUser().getId());
             Role verifiedRole = guild.getRoleById(PluginConfiguration.Roles.verifiedRoleID);
             Role donorRole = guild.getRoleById(PluginConfiguration.Roles.donatorRoleID);
             if (verifiedRole != null && source.getRoles().contains(verifiedRole)) {
@@ -35,7 +36,7 @@ public class Unlink implements DiscordCommandExecutor {
             if (donorRole !=  null && source.getRoles().contains(donorRole)) {
                 guild.removeRoleFromMember(source, donorRole).queue();
             }
-            GameChat.sendEmbed("Successfully executed command:", "Successfully unlinked " + source.getPlayerData().flatMap(PlatformUser::getName).orElse("your account") + ".");
+            source.sendCommandResponse("Successfully executed command:", "Successfully unlinked " + source.getPlayerData().flatMap(PlatformUser::getName).orElse("your account") + ".");
             return;
         }
         if (!source.hasRole(Roles.ADMIN)) throw new DiscordCommandException("You do not have permission to use this command on other users.");
@@ -48,12 +49,14 @@ public class Unlink implements DiscordCommandExecutor {
         final GuildMember player = new GuildMember(member.get());
         final Optional<PlatformUser> user = player.getPlayerData();
         String response;
-        if (user.isPresent() && user.flatMap(PlatformUser::getName).isPresent()) {
+        if (user.isPresent()) {
             response = user.flatMap(PlatformUser::getName).get();
         } else {
             response = storage.getLastKnownUsername(matcher.group(1));
-            if (response == null) response = storage.getUUIDfromDiscordID(matcher.group(1));
-            if (response == null) throw new DiscordCommandException("The user was not verified!");
+            if (response == null) response = storage.getVerificationData(matcher.group(1))
+                    .flatMap(Database.VerificationData::getUUID)
+                    .map(UUID::toString)
+                    .orElseThrow(()->new DiscordCommandException("The user was not verified!"));
         }
         storage.deleteRecord(matcher.group(1));
         Role verifiedRole = guild.getRoleById(PluginConfiguration.Roles.verifiedRoleID);
@@ -65,6 +68,6 @@ public class Unlink implements DiscordCommandExecutor {
         if (donorRole != null && player.getRoles().contains(donorRole)) {
             guild.removeRoleFromMember(player, donorRole).queue();
         }
-        GameChat.sendEmbed("Discord-Link Verification:", "Successfully unlinked " + response + ".");
+        source.sendCommandResponse("Discord-Link Verification:", "Successfully unlinked " + response + ".");
     }
 }

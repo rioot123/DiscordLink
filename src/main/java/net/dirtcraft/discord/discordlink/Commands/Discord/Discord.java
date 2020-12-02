@@ -1,9 +1,10 @@
 package net.dirtcraft.discord.discordlink.Commands.Discord;
 
-import net.dirtcraft.discord.discordlink.API.GameChat;
+import net.dirtcraft.discord.discordlink.API.Channels;
 import net.dirtcraft.discord.discordlink.API.GuildMember;
 import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommandExecutor;
+import net.dirtcraft.discord.discordlink.Commands.Sources.DiscordResponder;
 import net.dirtcraft.discord.discordlink.Exceptions.DiscordCommandException;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -30,6 +31,6 @@ public class Discord implements DiscordCommandExecutor {
         if (!offlinePlayer.hasPlayedBefore()) throw new DiscordCommandException("Invalid username or UUID.");
         Optional<GuildMember> optDiscordSource = GuildMember.fromPlayerId(offlinePlayer.getUniqueId());
         if (!optDiscordSource.isPresent()) throw new DiscordCommandException("User not verified.");
-        GameChat.sendEmbed(null, "\\" + optDiscordSource.get().getAsMention());
+        source.sendCommandResponse("Discord Username", "\\" + optDiscordSource.get().getAsMention());
     }
 }

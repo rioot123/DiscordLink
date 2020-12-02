@@ -1,14 +1,18 @@
 package net.dirtcraft.discord.discordlink.Utility;
 
 import net.dirtcraft.discord.discordlink.API.*;
-import net.dirtcraft.discord.discordlink.Commands.Sources.WrappedConsole;
+import net.dirtcraft.discord.discordlink.Commands.Sources.ConsoleSource;
 import net.dirtcraft.discord.discordlink.DiscordLink;
+import net.dirtcraft.discord.discordlink.Storage.Permission;
 import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
+import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformPlayer;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.requests.RestAction;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.bukkit.Bukkit;
 
@@ -16,6 +20,7 @@ import java.awt.*;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
@@ -29,7 +34,7 @@ public class Utility {
 
     public static Optional<Member> getMemberById(String id){
         try {
-            return Optional.of(GameChat.getGuild().retrieveMemberById(id).complete());
+            return Optional.of(Channels.getGuild().retrieveMemberById(id).complete());
         } catch (Exception e){
             return Optional.empty();
         }
@@ -37,7 +42,7 @@ public class Utility {
 
     public static Optional<Member> getMemberById(long id){
         try {
-            return Optional.of(GameChat.getGuild().retrieveMemberById(id).complete());
+            return Optional.of(Channels.getGuild().retrieveMemberById(id).complete());
         } catch (Exception e){
             return Optional.empty();
         }
@@ -45,7 +50,7 @@ public class Utility {
 
     public static Optional<Member> getMember(User user){
         try {
-            return Optional.of(GameChat.getGuild().retrieveMember(user).complete());
+            return Optional.of(Channels.getGuild().retrieveMember(user).complete());
         } catch (Exception e){
             return Optional.empty();
         }
@@ -64,12 +69,47 @@ public class Utility {
     public static void setTopic() {
         TextChannel channel = DiscordLink
                 .getJDA()
-                .getTextChannelById(PluginConfiguration.Main.GAMECHAT_CHANNEL_ID);
+                .getTextChannelById(PluginConfiguration.Main.defaultChannelID);
         String code = channel.getName().split("-")[1];
 
         channel.getManager()
                 .setTopic("ModPack: **" + PluginConfiguration.Main.SERVER_NAME + "** — IP: " + code + ".dirtcraft.gg")
                 .queue();
+    }
+
+    public static void setRoles(PlatformPlayer player){
+        CompletableFuture.runAsync(()-> GuildMember.fromPlayerId(player.getUUID())
+                .ifPresent(member->setRoles(player, member)));
+    }
+
+    public static void setRoles(PlatformPlayer player, GuildMember member) {
+        Guild guild = Channels.getGuild();
+        if (player.hasPermission(Permission.ROLES_DONOR)) setRoleIfAbsent(guild, member, Roles.DONOR);
+        if (!member.getRoles().contains(Roles.STAFF.getRole())) tryChangeNickname(guild, member, player.getName());
+        setRoleIfAbsent(guild, member, Roles.VERIFIED);
+    }
+
+    public static void setRoleIfAbsent(Guild guild, GuildMember member, Roles role){
+        try {
+            Role discordRole = role.getRole();
+            if (discordRole == null || member.hasRole(role)) return;
+            guild.addRoleToMember(member, discordRole).submit();
+        } catch (Exception ignored){}
+    }
+
+    public static void removeRoleIfPresent(Guild guild, GuildMember member, Roles role){
+        try {
+            Role discordRole = role.getRole();
+            if (discordRole == null || !member.hasRole(role)) return;
+            guild.removeRoleFromMember(member, discordRole).submit();
+        } catch (Exception ignored){}
+    }
+
+    public static void tryChangeNickname(Guild guild, GuildMember member, String name){
+        try {
+            if (name == null) return;
+            guild.modifyNickname(member, name).submit();
+        } catch (Exception ignored){ }
     }
 
     public static void setStatus() {
@@ -79,7 +119,7 @@ public class Utility {
     public static boolean toConsole(String command, MessageSource sender, Action type) {
         if (ignored.stream().anyMatch(command::startsWith)) return false;
         if (canUseCommand(sender, command)) {
-            final WrappedConsole commandSender = type.getSender(sender, command);
+            final ConsoleSource commandSender = type.getCommandSource(sender, command);
             toConsole(commandSender, command);
             return true;
         } else {
@@ -88,7 +128,7 @@ public class Utility {
         }
     }
 
-    public static void toConsole(WrappedConsole commandSender, String command) {
+    public static void toConsole(ConsoleSource commandSender, String command) {
         Bukkit.getScheduler().callSyncMethod(DiscordLink.getInstance(), () -> Bukkit.dispatchCommand(commandSender, command));
     }
 
@@ -97,18 +137,13 @@ public class Utility {
                 sender.hasRole(Roles.ADMIN) && blacklist.stream().noneMatch(command::startsWith);
     }
 
-    public static void sendResponse(MessageReceivedEvent event, String error, int delay){
-        event.getMessage().delete().queue();
-        GameChat.sendMessage("<@" + event.getAuthor().getId() + ">, " + error, delay);
-    }
-
     public static void sendPermissionError(MessageSource event){
-        GameChat.sendMessage("<@" + event.getUser().getId() + ">, you do **not** have permission to use this command!", 5);
+        event.sendCommandResponse("<@" + event.getUser().getId() + ">, you do **not** have permission to use this command!", 5);
         logCommand(event, "__Tried Executing Command__");
     }
 
     public static void sendCommandError(MessageSource event, String msg){
-        GameChat.sendMessage("<@" + event.getUser().getId() + ">, " + msg, 5);
+        event.sendCommandResponse("<@" + event.getUser().getId() + ">, " + msg, 5);
         logCommand(event, "__Tried Executing Command__");
     }
 
@@ -120,6 +155,10 @@ public class Utility {
                         .setFooter(event.getUser().getAsTag(), event.getUser().getAvatarUrl())
                         .build())
                 .queue();
+    }
+
+    public static BaseComponent[] format(String unformattedString) {
+        return TextComponent.fromLegacyText(unformattedString);
     }
 
     public static String formatColourCodes(String s){
@@ -173,5 +212,16 @@ public class Utility {
             }
         }
         if (sb.length() > 0) destination.accept(sb.toString());
+    }
+
+    public static String getSaltString() {
+        String SALTCHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+        StringBuilder salt = new StringBuilder();
+        Random rnd = new Random();
+        while (salt.length() < 6) { // length of the random string.
+            int index = (int) (rnd.nextFloat() * SALTCHARS.length());
+            salt.append(SALTCHARS.charAt(index));
+        }
+        return salt.toString();
     }
 }

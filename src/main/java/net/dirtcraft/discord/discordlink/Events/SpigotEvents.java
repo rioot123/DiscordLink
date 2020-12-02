@@ -1,7 +1,7 @@
 package net.dirtcraft.discord.discordlink.Events;
 
-import net.dirtcraft.discord.discordlink.API.GameChat;
-import net.dirtcraft.discord.discordlink.Storage.Permissions;
+import net.dirtcraft.discord.discordlink.API.Channels;
+import net.dirtcraft.discord.discordlink.Storage.Permission;
 import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformPlayer;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUtils;
@@ -26,8 +26,8 @@ public class SpigotEvents implements Listener {
         String prefix = Utility.sanitiseMinecraftText(vault.getPlayerPrefix(event.getPlayer()));
         String nickName = Utility.sanitiseMinecraftText(event.getPlayer().getDisplayName());
         String message = Utility.sanitiseMinecraftText(event.getMessage());
-        GameChat.sendPlayerMessage(prefix, nickName, message);
-        if (event.getPlayer().hasPermission(Permissions.COLOUR_CHAT)) {
+        Channels.sendPlayerMessage(prefix, nickName, message);
+        if (event.getPlayer().hasPermission(Permission.COLOUR_CHAT)) {
             String s = event.getMessage();
             s = Utility.formatColourCodes(s);
             event.setMessage(s);
@@ -40,7 +40,7 @@ public class SpigotEvents implements Listener {
         if (player.isVanished()) return;
         if (player.hasPlayedBefore()) {
             String prefix = Utility.removeColourCodes(vault.getPlayerPrefix(event.getPlayer()));
-            GameChat.sendMessage(PluginConfiguration.Format.playerJoin
+            Channels.getDefaultChat().sendMessage(PluginConfiguration.Format.playerJoin
                     .replace("{username}", player.getName())
                     .replace("{prefix}", prefix)
             );
@@ -50,7 +50,7 @@ public class SpigotEvents implements Listener {
                     .setDescription(PluginConfiguration.Format.newPlayerJoin
                             .replace("{username}", player.getName()))
                     .build();
-            GameChat.sendMessage(embed);
+            Channels.getDefaultChat().sendMessage(embed);
         }
     }
 
@@ -59,7 +59,7 @@ public class SpigotEvents implements Listener {
         PlatformPlayer player = PlatformUtils.getPlayer(event.getPlayer());
         if (player.isVanished()) return;
         String prefix = Utility.removeColourCodes(vault.getPlayerPrefix(event.getPlayer()));
-        GameChat.sendMessage(PluginConfiguration.Format.playerDisconnect
+        Channels.getDefaultChat().sendMessage(PluginConfiguration.Format.playerDisconnect
                 .replace("{username}", player.getName())
                 .replace("{prefix}", prefix)
         );

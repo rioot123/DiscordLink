@@ -50,6 +50,19 @@ processResources {
     }
 }
 
+task processSource(type: Sync) {
+    from sourceSets.main.java
+    inputs.properties(
+            version: version)
+    filter(ReplaceTokens, tokens: [
+            VERSION  : version])
+    into "$buildDir/src"
+}
+
+compileJava {
+    source = processSource.outputs
+}
+
 shadowJar {
     archiveFileName = "${pluginId}-${pluginVersion}.jar"
     configurations = [project.configurations.shadow] // ***

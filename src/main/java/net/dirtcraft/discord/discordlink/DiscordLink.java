@@ -1,7 +1,7 @@
 package net.dirtcraft.discord.discordlink;
 
 import net.dirtcraft.discord.dirtdatabaselib.SQLManager;
-import net.dirtcraft.discord.discordlink.API.GameChat;
+import net.dirtcraft.discord.discordlink.API.Channels;
 import net.dirtcraft.discord.discordlink.Commands.Bukkit.Discord;
 import net.dirtcraft.discord.discordlink.Commands.Bukkit.Unverify;
 import net.dirtcraft.discord.discordlink.Commands.Bukkit.Verify;
@@ -67,14 +67,14 @@ public class DiscordLink extends JavaPlugin {
 
             Utility.setStatus();
             Utility.setTopic();
-            GameChat.sendMessage(
+            Channels.getDefaultChat().sendMessage(
                     Utility.embedBuilder()
                             .setColor(Color.GREEN)
                             .setDescription(PluginConfiguration.Format.serverStart
                                     .replace("{modpack}", PluginConfiguration.Main.SERVER_NAME)
                             ).build());
 
-            getCommand("verify").setExecutor(new Verify());
+            getCommand("verify").setExecutor(new Verify(storage));
             getCommand("unverify").setExecutor(new Unverify());
             getCommand("discord").setExecutor(new Discord());
 
@@ -93,7 +93,7 @@ public class DiscordLink extends JavaPlugin {
         SQLManager.close();
         Utility.setStatus();
         Utility.setTopic();
-        GameChat.sendMessage(
+        Channels.getDefaultChat().sendMessage(
                 Utility.embedBuilder()
                         .setDescription(PluginConfiguration.Format.serverStop
                                 .replace("{modpack}", PluginConfiguration.Main.SERVER_NAME)

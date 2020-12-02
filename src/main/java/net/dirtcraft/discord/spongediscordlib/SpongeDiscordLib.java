@@ -46,8 +46,8 @@ public class SpongeDiscordLib {
         return PluginConfiguration.Main.botToken;
     }
 
-    public static String getGamechatChannelID() {
-        return PluginConfiguration.Main.GAMECHAT_CHANNEL_ID;
+    public static long getGamechatChannelID() {
+        return PluginConfiguration.Main.defaultChannelID;
     }
 
     public static String getServerName() {

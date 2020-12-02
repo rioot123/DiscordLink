@@ -30,12 +30,12 @@ public class DiscordCommand {
         return allowedRoles.stream().allMatch(member::hasRole);
     }
 
-    public static Builder builder(){
+    public static Builder builder()         {
         return new Builder();
     }
 
     public final void process(MessageSource member, String command, List<String> args) {
-        if (!PlatformUtils.isGameReady()) return;
+        if (!preBoot && !PlatformUtils.isGameReady()) return;
         if (!allowedRoles.stream().allMatch(member::hasRole)) {
             Utility.sendPermissionError(member);
             return;

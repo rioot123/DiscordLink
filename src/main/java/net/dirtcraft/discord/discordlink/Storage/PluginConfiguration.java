@@ -34,11 +34,20 @@ public class PluginConfiguration {
         @Setting(value = "Bot-Prefix", comment = "Prefix to use bot commands")
         public static String discordCommand = "!";
 
-        @Setting(value = "Discord Bot Token")
-        public static String botToken = "";
+        @Setting(value = "Silent-Manager-Console-Prefix", comment = "Prefix to use private console command (Full Access, Set different from non-proxy Discord-Link)")
+        public static String bungeePrivate = "#$";
+
+        @Setting(value = "Console-Manager-Prefix", comment = "Prefix to use bungee command (Full Access, Set different from non-proxy Discord-Link)")
+        public static String bungeePublic = "$";
 
         @Setting(value = "Gamechat Channel ID")
-        public static String GAMECHAT_CHANNEL_ID = "";
+        public static long defaultChannelID = 511070400835485717L;
+
+        @Setting(value = "Discord-Server-ID")
+        public static long serverLogChannelID = 566095634008899585L;
+
+        @Setting(value = "Discord Bot Token")
+        public static String botToken = "";
 
         @Setting(value = "Server Name")
         public static String SERVER_NAME = "";

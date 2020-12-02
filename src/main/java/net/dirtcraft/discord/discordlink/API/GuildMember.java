@@ -1,6 +1,7 @@
 package net.dirtcraft.discord.discordlink.API;
 
 import net.dirtcraft.discord.discordlink.DiscordLink;
+import net.dirtcraft.discord.discordlink.Storage.Database;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformPlayer;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUser;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUtils;
@@ -8,6 +9,7 @@ import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.*;
 
@@ -17,17 +19,22 @@ public class GuildMember extends WrappedMember {
     private List<Roles> roles;
     private Roles highestRank;
 
-    public static Optional<GuildMember> fromPlayerId(UUID player) {
-        String memberID = DiscordLink.getInstance().getStorage().getDiscordUser(player);
-        if (memberID == null) return Optional.empty();
+    public static Optional<GuildMember> fromDiscordId(long id){
+        return Optional.ofNullable(Channels.getGuild().getMemberById(id))
+                .map(GuildMember::new);
+    }
 
-        final Member member = Utility.getMemberById(memberID).orElse(null);
-        if (member == null) return Optional.empty();
-
-        final GuildMember profile = new GuildMember(member);
-        profile.user = PlatformUtils.getPlayerOffline(player).orElse(null);
-        profile.retrievedPlayer = true;
-        return Optional.of(profile);
+    public static Optional<GuildMember> fromPlayerId(UUID player){
+        final Optional<GuildMember> profile =  DiscordLink.getInstance().getStorage().getVerificationData(player)
+                .flatMap(Database.VerificationData::getDiscordId)
+                .flatMap(Utility::getMemberById)
+                .map(GuildMember::new);
+        profile.ifPresent(member-> {
+            member.retrievedPlayer = true;
+            member.user = PlatformUtils.getPlayerOffline(player)
+                    .orElse(null);
+        });
+        return profile;
     }
 
     public GuildMember(Member member){
@@ -53,9 +60,8 @@ public class GuildMember extends WrappedMember {
 
     public Optional<PlatformUser> getPlayerData(){
         if (!retrievedPlayer) {
-            final String playerId = DiscordLink.getInstance().getStorage().getUUIDfromDiscordID(member.getUser().getId());
-            final Optional<PlatformUser> optData = Optional.ofNullable(playerId)
-                    .map(UUID::fromString)
+            final Optional<PlatformUser> optData = DiscordLink.getInstance().getStorage().getVerificationData(getId())
+                    .flatMap(Database.VerificationData::getUUID)
                     .flatMap(PlatformUtils::getPlayerOffline);
             retrievedPlayer = true;
             return optData;
@@ -70,19 +76,19 @@ public class GuildMember extends WrappedMember {
         member.getUser().openPrivateChannel().queue(dm-> dm.sendMessage(message).queue());
     }
 
-    public boolean isStaff() {
+    public boolean isStaff(){
         return roles.contains(Roles.STAFF);
     }
 
-    public boolean isDonor() {
+    public boolean isDonor(){
         return roles.contains(Roles.DONOR);
     }
 
-    public boolean isBoosting() {
+    public boolean isBoosting(){
         return roles.contains(Roles.NITRO);
     }
 
-    public boolean isVerified() {
+    public boolean isVerified(){
         return roles.contains(Roles.VERIFIED);
     }
 
@@ -98,7 +104,7 @@ public class GuildMember extends WrappedMember {
         return highestRank.getStyle();
     }
 
-    public Roles getHighestRank(){
+    @NonNull public Roles getHighestRank(){
         return highestRank;
     }
 }
