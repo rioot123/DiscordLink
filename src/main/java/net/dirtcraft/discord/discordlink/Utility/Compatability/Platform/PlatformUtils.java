@@ -26,6 +26,11 @@ public class PlatformUtils {
                 .map(PlatformUser::new);
     }
 
+    public static Optional<PlatformUser> getPlayerOffline(CommandSender sender){
+        if (!(sender instanceof Player)) return Optional.empty();
+        else return Optional.of(new PlatformUser((Player) sender));
+    }
+
     public static Optional<PlatformPlayer> getPlayer(PlatformUser player){
         return Optional.ofNullable(player.getPlayer()).map(PlatformPlayer::new);
     }

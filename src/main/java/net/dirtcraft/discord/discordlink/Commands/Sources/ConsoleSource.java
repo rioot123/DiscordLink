@@ -18,9 +18,6 @@ public abstract class ConsoleSource implements ConsoleCommandSender {
 
     private ConsoleCommandSender actualSource = Bukkit.getConsoleSender();
 
-    ConsoleSource(){
-    }
-
     @Override
     public void sendMessage(@NotNull String[] messages) {
         for (String message : messages) sendMessage(message);
