@@ -9,15 +9,19 @@ import net.dirtcraft.discord.discordlink.Commands.Sources.ResponseScheduler;
 import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUser;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Sanctions.SanctionUtils;
+import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.PluginManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.RegEx;
 import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CompletableFuture;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class LiteBans extends SanctionUtils {
     private final Timer timer = new Timer();
@@ -30,7 +34,11 @@ public class LiteBans extends SanctionUtils {
         Events.get().register(new Events.Listener() {
             @Override
             public void broadcastSent(@NotNull String message, @Nullable String type) {
-                message = message.replaceAll("\\{hoverText:.*?}", "");
+                message = Utility.stripColorCodes(message);
+                String reason = match("(?m)(\\nReason » .*)", message).replaceAll("}$", "");
+                String duration = match("(?m)(\\nDuration » .*)", message).replaceAll("}$", "");
+                message = message.replaceAll("(?is)\\{hovertext:.*?}", "");
+                message = message.replaceAll("(?im)\\n» Hover for more info", reason + duration);
                 ResponseScheduler.submit(responder, "``" + message + "``");
             }
         });
@@ -136,5 +144,12 @@ public class LiteBans extends SanctionUtils {
             this.executorName = executorName;
             this.command = command;
         }
+    }
+
+    private static String match(@RegEx String regex, String s){
+        Pattern p = Pattern.compile(regex);
+        Matcher m = p.matcher(s);
+        if (m.find() && m.groupCount() > 0) return m.group(1);
+        else return "";
     }
 }

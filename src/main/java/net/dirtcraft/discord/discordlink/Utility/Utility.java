@@ -111,13 +111,15 @@ public class Utility {
     }
 
     public static CommandResult toConsole(String command, MessageSource sender, Action type) {
-        if (!canUseCommand(sender, type)) {
+        boolean sanction = isSanction(command);
+        boolean whitelisted = isWhitelisted(command);
+        if (!canUseCommand(sender, sanction, whitelisted)) {
             sendPermissionError(sender);
             return CommandResult.FAILURE;
-        } else if (isSanction(command)) {
+        } else if (sanction) {
             SanctionUtils.INSTANCE.sanction(sender, command, false);
             return CommandResult.SUCCESS;
-        } else if (type.isBungee() || isWhitelisted(command)) {
+        } else if (type.isBungee() || whitelisted || sender.hasRole(Roles.DIRTY) && sender.getChannel().equals(Channels.getDefaultChat())) {
             ConsoleSource console = type.getCommandSource(sender, command);
             toConsole(console, command);
             return CommandResult.SUCCESS;
@@ -127,7 +129,6 @@ public class Utility {
         } else {
             return CommandResult.IGNORED;
         }
-
     }
 
     public static void toConsole(ConsoleSource commandSender, String command) {
@@ -135,8 +136,8 @@ public class Utility {
         manager.dispatchCommand(commandSender, command);
     }
 
-    private static boolean canUseCommand(GuildMember sender, Action type){
-        return sender.hasRole(Roles.DIRTY) || !type.isBungee() && sender.hasRole(Roles.ADMIN);
+    private static boolean canUseCommand(GuildMember sender, boolean sanction, boolean whitelisted){
+        return (sender.hasRole(Roles.DIRTY)) || (sender.hasRole(Roles.ADMIN) && sanction || whitelisted) || sender.hasRole(Roles.MOD) && sanction;
     }
 
     private static boolean isSanction(String command){

@@ -62,7 +62,7 @@ public class DiscordChatHandler extends ListenerAdapter {
 
     public void processPrivateMessage(MessageSource sender, MessageReceivedEvent event) {
         if (!PlatformUtils.isGameReady()) return;
-        final Action intent = Action.fromMessageRaw(event.getMessage().getContentRaw()) == Action.DISCORD_COMMAND? Action.DISCORD_COMMAND: Action.PRIVATE_COMMAND;
+        final Action intent = Action.fromMessageRaw(event.getMessage().getContentRaw()) == Action.DISCORD_COMMAND? Action.DISCORD_COMMAND: Action.PRIVATE_BUNGEE;
         final String message = Action.filterConsolePrefixes(event.getMessage().getContentRaw());
         if (intent == Action.DISCORD_COMMAND) commandManager.process(sender, intent.getCommand(event));
         else if (toConsole(message, sender, intent) == Utility.CommandResult.SUCCESS) logCommand(sender, "__Executed Private Command via DM__");
