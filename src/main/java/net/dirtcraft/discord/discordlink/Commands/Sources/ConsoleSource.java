@@ -19,12 +19,12 @@ public abstract class ConsoleSource implements CommandSender, DiscordResponder {
 
     @Override
     public void sendMessage(BaseComponent... message) {
-        sendMessage(BaseComponent.toPlainText(message));
+        sendMessages(BaseComponent.toLegacyText(message).split("\n"));
     }
 
     @Override
     public void sendMessage(BaseComponent message) {
-        sendMessage(BaseComponent.toPlainText(message));
+        sendMessages(BaseComponent.toLegacyText(message).split("\n"));
     }
 
     @Override

@@ -35,10 +35,7 @@ public class LiteBans extends SanctionUtils {
             @Override
             public void broadcastSent(@NotNull String message, @Nullable String type) {
                 message = Utility.stripColorCodes(message);
-                String reason = match("(?m)(\\nReason » .*)", message).replaceAll("}$", "");
-                String duration = match("(?m)(\\nDuration » .*)", message).replaceAll("}$", "");
-                message = message.replaceAll("(?is)\\{hovertext:.*?}", "");
-                message = message.replaceAll("(?im)\\n» Hover for more info", reason + duration);
+                message = formatBanMessage(message);
                 ResponseScheduler.submit(responder, "``" + message + "``");
             }
         });
@@ -119,7 +116,21 @@ public class LiteBans extends SanctionUtils {
         }
     }
 
-    private static class LiteBanListener extends Events.Listener {
+    private String match(@RegEx String regex, String s){
+        Pattern p = Pattern.compile(regex);
+        Matcher m = p.matcher(s);
+        if (m.find() && m.groupCount() > 0) return m.group(1);
+        else return "";
+    }
+
+    private String formatBanMessage(String message){
+        String reason = match("(?m)(\\nReason » .*)", message).replaceAll("}$", "");
+        String duration = match("(?m)(\\nDuration » .*)", message).replaceAll("}$", "");
+        message = message.replaceAll("(?is)\\{hovertext:.*?}", "");
+        return message.replaceAll("(?im)\\n» Hover for more info", reason + duration);
+    }
+
+    private class LiteBanListener extends Events.Listener {
         final ConsoleSource console;
         final String username;
 
@@ -130,7 +141,10 @@ public class LiteBans extends SanctionUtils {
 
         @Override
         public void broadcastSent(@NotNull String message, @Nullable String type) {
-            if (!message.matches("(?im)^([&§][0-9a-f])?" + username + ".*")) return;
+            message = Utility.stripColorCodes(message);
+            Pattern pattern = Pattern.compile("(?im)^» " + username);
+            if (!pattern.matcher(message).find()) return;
+            message = formatBanMessage(message);
             Events.get().unregister(this);
             console.sendMessage(message);
         }
@@ -144,12 +158,5 @@ public class LiteBans extends SanctionUtils {
             this.executorName = executorName;
             this.command = command;
         }
-    }
-
-    private static String match(@RegEx String regex, String s){
-        Pattern p = Pattern.compile(regex);
-        Matcher m = p.matcher(s);
-        if (m.find() && m.groupCount() > 0) return m.group(1);
-        else return "";
     }
 }
