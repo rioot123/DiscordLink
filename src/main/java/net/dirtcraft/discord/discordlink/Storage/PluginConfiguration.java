@@ -21,6 +21,7 @@ public class PluginConfiguration {
     @Setting private Prefixes Prefixes = new Prefixes();
     @Setting private Channels channels = new Channels();
     @Setting private Promotion promotion = new Promotion();
+    @Setting private HubChat hubChat = new HubChat();
 
     @ConfigSerializable
     public static class Prefixes {
@@ -38,6 +39,12 @@ public class PluginConfiguration {
 
         @Setting(comment = "Prefix to use bot commands")
         public static String discordCommand = "!";
+    }
+
+    @ConfigSerializable
+    public static class HubChat {
+        @Setting public static boolean enabled = true;
+        @Setting public static String serverId = "Hub";
     }
 
     @ConfigSerializable

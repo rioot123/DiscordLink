@@ -8,6 +8,7 @@ import net.dirtcraft.discord.discordlink.Commands.Bungee.Settings.SubCommand;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Storage.Permission;
 import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
+import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformChat;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Sanctions.SanctionUtils;
 import net.dirtcraft.discord.discordlink.Utility.Pair;
 import net.md_5.bungee.api.CommandSender;
@@ -60,5 +61,6 @@ public class SettingsBase extends Command {
         Roles.DONOR.id = donatorRoleID;
         Roles.NITRO.id = nitroRoleID;
         Channels.update();
+        PlatformChat.reload();
     }
 }

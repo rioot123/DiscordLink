@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.requests.RestAction;
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -214,6 +215,7 @@ public class Utility {
     }
 
     public static BaseComponent[] format(String s){
+        s=s.replaceAll("(?i)[&]([0-9a-fklmnor])", "§$1");
         return TextComponent.fromLegacyText(s);
     }
 

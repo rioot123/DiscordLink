@@ -30,6 +30,7 @@ public class LiteBans extends SanctionUtils {
         Events.get().register(new Events.Listener() {
             @Override
             public void broadcastSent(@NotNull String message, @Nullable String type) {
+                message = message.replaceAll("\\{hoverText:.*?}", "");
                 ResponseScheduler.submit(responder, "``" + message + "``");
             }
         });
@@ -121,7 +122,7 @@ public class LiteBans extends SanctionUtils {
 
         @Override
         public void broadcastSent(@NotNull String message, @Nullable String type) {
-            if (!message.matches("(?i)^([&§][0-9a-f])?" + username + ".*")) return;
+            if (!message.matches("(?im)^([&§][0-9a-f])?" + username + ".*")) return;
             Events.get().unregister(this);
             console.sendMessage(message);
         }

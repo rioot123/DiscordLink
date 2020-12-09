@@ -4,6 +4,7 @@ import net.dirtcraft.discord.discordlink.API.Channels;
 import net.dirtcraft.discord.discordlink.API.GuildMember;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Storage.Permission;
+import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformPlayer;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUtils;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
@@ -36,8 +37,9 @@ public class BungeeEventHandler implements Listener {
 
     @EventHandler
     public void onChat(ChatEvent event){
+        if (!PluginConfiguration.HubChat.enabled) return;
         if (!(event.getReceiver() instanceof Server) || event.isCommand()) return;
-        if (!((Server) event.getReceiver()).getInfo().getName().equalsIgnoreCase("lobby")) return;
+        if (!((Server) event.getReceiver()).getInfo().getName().equalsIgnoreCase(PluginConfiguration.HubChat.serverId)) return;
         Channels.sendPlayerMessage("[HUB]", event.getSender().toString(), event.getMessage());
     }
 }

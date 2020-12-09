@@ -44,7 +44,7 @@ public enum Roles {
     }
 
     @NonNull public String getStyle(){
-        return this.isStaff ? "§" + color + "§l" : "§7";
+        return this.isStaff ? "§" + color : "§7";
     }
 
     @NonNull public String getChevron(){

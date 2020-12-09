@@ -19,13 +19,18 @@ import java.util.Optional;
 import static net.dirtcraft.discord.discordlink.Utility.Utility.*;
 
 public class PlatformChat {
-    public static final PlatformChat INSTANCE = new PlatformChat();
+    public static PlatformChat INSTANCE = new PlatformChat();
     final ServerInfo lobby;
     public PlatformChat(){
-        lobby = ProxyServer.getInstance().getServerInfo("lobby");
+        lobby = ProxyServer.getInstance().getServerInfo(PluginConfiguration.HubChat.serverId);
+    }
+
+    public static void reload(){
+        INSTANCE = new PlatformChat();
     }
 
     public void discordToMCAsync(MessageSource sender, String message){
+        if (!PluginConfiguration.HubChat.enabled) return;
         final Optional<PlatformUser> optSpigotUser = sender.getPlayerData();
         final String mcUsername = optSpigotUser.flatMap(PlatformUser::getName).orElse(null);
         final String username;
