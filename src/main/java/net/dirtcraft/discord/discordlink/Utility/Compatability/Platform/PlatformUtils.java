@@ -24,6 +24,7 @@ public class PlatformUtils {
     public static Optional<PlatformUser> getPlayerOffline(String identifier){
         boolean isUUID = identifier.matches("(?i)[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
         return Optional.ofNullable(isUUID? Bukkit.getOfflinePlayer(UUID.fromString(identifier)): Bukkit.getOfflinePlayer(identifier))
+                .filter(OfflinePlayer::hasPlayedBefore)
                 .map(PlatformUser::new);
     }
 

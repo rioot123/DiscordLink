@@ -78,7 +78,7 @@ public class Verify implements CommandExecutor {
     }
 
     private void sendDiscordInvite(Player player, String message){
-        TextComponent text = new TextComponent(TextComponent.fromLegacyText(message));
+        TextComponent text = new TextComponent(Utility.format(message));
         text.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText("&5&nClick Me&7 to verify your Discord account!")));
         text.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "http://verify.dirtcraft.gg/"));
         player.spigot().sendMessage(text);

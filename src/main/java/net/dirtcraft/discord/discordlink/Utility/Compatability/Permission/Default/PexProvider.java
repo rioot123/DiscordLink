@@ -13,10 +13,7 @@ import ru.tehkode.permissions.PermissionUser;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
 
 import javax.annotation.Nullable;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static net.dirtcraft.discord.discordlink.Storage.Permission.PROMOTE_PERMISSION_GROUP_PREFIX;
@@ -119,6 +116,7 @@ public class PexProvider extends PermissionUtils {
 
     public Map<String, String> getUserGroupPrefixMap(PlatformUser user){
         return api.getUser(user.getUUID()).getOwnParents().stream()
+                .filter(Objects::nonNull)
                 .filter(p->!p.getOwnPrefix().matches(""))
                 .map(g->new Pair<>(g.getIdentifier(), g.getOwnPrefix()))
                 .collect(Collectors.toMap(Pair::getKey, Pair::getValue));
@@ -126,5 +124,17 @@ public class PexProvider extends PermissionUtils {
 
     public Optional<String> getGroupPrefix(String name){
         return Optional.ofNullable(api.getGroup(name).getOwnPrefix());
+    }
+
+    public boolean isInGroup(PlatformUser user, String group){
+        return Optional.ofNullable(api.getUser(user.getUUID()))
+                .map(u->u.inGroup(group))
+                .orElse(false);
+    }
+
+    public boolean groupHasPermission(String group, String perm){
+        return Optional.ofNullable(api.getGroup(group))
+                .map(g->g.has(perm))
+                .orElse(false);
     }
 }

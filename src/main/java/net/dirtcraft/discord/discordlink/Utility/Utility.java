@@ -157,6 +157,7 @@ public class Utility {
     }
 
     public static BaseComponent[] format(String unformattedString) {
+        unformattedString = unformattedString.replaceAll("&([0-9a-fklmnor])", "§$1");
         return TextComponent.fromLegacyText(unformattedString);
     }
 

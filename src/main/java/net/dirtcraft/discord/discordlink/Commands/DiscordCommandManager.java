@@ -112,7 +112,7 @@ public class DiscordCommandManager extends DiscordCommandTree {
         register(halt, "halt");
         register(seen, "seen");
         register(unstuck, "unstuck", "spawn");
-        register(username, "username");
+        register(username, "username", "minecraft");
         register(discord, "discord");
         register(ranks, "ranks", "groups", "parents");
         //register(sync, "sync");
