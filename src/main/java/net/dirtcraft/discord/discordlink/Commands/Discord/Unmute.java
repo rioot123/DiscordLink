@@ -24,6 +24,6 @@ public class Unmute implements DiscordCommandExecutor {
 
         if (member == null) throw new DiscordCommandException("Invalid member specified!");
         GuildMember guildMember = new GuildMember(member);
-        Utility.setRoleIfAbsent(Channels.getGuild(), guildMember, Roles.MUTED);
+        Utility.removeRoleIfPresent(Channels.getGuild(), guildMember, Roles.MUTED);
     }
 }
