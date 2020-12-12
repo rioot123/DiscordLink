@@ -18,7 +18,8 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import javax.annotation.Nonnull;
 import java.util.concurrent.CompletableFuture;
 
-import static net.dirtcraft.discord.discordlink.Utility.Utility.*;
+import static net.dirtcraft.discord.discordlink.Utility.Utility.logCommand;
+import static net.dirtcraft.discord.discordlink.Utility.Utility.toConsole;
 
 public class DiscordEvents extends ListenerAdapter {
 

@@ -3,7 +3,6 @@ package net.dirtcraft.discord.discordlink.Utility.Compatability.Platform;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.PermissionUtils;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
-import ru.tehkode.permissions.bukkit.PermissionsEx;
 
 import java.util.Optional;
 import java.util.UUID;

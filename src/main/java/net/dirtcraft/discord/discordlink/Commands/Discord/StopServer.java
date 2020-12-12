@@ -4,7 +4,6 @@ import cpw.mods.fml.common.FMLCommonHandler;
 import net.dirtcraft.discord.discordlink.API.Channels;
 import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommandExecutor;
-import net.dirtcraft.discord.discordlink.Commands.Sources.DiscordResponder;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;

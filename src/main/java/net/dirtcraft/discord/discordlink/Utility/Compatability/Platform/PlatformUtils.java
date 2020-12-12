@@ -2,6 +2,7 @@ package net.dirtcraft.discord.discordlink.Utility.Compatability.Platform;
 
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -24,6 +25,10 @@ public class PlatformUtils {
         boolean isUUID = identifier.matches("(?i)[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
         return Optional.ofNullable(isUUID? Bukkit.getOfflinePlayer(UUID.fromString(identifier)): Bukkit.getOfflinePlayer(identifier))
                 .map(PlatformUser::new);
+    }
+
+    public static PlatformUser getPlayerOffline(OfflinePlayer player){
+        return new PlatformUser(player);
     }
 
     public static Optional<PlatformUser> getPlayerOffline(CommandSender sender){

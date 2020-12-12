@@ -5,6 +5,7 @@ import net.dirtcraft.discord.discordlink.Commands.Sources.ConsoleSource;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.PermissionUtils;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformPlayer;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUser;
+import net.dirtcraft.discord.discordlink.Utility.Pair;
 import ru.tehkode.permissions.PermissionEntity;
 import ru.tehkode.permissions.PermissionGroup;
 import ru.tehkode.permissions.PermissionManager;
@@ -102,7 +103,7 @@ public class PexProvider extends PermissionUtils {
         PermissionUser user = api.getUser(target);
         PermissionGroup current = ladder.get(position);
         PermissionGroup previous = ladder.get(position - 1);
-        if (current == null || previous == null || user == null || hasPermission(source, previous)) return Optional.empty();
+        if (current == null || previous == null || user == null || hasPermission(source, current)) return Optional.empty();
         user.addGroup(previous);
         user.removeGroup(current);
         user.save();
@@ -114,5 +115,16 @@ public class PexProvider extends PermissionUtils {
         if (group == null) return true;
         String id = group.getIdentifier();
         return source.hasPermission(PROMOTE_PERMISSION_GROUP_PREFIX + id);
+    }
+
+    public Map<String, String> getUserGroupPrefixMap(PlatformUser user){
+        return api.getUser(user.getUUID()).getOwnParents().stream()
+                .filter(p->!p.getOwnPrefix().matches(""))
+                .map(g->new Pair<>(g.getIdentifier(), g.getOwnPrefix()))
+                .collect(Collectors.toMap(Pair::getKey, Pair::getValue));
+    }
+
+    public Optional<String> getGroupPrefix(String name){
+        return Optional.ofNullable(api.getGroup(name).getOwnPrefix());
     }
 }

@@ -11,7 +11,6 @@ import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.Platform
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 public class Ranks implements DiscordCommandExecutor {
     private PermissionUtils provider;
