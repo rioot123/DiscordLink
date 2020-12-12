@@ -46,7 +46,8 @@ public class DiscordEvents extends ListenerAdapter {
         final String rawMessage = event.getMessage().getContentRaw();
         final Action intent = Action.fromMessageRaw(rawMessage);
 
-        if (intent.isBotCommand()) commandManager.process(sender, intent.getCommand(event));
+        if (sender.hasRole(Roles.MUTED)) sender.getMessage().delete().queue(s->{},e->{});
+        else if (intent.isBotCommand()) commandManager.process(sender, intent.getCommand(event));
         else if (PlatformUtils.isGameReady() && intent.isChat()) PlatformChat.discordToMCAsync(sender, event);
         else if (PlatformUtils.isGameReady() && intent.isConsole()) {
             boolean executed = toConsole(intent.getCommand(event), sender, intent);
