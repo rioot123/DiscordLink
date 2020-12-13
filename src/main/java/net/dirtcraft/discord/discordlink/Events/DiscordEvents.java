@@ -49,6 +49,13 @@ public class DiscordEvents extends ListenerAdapter {
         final Action intent = Action.fromMessageRaw(rawMessage);
 
         if (intent.isBotCommand()) commandManager.process(sender, intent.getCommand(event));
+        else if (sender.isMuted() && intent.isChat()) {
+            if (event.getChannelType() != ChannelType.PRIVATE) {
+                event.getMessage().delete().queue();
+            }
+
+            sender.sendCommandResponse("<@" + sender.getId() + "> You are **not** allowed to talk there! Please open an appeal in <#590388043379376158> to lift your sanction.", 5);
+        }
         else if (PlatformUtils.isGameReady() && intent.isChat()) PlatformChat.discordToMCAsync(sender, event);
         else if (PlatformUtils.isGameReady() && intent.isConsole()) {
             boolean executed = toConsole(intent.getCommand(event), sender, intent);
