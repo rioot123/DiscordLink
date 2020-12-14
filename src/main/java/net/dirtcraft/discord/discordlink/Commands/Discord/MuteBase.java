@@ -77,7 +77,7 @@ public class MuteBase extends DiscordCommandTree {
                     e.printStackTrace();
                 }
             }
-        }, 0, 1000*60*30);
+        }, 0, 1000*60*5);
     }
 
     private void initDatabase(){
