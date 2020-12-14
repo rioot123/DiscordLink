@@ -1,7 +1,7 @@
 package net.dirtcraft.discord.discordlink.API;
 
 import net.dirtcraft.discord.discordlink.DiscordLink;
-import net.dirtcraft.discord.discordlink.Storage.Database;
+import net.dirtcraft.discord.discordlink.Storage.tables.Verification;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformPlayer;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUser;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUtils;
@@ -26,7 +26,7 @@ public class GuildMember extends WrappedMember {
 
     public static Optional<GuildMember> fromPlayerId(UUID player){
         final Optional<GuildMember> profile =  DiscordLink.getInstance().getStorage().getVerificationData(player)
-                .flatMap(Database.VerificationData::getDiscordId)
+                .flatMap(Verification.VerificationData::getDiscordId)
                 .flatMap(Utility::getMemberById)
                 .map(GuildMember::new);
         profile.ifPresent(member-> {
@@ -61,7 +61,7 @@ public class GuildMember extends WrappedMember {
     public Optional<PlatformUser> getPlayerData(){
         if (!retrievedPlayer) {
             final Optional<PlatformUser> optData = DiscordLink.getInstance().getStorage().getVerificationData(getId())
-                    .flatMap(Database.VerificationData::getUUID)
+                    .flatMap(Verification.VerificationData::getUUID)
                     .flatMap(PlatformUtils::getPlayerOffline);
             retrievedPlayer = true;
             return optData;

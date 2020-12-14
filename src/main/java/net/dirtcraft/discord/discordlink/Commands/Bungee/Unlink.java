@@ -3,6 +3,7 @@ package net.dirtcraft.discord.discordlink.Commands.Bungee;
 import net.dirtcraft.discord.discordlink.API.Channels;
 import net.dirtcraft.discord.discordlink.API.Roles;
 import net.dirtcraft.discord.discordlink.Storage.Database;
+import net.dirtcraft.discord.discordlink.Storage.tables.Verification;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dv8tion.jda.api.entities.Guild;
 import net.md_5.bungee.api.CommandSender;
@@ -27,7 +28,7 @@ public class Unlink extends Command {
     }
 
     private BaseComponent[] execute(ProxiedPlayer player){
-        Database.VerificationData data = storage.getVerificationData(player.getUniqueId()).orElse(null);
+        Verification.VerificationData data = storage.getVerificationData(player.getUniqueId()).orElse(null);
         if (data == null){
             return Utility.format("&cYour account is not verified!");
         } else {

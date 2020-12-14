@@ -1,22 +1,25 @@
 package net.dirtcraft.discord.discordlink.Events;
 
-import net.dirtcraft.discord.discordlink.API.Action;
-import net.dirtcraft.discord.discordlink.API.Channels;
-import net.dirtcraft.discord.discordlink.API.MessageSource;
-import net.dirtcraft.discord.discordlink.API.Roles;
+import net.dirtcraft.discord.discordlink.API.*;
+import net.dirtcraft.discord.discordlink.Commands.Bungee.Discord;
+import net.dirtcraft.discord.discordlink.Commands.Discord.Mute.MuteInfo;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommandManager;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Storage.Database;
+import net.dirtcraft.discord.discordlink.Storage.tables.Mutes;
+import net.dirtcraft.discord.discordlink.Storage.tables.Verification;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformChat;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUtils;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import javax.annotation.Nonnull;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import static net.dirtcraft.discord.discordlink.Utility.Utility.logCommand;
@@ -24,6 +27,19 @@ import static net.dirtcraft.discord.discordlink.Utility.Utility.toConsole;
 
 public class DiscordChatHandler extends ListenerAdapter {
     private final DiscordCommandManager commandManager = new DiscordCommandManager();
+
+    @Override
+    public void onGuildMemberRoleAdd(@Nonnull GuildMemberRoleAddEvent event) {
+        if (!event.getRoles().contains(Roles.MUTED.getRole())) return;
+        CompletableFuture.runAsync(()->{
+            Optional<Mutes.MuteData> data = DiscordLink.getInstance().getStorage().hasActiveMute(event.getMember().getIdLong());
+            if (!data.isPresent()) return;
+
+            Utility.setRoleIfAbsent(event.getMember().getIdLong(), Roles.MUTED);
+            new GuildMember(event.getMember()).sendMessage(MuteInfo.getInfo(data.get()));
+        });
+
+    }
 
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
@@ -71,7 +87,7 @@ public class DiscordChatHandler extends ListenerAdapter {
     public void processUnverifiedMessage(MessageSource sender, MessageReceivedEvent event){
         if (event.getChannelType() != ChannelType.PRIVATE) event.getMessage().delete().queue();
         Database database = DiscordLink.getInstance().getStorage();
-        Database.VerificationData data = database.getVerificationData(sender.getId()).orElse(null);
+        Verification.VerificationData data = database.getVerificationData(sender.getId()).orElse(null);
         if (data != null && data.getUUID().isPresent()) {
             Utility.setRoleIfAbsent(Channels.getGuild(), sender, Roles.VERIFIED);
             sender.sendCommandResponse("Verified role was missing, But you appear to be verified so it has been added again. Please send message or command again.");

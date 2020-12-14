@@ -11,6 +11,7 @@ import net.dirtcraft.discord.discordlink.Commands.Sources.ResponseScheduler;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Storage.Database;
 import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
+import net.dirtcraft.discord.discordlink.Storage.tables.Verification;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUser;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Sanctions.SanctionUtils;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
@@ -23,7 +24,6 @@ import javax.annotation.RegEx;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Optional;
-import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -31,7 +31,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class LiteBans extends SanctionUtils {
-    private final Timer timer = new Timer();
     private Channel sanctions;
     private DiscordResponder responder;
     private Database storage;
@@ -48,7 +47,7 @@ public class LiteBans extends SanctionUtils {
                     @Override
                     public void run() {
                         storage.getVerificationData(entry.getUuid())
-                                .flatMap(Database.VerificationData::getGuildMember)
+                                .flatMap(Verification.VerificationData::getGuildMember)
                                 .ifPresent(user->muteDiscordPlayer(entry, user));
                     }
                 }, 0);
@@ -60,7 +59,7 @@ public class LiteBans extends SanctionUtils {
                     @Override
                     public void run() {
                         storage.getVerificationData(entry.getUuid())
-                                .flatMap(Database.VerificationData::getGuildMember)
+                                .flatMap(Verification.VerificationData::getGuildMember)
                                 .ifPresent(user->unmuteDiscordPlayer(entry, user));
                     }
                 }, 0);

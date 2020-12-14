@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public abstract class Mutes extends Votes {
     protected abstract Connection getConnection();
@@ -90,8 +91,9 @@ public abstract class Mutes extends Votes {
 
     public Optional<MuteData> hasActiveMute(long discordId){
         try (Connection connection = getConnection();
-             PreparedStatement ps = connection.prepareStatement("SELECT * FROM discordmutedata WHERE active = ?")) {
-            ps.setBoolean(1, true);
+             PreparedStatement ps = connection.prepareStatement("SELECT * FROM discordmutedata WHERE subjectDiscord = ? AND active = ?")) {
+            ps.setLong(1, discordId);
+            ps.setBoolean(2, true);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     long id = rs.getLong("id");
@@ -174,6 +176,31 @@ public abstract class Mutes extends Votes {
         }
     }
 
+    public void buildMuteTable(){
+        String statment = "CREATE TABLE IF NOT EXISTS `discordmutedata` (\n" +
+                "\t`id` BIGINT(20) NOT NULL AUTO_INCREMENT,\n" +
+                "\t`submitterDiscord` BIGINT(20) NULL DEFAULT NULL,\n" +
+                "\t`submitterMinecraft` CHAR(36) NULL DEFAULT NULL COLLATE 'latin1_swedish_ci',\n" +
+                "\t`subjectDiscord` BIGINT(20) NOT NULL,\n" +
+                "\t`subjectMinecraft` CHAR(36) NULL DEFAULT NULL COLLATE 'latin1_swedish_ci',\n" +
+                "\t`removedByDiscord` BIGINT(20) NULL DEFAULT NULL,\n" +
+                "\t`removedByMinecraft` CHAR(36) NULL DEFAULT NULL COLLATE 'latin1_swedish_ci',\n" +
+                "\t`submitted` TIMESTAMP NOT NULL DEFAULT current_timestamp(),\n" +
+                "\t`removed` TIMESTAMP NULL DEFAULT NULL,\n" +
+                "\t`expires` TIMESTAMP NULL DEFAULT NULL,\n" +
+                "\t`reason` VARCHAR(2000) NOT NULL COLLATE 'latin1_swedish_ci',\n" +
+                "\t`active` BIT(1) NOT NULL DEFAULT b'1',\n" +
+                "\tINDEX `id` (`id`) USING BTREE\n" +
+                ");";
+        try (Connection connection = getConnection();
+             PreparedStatement ps = connection.prepareStatement(statment)) {
+            ps.execute();
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+        }
+
+    }
+
     @SuppressWarnings("FieldCanBeLocal")
     public static class MuteData {
         private final long id;
@@ -213,7 +240,9 @@ public abstract class Mutes extends Votes {
         }
 
         public boolean expired(){
-            return expires.after(Timestamp.from(Instant.now()));
+            if (expires == null) return false;
+            Timestamp now = Timestamp.from(Instant.now());
+            return now.after(expires);
         }
 
         public String getReason(){

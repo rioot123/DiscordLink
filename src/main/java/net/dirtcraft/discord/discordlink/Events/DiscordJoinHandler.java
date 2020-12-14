@@ -6,6 +6,7 @@ import net.dirtcraft.discord.discordlink.API.Roles;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Storage.Database;
 import net.dirtcraft.discord.discordlink.Storage.tables.Mutes;
+import net.dirtcraft.discord.discordlink.Storage.tables.Verification;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -25,7 +26,7 @@ public class DiscordJoinHandler extends ListenerAdapter {
         if (event.getUser().isBot()) return;
         Optional<GuildMember> optMember = db.getVerificationData(event.getUser().getId())
                 .filter(s->s.getMinecraftUser().isPresent())
-                .flatMap(Database.VerificationData::getGuildMember);
+                .flatMap(Verification.VerificationData::getGuildMember);
         optMember.ifPresent(user-> Utility.setRoleIfAbsent(Channels.getGuild(), user, Roles.VERIFIED));
         Optional<Mutes.MuteData> muteData = (db.hasActiveMute(event.getUser().getIdLong()));
         if (muteData.isPresent()) Utility.setRoleIfAbsent(event.getUser().getIdLong(), Roles.MUTED);

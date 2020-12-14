@@ -12,15 +12,17 @@ import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dv8tion.jda.api.EmbedBuilder;
 
-public class MuteBase extends DiscordCommandTree {
-    public MuteBase(){
-        DiscordCommand add = DiscordCommand.builder()
-                .setDescription("Mutes a player!")
-                .setCommandUsage("<@Discord> [duration] [reason]")
-                .setRequiredRoles(Roles.MOD)
-                .setCommandExecutor(new Mute())
-                .build();
+import java.util.Timer;
 
+public class MuteBase extends DiscordCommandTree {
+    DiscordCommand add = DiscordCommand.builder()
+            .setDescription("Mutes a player!")
+            .setCommandUsage("<@Discord> [duration] [reason]")
+            .setRequiredRoles(Roles.MOD)
+            .setCommandExecutor(new Mute())
+            .build();
+
+    public MuteBase(){
         DiscordCommand remove = DiscordCommand.builder()
                 .setDescription("Removes a players mute")
                 .setCommandUsage("<@Discord>")
@@ -35,13 +37,17 @@ public class MuteBase extends DiscordCommandTree {
                 .setCommandExecutor(new MuteInfo())
                 .build();
 
-        register(add, "add", "a");
-        register(remove, "remove", "r");
-        register(info, "info", "i");
+        register(add, "add");
+        register(remove, "remove");
+        register(info, "info");
     }
 
     @Override
     public void defaultResponse(MessageSource member, String command, java.util.List<String> args) throws DiscordCommandException {
+        if (!args.isEmpty() && !defaults.contains(args.get(0))) {
+            add.process(member, command, args);
+            return;
+        }
         EmbedBuilder embed = Utility.embedBuilder();
         String pre = PluginConfiguration.Prefixes.discordCommand;
         getCommandMap().forEach((alias, cmd)->{
