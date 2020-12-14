@@ -26,6 +26,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
+import java.util.regex.Pattern;
 
 import static net.dirtcraft.discord.discordlink.Storage.PluginConfiguration.Command.sanctions;
 import static net.dirtcraft.discord.discordlink.Storage.PluginConfiguration.Command.whiteList;
@@ -169,7 +170,7 @@ public class Utility {
     }
 
     private static boolean isWhitelisted(String command){
-        return whiteList.stream().anyMatch(command::startsWith);
+        return whiteList.stream().anyMatch(e->command.matches("(?i)^" + e + "( |$)"));
     }
 
     public static void sendPermissionError(MessageSource event){

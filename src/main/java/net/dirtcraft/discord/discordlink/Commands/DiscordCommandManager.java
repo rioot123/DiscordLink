@@ -2,6 +2,7 @@ package net.dirtcraft.discord.discordlink.Commands;
 
 import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.API.Roles;
+import net.dirtcraft.discord.discordlink.Commands.Discord.LobbyList;
 import net.dirtcraft.discord.discordlink.Commands.Discord.MuteBase;
 import net.dirtcraft.discord.discordlink.Commands.Discord.StopServer;
 import net.dirtcraft.discord.discordlink.Commands.Discord.Version;
@@ -37,6 +38,12 @@ public class DiscordCommandManager extends DiscordCommandTree {
                 .setRequiredRoles(Roles.DIRTY)
                 .build();
 
+        DiscordCommand list = DiscordCommand.builder()
+                .setDescription("Shows lobby players.")
+                .setCommandExecutor(new LobbyList())
+                .build();
+
+        register(list, "list");
         register(mute, "mute");
         register(halt, "proxy-halt");
         register(version, "version");

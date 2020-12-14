@@ -43,6 +43,7 @@ public class PluginConfiguration {
 
     @ConfigSerializable
     public static class HubChat {
+        @Setting public static boolean leaveJoinMessages = true;
         @Setting public static boolean enabled = true;
         @Setting public static String serverId = "Hub";
     }

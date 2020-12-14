@@ -3,6 +3,7 @@ package net.dirtcraft.discord.discordlink.Events;
 import net.dirtcraft.discord.discordlink.API.Channels;
 import net.dirtcraft.discord.discordlink.API.GuildMember;
 import net.dirtcraft.discord.discordlink.API.Roles;
+import net.dirtcraft.discord.discordlink.Commands.Discord.Mute.MuteInfo;
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Storage.Database;
 import net.dirtcraft.discord.discordlink.Storage.tables.Mutes;
@@ -28,8 +29,14 @@ public class DiscordJoinHandler extends ListenerAdapter {
                 .filter(s->s.getMinecraftUser().isPresent())
                 .flatMap(Verification.VerificationData::getGuildMember);
         optMember.ifPresent(user-> Utility.setRoleIfAbsent(Channels.getGuild(), user, Roles.VERIFIED));
-        Optional<Mutes.MuteData> muteData = (db.hasActiveMute(event.getUser().getIdLong()));
-        if (muteData.isPresent()) Utility.setRoleIfAbsent(event.getUser().getIdLong(), Roles.MUTED);
+        Optional<Mutes.MuteData> muteData = db.hasActiveMute(event.getUser().getIdLong());
+        muteData.ifPresent(data->{
+            Utility.setRoleIfAbsent(event.getUser().getIdLong(), Roles.MUTED);
+            GuildMember member = new GuildMember(event.getMember());
+            member.sendMessage("An active mute has been found linked to your account so it has been applied.\n" +
+                    "You can appeal this at <#590388043379376158>");
+            member.sendMessage(MuteInfo.getInfo(data));
+        });
     }
 
 }

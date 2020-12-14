@@ -56,7 +56,7 @@ public class Mute implements DiscordCommandExecutor {
         }
     }
 
-    public String getDuration(Timestamp date){
+    public static String getDuration(Timestamp date){
         Timestamp now = Timestamp.from(Instant.now());
         if (date == null) return "is permanent";
         else if (!date.after(now)) return "has already expired";

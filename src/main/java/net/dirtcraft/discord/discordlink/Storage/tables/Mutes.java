@@ -7,6 +7,8 @@ import net.dirtcraft.discord.discordlink.Utility.Utility;
 
 import java.sql.*;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +24,8 @@ public abstract class Mutes extends Votes {
              PreparedStatement ps = connection.prepareStatement("INSERT INTO discordmutedata " +
                      "(submitterMinecraft, subjectDiscord, subjectMinecraft, expires, reason) " +
                      "VALUES (?, ?, ?, ?, ?)")) {
+            boolean perm = expires.before(Timestamp.from(Instant.now().minus(10, ChronoUnit.DAYS)));
+            if (perm) expires = null;
             final String subjectUuid = subject.getPlayerData()
                     .map(PlatformUser::getUUID)
                     .map(UUID::toString)

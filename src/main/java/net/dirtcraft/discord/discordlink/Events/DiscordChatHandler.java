@@ -14,7 +14,9 @@ import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleRemoveEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -30,15 +32,17 @@ public class DiscordChatHandler extends ListenerAdapter {
 
     @Override
     public void onGuildMemberRoleAdd(@Nonnull GuildMemberRoleAddEvent event) {
-        if (!event.getRoles().contains(Roles.MUTED.getRole())) return;
+        if (!event.getRoles().contains(Roles.VERIFIED.getRole())) return;
         CompletableFuture.runAsync(()->{
             Optional<Mutes.MuteData> data = DiscordLink.getInstance().getStorage().hasActiveMute(event.getMember().getIdLong());
             if (!data.isPresent()) return;
 
             Utility.setRoleIfAbsent(event.getMember().getIdLong(), Roles.MUTED);
-            new GuildMember(event.getMember()).sendMessage(MuteInfo.getInfo(data.get()));
+            GuildMember member = new GuildMember(event.getMember());
+            member.sendMessage("An active mute has been found linked to your account so it has been applied.\n" +
+                    "You can appeal this at <#590388043379376158>");
+            member.sendMessage(MuteInfo.getInfo(data.get()));
         });
-
     }
 
     @Override
