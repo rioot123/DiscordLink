@@ -28,29 +28,32 @@ public class MuteInfo implements DiscordCommandExecutor {
         Database database = DiscordLink.getInstance().getStorage();
         Mutes.MuteData data = database.hasActiveMute(target.getIdLong()).orElseThrow(()->new DiscordCommandException("The player does not have an active mute!"));
 
+        source.sendCommandResponse(getInfo(data));
+    }
+
+    public static MessageEmbed getInfo(Mutes.MuteData data){
         String name = or(
                 "Unknown",
                 ()->data.getSubmitter()
-                .map(id->Channels.getGuild().retrieveMemberById(id))
-                .map(RestAction::complete)
-                .map(GuildMember::new)
-                .map(GuildMember::getEffectiveName),
+                        .map(id->Channels.getGuild().retrieveMemberById(id))
+                        .map(RestAction::complete)
+                        .map(GuildMember::new)
+                        .map(GuildMember::getEffectiveName),
                 ()->data.getSubmitterUUID()
-                .flatMap(PlatformUtils::getPlayerOffline)
-                .flatMap(PlatformUser::getName)
+                        .flatMap(PlatformUtils::getPlayerOffline)
+                        .flatMap(PlatformUser::getName)
         );
         if (!data.getSubmitter().isPresent()) name += " (via MC/Proxy)";
         else name += " (via Discord)";
-        MessageEmbed response = Utility.embedBuilder()
+        return Utility.embedBuilder()
                 .addField("Punisher", name, true)
                 .addField("Submitted", data.getSubmitted().toLocalDateTime().format(DateTimeFormatter.ofPattern("d MMM uuuu")), true)
                 .addField("Expires", getDuration(data.getExpires().orElse(null)), true)
                 .addField("Reason", data.getReason(), false)
                 .build();
-        source.sendCommandResponse(response);
     }
 
-    public String getDuration(Timestamp date){
+    private static String getDuration(Timestamp date){
         Timestamp now = Timestamp.from(Instant.now());
         if (date == null) return "Never.";
         else if (!date.after(now)) return "Has already expired";
@@ -73,7 +76,7 @@ public class MuteInfo implements DiscordCommandExecutor {
     }
 
     @SafeVarargs
-    public final <T> Optional<T> or(Supplier<Optional<T>>... optionals){
+    private static <T> Optional<T> or(Supplier<Optional<T>>... optionals){
         for (Supplier<Optional<T>> supplier : optionals) {
             Optional<T> optional = supplier.get();
             if (optional.isPresent()) return optional;
@@ -82,7 +85,7 @@ public class MuteInfo implements DiscordCommandExecutor {
     }
 
     @SafeVarargs
-    public final <T> T or(T t, Supplier<Optional<T>>... optionals){
+    private static <T> T or(T t, Supplier<Optional<T>>... optionals){
         for (Supplier<Optional<T>> supplier : optionals) {
             Optional<T> optional = supplier.get();
             if (optional.isPresent()) return optional.get();

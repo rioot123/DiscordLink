@@ -18,6 +18,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class MuteBase extends DiscordCommandTree {
+    boolean init = false;
+    Timer timer = new Timer();
     DiscordCommand add = DiscordCommand.builder()
             .setDescription("Mutes a player!")
             .setCommandUsage("<@Discord> [duration] [reason]")
@@ -65,23 +67,33 @@ public class MuteBase extends DiscordCommandTree {
     }
 
     private void observeMutes(){
-        Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
                 try {
-                    if (!PlatformUtils.isGameReady()) return;
-                    System.out.println("!!!!");
+                    if (!init || !PlatformUtils.isGameReady()) return;
                     DiscordLink.getInstance().getStorage().deactivateExpiredMutes();
                 } catch (Exception e){
                     e.printStackTrace();
                 }
             }
-        }, 0, 1000*60*60);
+        }, 0, 1000*60*30);
     }
 
     private void initDatabase(){
-
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                try {
+                    if (init || !PlatformUtils.isGameReady()) return;
+                    DiscordLink.getInstance().getStorage().buildMuteTable();
+                    init = true;
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        };
+        timer.schedule(timerTask, 0, 1000);
     }
 
 }

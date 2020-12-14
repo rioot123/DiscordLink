@@ -14,6 +14,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Optional;
 
 public class Mute implements DiscordCommandExecutor {
     @Override
@@ -30,6 +31,10 @@ public class Mute implements DiscordCommandExecutor {
                 "\nThe mute " + getDuration(expires) + "" +
                 "\nFeel free to make an appeal in <#590388043379376158>.";
         target.sendMessage(message);
+
+        source.sendCommandResponse(source.getAsMention() + " Mute has been applied to user " + target.getAsMention(), 30);
+        storage.hasActiveMute(target.getIdLong())
+                .ifPresent(data->source.sendCommandResponse(MuteInfo.getInfo(data), 30));
     }
 
     public Timestamp getExpireDate(List<String> args){
