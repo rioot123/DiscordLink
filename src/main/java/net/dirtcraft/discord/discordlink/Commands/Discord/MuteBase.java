@@ -7,20 +7,27 @@ import net.dirtcraft.discord.discordlink.Commands.Discord.Mute.MuteInfo;
 import net.dirtcraft.discord.discordlink.Commands.Discord.Mute.Unmute;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommand;
 import net.dirtcraft.discord.discordlink.Commands.DiscordCommandTree;
+import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Exceptions.DiscordCommandException;
 import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
+import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUtils;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dv8tion.jda.api.EmbedBuilder;
 
-public class MuteBase extends DiscordCommandTree {
-    public MuteBase(){
-        DiscordCommand add = DiscordCommand.builder()
-                .setDescription("Mutes a player!")
-                .setCommandUsage("<@Discord> [duration] [reason]")
-                .setRequiredRoles(Roles.MOD)
-                .setCommandExecutor(new Mute())
-                .build();
+import java.util.Timer;
+import java.util.TimerTask;
 
+public class MuteBase extends DiscordCommandTree {
+    DiscordCommand add = DiscordCommand.builder()
+            .setDescription("Mutes a player!")
+            .setCommandUsage("<@Discord> [duration] [reason]")
+            .setRequiredRoles(Roles.MOD)
+            .setCommandExecutor(new Mute())
+            .build();
+
+    public MuteBase(){
+        initDatabase();
+        observeMutes();
         DiscordCommand remove = DiscordCommand.builder()
                 .setDescription("Removes a players mute")
                 .setCommandUsage("<@Discord>")
@@ -35,13 +42,17 @@ public class MuteBase extends DiscordCommandTree {
                 .setCommandExecutor(new MuteInfo())
                 .build();
 
-        register(add, "add", "a");
-        register(remove, "remove", "r");
-        register(info, "info", "i");
+        register(add, "add");
+        register(remove, "remove");
+        register(info, "info");
     }
 
     @Override
     public void defaultResponse(MessageSource member, String command, java.util.List<String> args) throws DiscordCommandException {
+        if (!args.isEmpty() && !defaults.contains(args.get(0))) {
+            add.process(member, command, args);
+            return;
+        }
         EmbedBuilder embed = Utility.embedBuilder();
         String pre = PluginConfiguration.Main.discordCommand;
         getCommandMap().forEach((alias, cmd)->{
@@ -51,6 +62,26 @@ public class MuteBase extends DiscordCommandTree {
             embed.setFooter("Requested By: " + member.getUser().getAsTag(), member.getUser().getAvatarUrl());
         });
         member.sendCommandResponse(embed.build(), 30);
+    }
+
+    private void observeMutes(){
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                try {
+                    if (!PlatformUtils.isGameReady()) return;
+                    System.out.println("!!!!");
+                    DiscordLink.getInstance().getStorage().deactivateExpiredMutes();
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }, 0, 1000*60*60);
+    }
+
+    private void initDatabase(){
+
     }
 
 }

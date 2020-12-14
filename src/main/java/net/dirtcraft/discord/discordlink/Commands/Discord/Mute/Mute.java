@@ -18,22 +18,18 @@ import java.util.List;
 public class Mute implements DiscordCommandExecutor {
     @Override
     public void execute(MessageSource source, String command, List<String> args) throws DiscordCommandException {
-        try {
-            Database storage = DiscordLink.getInstance().getStorage();
-            GuildMember target = parseDiscord(args).orElseThrow(() -> new DiscordCommandException("Discord user not specified."));
-            Timestamp expires = getExpireDate(args);
-            String reason = args.isEmpty() ? "None given." : String.join(" ", args);
-            Utility.setRoleIfAbsent(Channels.getGuild(), target, Roles.MUTED);
-            storage.deactivateMute(source.getIdLong(), target.getIdLong());
-            storage.registerMute(source.getIdLong(), target, expires, reason);
-            String message = "You have been muted by " + source.getEffectiveName() + "for " +
-                    "```\n" + reason + "\n```" +
-                    "\nThe mute " + getDuration(expires) + "" +
-                    "\nFeel free to make an appeal in <#590388043379376158>.";
-            target.sendMessage(message);
-        } catch (Exception e){
-            e.printStackTrace();
-        }
+        GuildMember target = parseDiscord(args).orElseThrow(() -> new DiscordCommandException("Discord user not specified."));
+        Database storage = DiscordLink.getInstance().getStorage();
+        Timestamp expires = getExpireDate(args);
+        String reason = args.isEmpty() ? "None given." : String.join(" ", args);
+        Utility.setRoleIfAbsent(Channels.getGuild(), target, Roles.MUTED);
+        storage.deactivateMute(source.getIdLong(), target.getIdLong());
+        storage.registerMute(source.getIdLong(), target, expires, reason);
+        String message = "You have been muted by " + source.getEffectiveName() + " for " +
+                "```\n" + reason + "\n```" +
+                "\nThe mute " + getDuration(expires) + "" +
+                "\nFeel free to make an appeal in <#590388043379376158>.";
+        target.sendMessage(message);
     }
 
     public Timestamp getExpireDate(List<String> args){
@@ -58,23 +54,23 @@ public class Mute implements DiscordCommandExecutor {
 
     public String getDuration(Timestamp date){
         Timestamp now = Timestamp.from(Instant.now());
-        if (date == null) return "Is permanent";
-        else if (!date.after(now)) return "Has already expired";
+        if (date == null) return "is permanent";
+        else if (!date.after(now)) return "has already expired";
         long msRemaining = date.getTime() - now.getTime();
 
         long seconds = msRemaining / 1000;
         long minutes = seconds / 60;
 
-        if (minutes == 0) return "Will expire in " + seconds + " seconds.";
+        if (minutes == 0) return "will expire in " + seconds + " seconds.";
         long hours = minutes / 60;
         seconds = seconds % 60;
 
-        if (hours == 0) return "Will expire in " + minutes + " minutes, " + seconds + " seconds.";
+        if (hours == 0) return "will expire in " + minutes + " minutes, " + seconds + " seconds.";
         long days = hours / 24;
         minutes = minutes % 60;
 
-        if (days == 0) return "Will expire in " + hours + " hours, " + minutes + " minutes.";
+        if (days == 0) return "will expire in " + hours + " hours, " + minutes + " minutes.";
         hours = hours % 24;
-        return "Will expire in " + days + " days, " + hours + " hours.";
+        return "will expire in " + days + " days, " + hours + " hours.";
     }
 }

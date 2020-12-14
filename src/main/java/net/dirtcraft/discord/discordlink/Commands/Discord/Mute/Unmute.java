@@ -16,6 +16,5 @@ public class Unmute implements DiscordCommandExecutor {
         GuildMember target = parseDiscord(args).orElseThrow(()->new DiscordCommandException("Discord user not specified."));
         Utility.removeRoleIfPresent(target.getIdLong(), Roles.MUTED);
         DiscordLink.getInstance().getStorage().deactivateMute(source.getIdLong(), target.getIdLong());
-
     }
 }

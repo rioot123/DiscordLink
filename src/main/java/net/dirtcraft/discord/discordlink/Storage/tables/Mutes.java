@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public abstract class Mutes extends Votes {
     protected abstract Connection getConnection();
@@ -90,8 +91,9 @@ public abstract class Mutes extends Votes {
 
     public Optional<MuteData> hasActiveMute(long discordId){
         try (Connection connection = getConnection();
-             PreparedStatement ps = connection.prepareStatement("SELECT * FROM discordmutedata WHERE active = ?")) {
-            ps.setBoolean(1, true);
+             PreparedStatement ps = connection.prepareStatement("SELECT * FROM discordmutedata WHERE subjectDiscord = ? AND active = ?")) {
+            ps.setLong(1, discordId);
+            ps.setBoolean(2, true);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     long id = rs.getLong("id");
@@ -213,7 +215,8 @@ public abstract class Mutes extends Votes {
         }
 
         public boolean expired(){
-            return expires.after(Timestamp.from(Instant.now()));
+            Timestamp now = Timestamp.from(Instant.now());
+            return now.after(expires);
         }
 
         public String getReason(){
