@@ -1,11 +1,15 @@
 package net.dirtcraft.discord.discordlink.Utility.Compatability.Sanctions.LiteBans;
 
+import litebans.api.Entry;
 import litebans.api.Events;
 import net.dirtcraft.discord.discordlink.API.Channel;
+import net.dirtcraft.discord.discordlink.API.GuildMember;
 import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.Commands.Sources.ConsoleSource;
 import net.dirtcraft.discord.discordlink.Commands.Sources.DiscordResponder;
 import net.dirtcraft.discord.discordlink.Commands.Sources.ResponseScheduler;
+import net.dirtcraft.discord.discordlink.DiscordLink;
+import net.dirtcraft.discord.discordlink.Storage.Database;
 import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUser;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Sanctions.SanctionUtils;
@@ -16,9 +20,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.RegEx;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -27,11 +34,38 @@ public class LiteBans extends SanctionUtils {
     private final Timer timer = new Timer();
     private Channel sanctions;
     private DiscordResponder responder;
+    private Database storage;
 
     public LiteBans(Channel channel) {
         this.sanctions = channel;
         this.responder = sanctions.getChatResponder();
+        this.storage = DiscordLink.getInstance().getStorage();
         Events.get().register(new Events.Listener() {
+            @Override
+            public void entryAdded(Entry entry){
+                String type = entry.getType();
+                if (type.equals("mute")) timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        storage.getVerificationData(entry.getUuid())
+                                .flatMap(Database.VerificationData::getGuildMember)
+                                .ifPresent(user->muteDiscordPlayer(entry, user));
+                    }
+                }, 0);
+            }
+            @Override
+            public void entryRemoved(Entry entry){
+                String type = entry.getType();
+                if (type.equals("mute")) timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        storage.getVerificationData(entry.getUuid())
+                                .flatMap(Database.VerificationData::getGuildMember)
+                                .ifPresent(user->unmuteDiscordPlayer(entry, user));
+                    }
+                }, 0);
+            }
+
             @Override
             public void broadcastSent(@NotNull String message, @Nullable String type) {
                 message = Utility.stripColorCodes(message);
@@ -50,6 +84,19 @@ public class LiteBans extends SanctionUtils {
                     e.printStackTrace();
                     return null;
                 });
+    }
+
+    public void muteDiscordPlayer(Entry entry, GuildMember member){
+        UUID staff = entry.getExecutorUUID() == null? null: UUID.fromString(entry.getExecutorUUID());
+        Timestamp expires = Timestamp.from(Instant.ofEpochMilli(entry.getDateEnd()));
+        String reason = entry.getReason();
+        storage.deactivateMute(staff, member.getIdLong());
+        storage.registerMute(staff, member, expires, reason);
+    }
+
+    public void unmuteDiscordPlayer(Entry entry, GuildMember member){
+        UUID staff = entry.getExecutorUUID() == null? null: UUID.fromString(entry.getExecutorUUID());
+        storage.deactivateMute(staff, member.getIdLong());
     }
 
     @Override

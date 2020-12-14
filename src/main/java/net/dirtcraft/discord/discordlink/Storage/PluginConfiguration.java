@@ -74,6 +74,7 @@ public class PluginConfiguration {
         @Setting public static long verifiedRoleID = 578447006662524940L;
         @Setting public static long donatorRoleID = 591145069810155530L;
         @Setting public static long nitroRoleID = 581195961813172225L;
+        @Setting public static long muteRoleID = 589777192024670228L;
     }
 
     @ConfigSerializable

@@ -2,6 +2,7 @@ package net.dirtcraft.discord.discordlink.Utility.Compatability.Platform;
 
 import net.dirtcraft.discord.discordlink.DiscordLink;
 import net.dirtcraft.discord.discordlink.Storage.Database;
+import net.dirtcraft.discord.discordlink.Storage.tables.Votes;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -21,11 +22,11 @@ public class PlatformUtils {
         if (!optVoter.isPresent()) {
             username = APIHelper.getLatestUsername(uuid).orElse(null);
             if (username != null) database.createVoteRecord(uuid, username);
-        } else if (!optVoter.map(Database.VoterData::getUsername).isPresent() || !optVoter.get().hasVotedInPastWeek()) {
+        } else if (!optVoter.map(Votes.VoterData::getUsername).isPresent() || !optVoter.get().hasVotedInPastWeek()) {
             username = APIHelper.getLatestUsername(uuid).orElse(null);
             if (username != null) database.updateUsername(uuid, username);
         } else {
-            username = optVoter.map(Database.VoterData::getUsername).get();
+            username = optVoter.map(Votes.VoterData::getUsername).get();
         }
         return Optional.of(new PlatformUser(uuid, username));
     }

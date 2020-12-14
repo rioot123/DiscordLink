@@ -19,6 +19,11 @@ public class GuildMember extends WrappedMember {
     private List<Roles> roles;
     private Roles highestRank;
 
+    public static Optional<GuildMember> fromDiscordId(long id){
+        return Optional.ofNullable(Channels.getGuild().getMemberById(id))
+                .map(GuildMember::new);
+    }
+
     public static Optional<GuildMember> fromPlayerId(UUID player){
         final Optional<GuildMember> profile =  DiscordLink.getInstance().getStorage().getVerificationData(player)
                 .flatMap(Database.VerificationData::getDiscordId)
