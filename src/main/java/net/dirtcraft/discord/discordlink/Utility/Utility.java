@@ -26,6 +26,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
+import java.util.regex.Pattern;
 
 import static net.dirtcraft.discord.discordlink.Storage.PluginConfiguration.Command.sanctions;
 import static net.dirtcraft.discord.discordlink.Storage.PluginConfiguration.Command.whiteList;
@@ -95,8 +96,32 @@ public class Utility {
         } catch (Exception ignored){}
     }
 
+    public static void setRoleIfAbsent(long id, Roles role){
+        try {
+            Guild guild = Channels.getGuild();
+            Member discord = guild.retrieveMemberById(id).complete();
+            if (discord == null) return;
+            GuildMember member = new GuildMember(discord);
+            Role discordRole = role.getRole();
+            if (discordRole == null || member.hasRole(role)) return;
+            guild.addRoleToMember(member, discordRole).submit();
+        } catch (Exception ignored){}
+    }
+
     public static void removeRoleIfPresent(Guild guild, GuildMember member, Roles role){
         try {
+            Role discordRole = role.getRole();
+            if (discordRole == null || !member.hasRole(role)) return;
+            guild.removeRoleFromMember(member, discordRole).submit();
+        } catch (Exception ignored){}
+    }
+
+    public static void removeRoleIfPresent(long id, Roles role){
+        try {
+            Guild guild = Channels.getGuild();
+            Member discord = guild.retrieveMemberById(id).complete();
+            if (discord == null) return;
+            GuildMember member = new GuildMember(discord);
             Role discordRole = role.getRole();
             if (discordRole == null || !member.hasRole(role)) return;
             guild.removeRoleFromMember(member, discordRole).submit();
@@ -141,11 +166,11 @@ public class Utility {
     }
 
     private static boolean isSanction(String command){
-        return sanctions.stream().anyMatch(command::startsWith);
+        return sanctions.stream().anyMatch(e->command.matches("^\\b" + e + "\\b(.|\n)*?$"));
     }
 
     private static boolean isWhitelisted(String command){
-        return whiteList.stream().anyMatch(command::startsWith);
+        return whiteList.stream().anyMatch(e->command.matches("^\\b" + e + "\\b(.|\n)*?$"));
     }
 
     public static void sendPermissionError(MessageSource event){

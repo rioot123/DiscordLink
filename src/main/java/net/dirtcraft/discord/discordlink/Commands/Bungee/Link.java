@@ -5,6 +5,7 @@ import com.google.common.io.ByteStreams;
 import net.dirtcraft.discord.discordlink.API.GuildMember;
 import net.dirtcraft.discord.discordlink.Storage.Database;
 import net.dirtcraft.discord.discordlink.Storage.Settings;
+import net.dirtcraft.discord.discordlink.Storage.tables.Verification;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUtils;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.md_5.bungee.api.CommandSender;
@@ -38,8 +39,8 @@ public class Link extends Command {
     }
 
     private BaseComponent[] verify(ProxiedPlayer player, String code) {
-        Optional<Database.VerificationData> optData = storage.getVerificationData(player.getUniqueId());
-        if (optData.isPresent() && !optData.flatMap(Database.VerificationData::getMember).isPresent()){
+        Optional<Verification.VerificationData> optData = storage.getVerificationData(player.getUniqueId());
+        if (optData.isPresent() && !optData.flatMap(Verification.VerificationData::getMember).isPresent()){
             String invite = "&cYour Discord account has already been verified, but it is not in the DirtCraft Discord!";
             invite += "\n&5&nClick Me&7 to &ajoin &7it";
             return sendDiscordInvite(invite);
@@ -49,8 +50,8 @@ public class Link extends Command {
             return Utility.format("&cThe code &e" + code + "&c is not valid!");
         }
 
-        GuildMember member = optData.flatMap(Database.VerificationData::getGuildMember).orElse(null);
-        if (member == null && !optData.flatMap(Database.VerificationData::getDiscordUser).isPresent()) {
+        GuildMember member = optData.flatMap(Verification.VerificationData::getGuildMember).orElse(null);
+        if (member == null && !optData.flatMap(Verification.VerificationData::getDiscordUser).isPresent()) {
             return Utility.format("&cCould not verify your Discord account, please contact an Administrator!");
         } else if (member == null) {
             String invite = "&cYour Discord account has been verified, but it is not in the DirtCraft Discord!";
@@ -67,8 +68,8 @@ public class Link extends Command {
     }
 
     private BaseComponent[] usage(ProxiedPlayer player){
-        Optional<Database.VerificationData> optData = storage.getVerificationData(player.getUniqueId());
-        if (optData.flatMap(Database.VerificationData::getGuildMember).isPresent()) {
+        Optional<Verification.VerificationData> optData = storage.getVerificationData(player.getUniqueId());
+        if (optData.flatMap(Verification.VerificationData::getGuildMember).isPresent()) {
             return sendAlreadyVerifiedError(optData);
         } else {
             String invite = "\n&5&nClick Me&7 to link your &9Discord&7 account and unlock additional features!\n";
@@ -84,8 +85,8 @@ public class Link extends Command {
     }
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    private BaseComponent[] sendAlreadyVerifiedError(Optional<Database.VerificationData> optData){
-        String response = optData.flatMap(Database.VerificationData::getDiscordUser)
+    private BaseComponent[] sendAlreadyVerifiedError(Optional<Verification.VerificationData> optData){
+        String response = optData.flatMap(Verification.VerificationData::getDiscordUser)
                 .map(user -> "&cYour account is already verified with &6" + user.getName() + "&8#&7" + user.getDiscriminator() + "&c!")
                 .orElse("&cYour account is already verified!");
         return Utility.format(response);

@@ -10,8 +10,7 @@ import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.Platform
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.Server;
-import net.md_5.bungee.api.event.ChatEvent;
-import net.md_5.bungee.api.event.PostLoginEvent;
+import net.md_5.bungee.api.event.*;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 
@@ -41,5 +40,25 @@ public class BungeeEventHandler implements Listener {
         if (!(event.getReceiver() instanceof Server) || event.isCommand()) return;
         if (!((Server) event.getReceiver()).getInfo().getName().equalsIgnoreCase(PluginConfiguration.HubChat.serverId)) return;
         Channels.sendPlayerMessage("[HUB]", event.getSender().toString(), event.getMessage());
+    }
+
+    @EventHandler
+    public void onJoin(ServerConnectedEvent event){
+        if (!PluginConfiguration.HubChat.leaveJoinMessages) return;
+        if (!event.getServer().getInfo().getName().equalsIgnoreCase(PluginConfiguration.HubChat.serverId)) return;
+        Channels.getDefaultChat().sendMessage(PluginConfiguration.Format.playerJoin
+                .replace("{username}", event.getPlayer().getName())
+                .replace("{prefix}", "")
+        );
+    }
+
+    @EventHandler
+    public void onLeave(ServerDisconnectEvent event){
+        if (!PluginConfiguration.HubChat.leaveJoinMessages) return;
+        if (!event.getTarget().getName().equalsIgnoreCase(PluginConfiguration.HubChat.serverId)) return;
+        Channels.getDefaultChat().sendMessage(PluginConfiguration.Format.playerDisconnect
+                .replace("{username}", event.getPlayer().getName())
+                .replace("{prefix}", "")
+        );
     }
 }

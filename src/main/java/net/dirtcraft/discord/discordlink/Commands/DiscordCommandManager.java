@@ -2,6 +2,8 @@ package net.dirtcraft.discord.discordlink.Commands;
 
 import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.API.Roles;
+import net.dirtcraft.discord.discordlink.Commands.Discord.LobbyList;
+import net.dirtcraft.discord.discordlink.Commands.Discord.MuteBase;
 import net.dirtcraft.discord.discordlink.Commands.Discord.StopServer;
 import net.dirtcraft.discord.discordlink.Commands.Discord.Version;
 import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
@@ -18,6 +20,12 @@ public class DiscordCommandManager extends DiscordCommandTree {
     private final HashSet<String> defaultAliases = new HashSet<>(Arrays.asList("", "help"));
 
     public DiscordCommandManager() {
+        DiscordCommand mute = DiscordCommand.builder()
+                .setDescription("Command base for mute manipulation")
+                .setCommandExecutor(new MuteBase())
+                .setRequiredRoles(Roles.STAFF)
+                .build();
+
         DiscordCommand halt = DiscordCommand.builder()
                 .setDescription("Abruptly stops the server.")
                 .setCommandExecutor(new StopServer())
@@ -30,6 +38,13 @@ public class DiscordCommandManager extends DiscordCommandTree {
                 .setRequiredRoles(Roles.DIRTY)
                 .build();
 
+        DiscordCommand list = DiscordCommand.builder()
+                .setDescription("Shows lobby players.")
+                .setCommandExecutor(new LobbyList())
+                .build();
+
+        register(list, "list");
+        register(mute, "mute");
         register(halt, "proxy-halt");
         register(version, "version");
     }
