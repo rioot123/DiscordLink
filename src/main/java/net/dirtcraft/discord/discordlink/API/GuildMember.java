@@ -80,6 +80,10 @@ public class GuildMember extends WrappedMember {
         return roles.contains(Roles.STAFF);
     }
 
+    public boolean isMuted(){
+        return roles.contains(Roles.MUTED);
+    }
+
     public boolean isDonor(){
         return roles.contains(Roles.DONOR);
     }

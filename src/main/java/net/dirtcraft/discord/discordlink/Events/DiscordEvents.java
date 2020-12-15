@@ -43,16 +43,19 @@ public class DiscordEvents extends ListenerAdapter {
     }
 
     public void processGuildMessage(MessageSource sender, MessageReceivedEvent event) {
+        if (sender.isMuted()) {
+            if (event.getChannelType() != ChannelType.PRIVATE) event.getMessage().delete().queue();
+            sender.sendCommandResponse("<@" + sender.getId() + "> You are **not** allowed to talk there! Please open an appeal in <#590388043379376158> to lift your sanction.", 5);
+        }
+
         final String rawMessage = event.getMessage().getContentRaw();
         final Action intent = Action.fromMessageRaw(rawMessage);
-
-        if (sender.hasRole(Roles.MUTED)) sender.getMessage().delete().queue(s->{},e->{});
-        else if (intent.isBotCommand()) commandManager.process(sender, intent.getCommand(event));
+        if (intent.isBotCommand()) commandManager.process(sender, intent.getCommand(event));
         else if (PlatformUtils.isGameReady() && intent.isChat()) PlatformChat.discordToMCAsync(sender, event);
         else if (PlatformUtils.isGameReady() && intent.isConsole()) {
             boolean executed = toConsole(intent.getCommand(event), sender, intent);
             if (executed && intent.isPrivate()) Utility.logCommand(sender, "__Executed Private Command__");
-            event.getMessage().delete().queue(s->{},e->{});
+            event.getMessage().delete().queue(s -> {}, e -> {});
         }
     }
 

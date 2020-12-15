@@ -25,7 +25,7 @@ public class Kits implements DiscordCommandExecutor {
             player = source.getPlayerData();
         } else {
             if (!source.isStaff()) throw new DiscordPermissionException();
-            player = parseIdentifier(args.get(0));
+            player = parseMinecraft(args.get(0));
         }
 
         if (!player.isPresent()) {

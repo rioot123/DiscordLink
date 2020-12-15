@@ -96,15 +96,9 @@ public class DiscordCommandManager extends DiscordCommandTree {
                 .build();
 
         DiscordCommand mute = DiscordCommand.builder()
-                .setDescription("Mutes a discord account")
-                .setRequiredRoles(Roles.MOD)
-                .setCommandExecutor(new Mute())
-                .build();
-
-        DiscordCommand unmute = DiscordCommand.builder()
-                .setDescription("allows a muted player to speak")
-                .setRequiredRoles(Roles.MOD)
-                .setCommandExecutor(new Unmute())
+                .setDescription("Command base for mute manipulation")
+                .setRequiredRoles(Roles.STAFF)
+                .setCommandExecutor(new MuteBase())
                 .build();
 
         register(list, "list", "players");
@@ -123,7 +117,6 @@ public class DiscordCommandManager extends DiscordCommandTree {
         register(version, "version", "info");
         register(logs, "logs");
         register(mute, "mute");
-        register(unmute, "unmute");
     }
 
     public void process(MessageSource member, String args){
