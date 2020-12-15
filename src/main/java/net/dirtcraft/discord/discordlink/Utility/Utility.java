@@ -166,11 +166,11 @@ public class Utility {
     }
 
     private static boolean isSanction(String command){
-        return sanctions.stream().anyMatch(command::startsWith);
+        return sanctions.stream().anyMatch(e->command.matches("^\\b" + e + "\\b(.|\n)*?$"));
     }
 
     private static boolean isWhitelisted(String command){
-        return whiteList.stream().anyMatch(e->command.matches("(?i)^" + e + "( |$)"));
+        return whiteList.stream().anyMatch(e->command.matches("^\\b" + e + "\\b(.|\n)*?$"));
     }
 
     public static void sendPermissionError(MessageSource event){

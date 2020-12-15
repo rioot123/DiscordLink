@@ -11,7 +11,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public abstract class SanctionUtils {
-    protected static boolean init = false;
+    //protected static boolean init = false;
     protected static Timer timer = new Timer();
     public static SanctionUtils INSTANCE = getInstance();
     public static String VERSION;
@@ -53,7 +53,7 @@ public abstract class SanctionUtils {
             @Override
             public void run() {
                 try {
-                    if (!init || !PlatformUtils.isGameReady()) return;
+                    if (!PlatformUtils.isGameReady()) return;
                     DiscordLink.getInstance().getStorage().deactivateExpiredMutes();
                 } catch (Exception e){
                     e.printStackTrace();
@@ -62,6 +62,7 @@ public abstract class SanctionUtils {
         }, 0, 1000*60*5);
     }
 
+    /*
     private static void initDatabase(){
         TimerTask timerTask = new TimerTask() {
             @Override
@@ -77,4 +78,5 @@ public abstract class SanctionUtils {
         };
         timer.schedule(timerTask, 0, 1000);
     }
+     */
 }
