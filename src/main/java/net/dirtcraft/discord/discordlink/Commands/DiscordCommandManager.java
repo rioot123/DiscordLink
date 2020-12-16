@@ -3,6 +3,7 @@ package net.dirtcraft.discord.discordlink.Commands;
 import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.API.Roles;
 import net.dirtcraft.discord.discordlink.Commands.Discord.*;
+import net.dirtcraft.discord.discordlink.Commands.Discord.Item.ItemList;
 import net.dirtcraft.discord.discordlink.Exceptions.DiscordCommandException;
 import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
@@ -113,8 +114,8 @@ public class DiscordCommandManager extends DiscordCommandTree {
 
         DiscordCommand inv = DiscordCommand.builder()
                 .setDescription("Debug")
-                .setRequiredRoles(Roles.DIRTY)
-                .setCommandExecutor(new Items())
+                .setRequiredRoles(Roles.MOD)
+                .setCommandExecutor(new ItemBase())
                 .build();
 
         DiscordCommand logs = DiscordCommand.builder()
