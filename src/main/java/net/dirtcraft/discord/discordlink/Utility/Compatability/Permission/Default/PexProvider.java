@@ -88,24 +88,24 @@ public class PexProvider extends PermissionUtils {
         PermissionUser user = api.getUser(target);
         PermissionGroup current = ladder.get(position);
         PermissionGroup next = ladder.get(position + 1);
-        if (current == null || next == null || user == null || hasPermission(source, next)) return Optional.empty();
+        if (next == null || user == null || !hasPermission(source, next)) return Optional.empty();
+        if (current != null) user.removeGroup(current);
         user.addGroup(next);
-        user.removeGroup(current);
         user.save();
 
-        return Optional.of(new RankUpdate(target, next.getIdentifier(), current.getIdentifier()));
+        return Optional.of(new RankUpdate(target, next.getIdentifier(), current == null? null: current.getIdentifier()));
     }
 
     public Optional<RankUpdate> demoteTarget(PlatformPlayer source, UUID target, Map<Integer, PermissionGroup> ladder, int position){
         PermissionUser user = api.getUser(target);
         PermissionGroup current = ladder.get(position);
         PermissionGroup previous = ladder.get(position - 1);
-        if (current == null || previous == null || user == null || hasPermission(source, current)) return Optional.empty();
-        user.addGroup(previous);
+        if (current == null || user == null || !hasPermission(source, current)) return Optional.empty();
+        if (previous != null) user.addGroup(previous);
         user.removeGroup(current);
         user.save();
 
-        return Optional.of(new RankUpdate(target, previous.getIdentifier(), current.getIdentifier()));
+        return Optional.of(new RankUpdate(target, previous == null? null: previous.getIdentifier(), current.getIdentifier()));
     }
 
     private boolean hasPermission(PlatformPlayer source, PermissionGroup group){

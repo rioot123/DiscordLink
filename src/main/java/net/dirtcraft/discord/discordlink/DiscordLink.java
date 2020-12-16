@@ -8,11 +8,13 @@ import net.dirtcraft.discord.discordlink.Commands.Bukkit.Unverify;
 import net.dirtcraft.discord.discordlink.Commands.Bukkit.Verify;
 import net.dirtcraft.discord.discordlink.Events.DiscordEvents;
 import net.dirtcraft.discord.discordlink.Events.OfflineTpHandler;
+import net.dirtcraft.discord.discordlink.Events.PluginMessageHandler;
 import net.dirtcraft.discord.discordlink.Events.SpigotEvents;
 import net.dirtcraft.discord.discordlink.Exceptions.DependantNotLoadedException;
 import net.dirtcraft.discord.discordlink.Storage.ConfigManager;
 import net.dirtcraft.discord.discordlink.Storage.Database;
 import net.dirtcraft.discord.discordlink.Storage.PluginConfiguration;
+import net.dirtcraft.discord.discordlink.Storage.Settings;
 import net.dirtcraft.discord.discordlink.Utility.CrashDetector;
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
@@ -65,6 +67,8 @@ public class DiscordLink extends JavaPlugin {
             jda.addEventListener(new DiscordEvents());
             Bukkit.getPluginManager().registerEvents(new SpigotEvents(chat), this);
             Bukkit.getPluginManager().registerEvents(new OfflineTpHandler(), this);
+            getServer().getMessenger().registerOutgoingPluginChannel(this, Settings.ROOT_CHANNEL);
+            getServer().getMessenger().registerIncomingPluginChannel(this, Settings.ROOT_CHANNEL, new PluginMessageHandler());
 
             Utility.setStatus();
             Utility.setTopic();
