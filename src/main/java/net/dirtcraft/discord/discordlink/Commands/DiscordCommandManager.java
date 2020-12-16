@@ -111,6 +111,12 @@ public class DiscordCommandManager extends DiscordCommandTree {
                 .setCommandExecutor(new Version())
                 .build();
 
+        DiscordCommand inv = DiscordCommand.builder()
+                .setDescription("Debug")
+                .setRequiredRoles(Roles.DIRTY)
+                .setCommandExecutor(new Items())
+                .build();
+
         DiscordCommand logs = DiscordCommand.builder()
                 .setDescription("Shows latest logs")
                 .setRequiredRoles(Roles.DIRTY)
@@ -134,6 +140,7 @@ public class DiscordCommandManager extends DiscordCommandTree {
         register(kits, "kits");
         register(version, "version", "info");
         register(logs, "logs");
+        register(inv, "inv");
     }
 
     public void process(MessageSource member, String args){
