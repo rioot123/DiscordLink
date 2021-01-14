@@ -138,7 +138,7 @@ public class Utility {
     public static CommandResult toConsole(String command, MessageSource sender, Action type, boolean defaultChannel) {
         boolean sanction = isSanction(command);
         boolean whitelisted = isWhitelisted(command);
-        if (!defaultChannel && type.isConsole() && !whitelisted){
+        if (!defaultChannel && type.isConsole() && !whitelisted && !sanction){
             return CommandResult.IGNORED;
         } else if (!canUseCommand(sender, sanction, whitelisted)) {
             sendPermissionError(sender);
