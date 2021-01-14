@@ -135,10 +135,12 @@ public class Utility {
         } catch (Exception ignored){ }
     }
 
-    public static CommandResult toConsole(String command, MessageSource sender, Action type) {
+    public static CommandResult toConsole(String command, MessageSource sender, Action type, boolean defaultChannel) {
         boolean sanction = isSanction(command);
         boolean whitelisted = isWhitelisted(command);
-        if (!canUseCommand(sender, sanction, whitelisted)) {
+        if (!defaultChannel && type.isConsole() && !whitelisted){
+            return CommandResult.IGNORED;
+        } else if (!canUseCommand(sender, sanction, whitelisted)) {
             sendPermissionError(sender);
             return CommandResult.FAILURE;
         } else if (sanction) {

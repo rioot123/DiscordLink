@@ -66,15 +66,16 @@ public class DiscordChatHandler extends ListenerAdapter {
     public void processGuildMessage(MessageSource sender, MessageReceivedEvent event) {
         final String rawMessage = event.getMessage().getContentRaw();
         final Action intent = Action.fromMessageRaw(rawMessage);
+        final boolean defaultChannel = Channels.isDefault(event.getChannel());
 
         if (intent.isChat()){
-            if (!Channels.isDefault(event.getChannel())) return;
+            if (!defaultChannel) return;
             PlatformChat.INSTANCE.discordToMCAsync(sender, event.getMessage().getContentDisplay());
         } else if (intent.isBotCommand()){
-            if (!Channels.isDefault(event.getChannel())) return;
+            if (!defaultChannel) return;
             commandManager.process(sender, intent.getCommand(event));
         } else if (intent.isConsole() || intent.isBungee()) {
-            Utility.CommandResult executed = toConsole(intent.getCommand(event), sender, intent);
+            Utility.CommandResult executed = toConsole(intent.getCommand(event), sender, intent, defaultChannel);
             if (executed == Utility.CommandResult.SUCCESS && intent.isPrivate()) Utility.logCommand(sender, "__Executed Private Command__");
             if (executed != Utility.CommandResult.IGNORED) event.getMessage().delete().queue();
         }
@@ -85,7 +86,7 @@ public class DiscordChatHandler extends ListenerAdapter {
         final Action intent = Action.fromMessageRaw(event.getMessage().getContentRaw()) == Action.DISCORD_COMMAND? Action.DISCORD_COMMAND: Action.PRIVATE_BUNGEE;
         final String message = Action.filterConsolePrefixes(event.getMessage().getContentRaw());
         if (intent == Action.DISCORD_COMMAND) commandManager.process(sender, intent.getCommand(event));
-        else if (toConsole(message, sender, intent) == Utility.CommandResult.SUCCESS) logCommand(sender, "__Executed Private Command via DM__");
+        else if (toConsole(message, sender, intent, true) == Utility.CommandResult.SUCCESS) logCommand(sender, "__Executed Private Command via DM__");
     }
 
     public void processUnverifiedMessage(MessageSource sender, MessageReceivedEvent event){
