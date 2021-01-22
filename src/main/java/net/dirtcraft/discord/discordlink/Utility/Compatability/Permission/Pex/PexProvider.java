@@ -1,4 +1,4 @@
-package net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.Default;
+package net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.Pex;
 
 import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.Commands.Sources.ConsoleSource;

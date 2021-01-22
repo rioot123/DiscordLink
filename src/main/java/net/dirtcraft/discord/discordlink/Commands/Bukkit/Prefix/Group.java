@@ -4,7 +4,7 @@ import net.dirtcraft.discord.discordlink.Commands.Bukkit.ThermosSubCommand;
 import net.dirtcraft.discord.discordlink.Commands.Sources.ConsoleSource;
 import net.dirtcraft.discord.discordlink.Storage.Permission;
 import net.dirtcraft.discord.discordlink.Storage.Settings;
-import net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.Default.PexProvider;
+import net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.Pex.PexProvider;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.PermissionUtils;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUser;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUtils;
