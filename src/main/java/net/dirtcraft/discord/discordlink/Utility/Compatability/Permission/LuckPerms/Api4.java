@@ -1,19 +1,19 @@
 package net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.LuckPerms;
 
 import me.lucko.luckperms.api.*;
+import me.lucko.luckperms.api.caching.CachedData;
 import me.lucko.luckperms.api.caching.MetaData;
 import me.lucko.luckperms.api.context.ContextSet;
 import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformPlayer;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUser;
+import net.dirtcraft.discord.discordlink.Utility.Pair;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import javax.annotation.Nullable;
-import java.util.List;
-import java.util.Optional;
-import java.util.SortedSet;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import static net.dirtcraft.discord.discordlink.Storage.Permission.PROMOTE_PERMISSION_GROUP_PREFIX;
 
@@ -80,6 +80,40 @@ public class Api4 extends LuckPermissions {
         if (source == null || !target.isPresent() || !track.isPresent()) return Optional.empty();
         else if (promote) return promoteTarget(source, target.get(), track.get());
         else return demoteTarget(source, target.get(), track.get());
+    }
+
+    @Override
+    public Map<String, String> getUserGroupPrefixMap(PlatformUser user) {
+        @NonNull Set<Group> groups = api.getGroupManager().getLoadedGroups();
+        return groups.stream()
+                .filter(g->user.hasPermission(g.getName()))
+                .map(g->new Pair<>(g.getDisplayName(), g.getCachedData().calculateMeta(Contexts.of(contexts, Contexts.global().getSettings())).getPrefix()))
+                .collect(Collectors.toMap(Pair::getKey, Pair::getValue));
+    }
+
+    @Override
+    public Optional<String> getGroupPrefix(String name) {
+        Group group = api.getGroupManager().getGroup(name);
+        return Optional.ofNullable(group)
+                .map(Group::getCachedData)
+                .map(cd->cd.getMetaData(Contexts.of(contexts, Contexts.global().getSettings())))
+                .map(MetaData::getPrefix);
+    }
+
+    @Override
+    public boolean isInGroup(PlatformUser user, String group) {
+        return user.hasPermission(group);
+    }
+
+    @Override
+    public boolean groupHasPermission(String group, String perm) {
+        Group g = api.getGroupManager().getGroup(group);
+        return Optional.ofNullable(g)
+                .map(Group::getCachedData)
+                .map(cd->cd.getPermissionData(Contexts.of(contexts, Contexts.global().getSettings())))
+                .map(pd->pd.getPermissionValue(perm))
+                .map(Tristate::asBoolean)
+                .orElse(false);
     }
 
     private Optional<RankUpdate> demoteTarget(PlatformPlayer source, me.lucko.luckperms.api.User targetUser, Track track) {

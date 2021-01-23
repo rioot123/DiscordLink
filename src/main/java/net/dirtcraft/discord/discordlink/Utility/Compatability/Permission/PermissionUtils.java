@@ -8,10 +8,14 @@ import net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.LuckPe
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.Pex.PexProvider;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformPlayer;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUser;
+import net.dirtcraft.discord.discordlink.Utility.Pair;
 
 import javax.annotation.Nullable;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public abstract class PermissionUtils {
 
@@ -36,6 +40,14 @@ public abstract class PermissionUtils {
     public abstract Optional<String> getPrefix(UUID uuid);
 
     public abstract Optional<RankUpdate> modifyRank(@Nullable PlatformPlayer source, @Nullable UUID targetUUID, @Nullable String trackName, boolean promote);
+
+    public abstract Map<String, String> getUserGroupPrefixMap(PlatformUser user);
+
+    public abstract Optional<String> getGroupPrefix(String name);
+
+    public abstract boolean isInGroup(PlatformUser user, String group);
+
+    public abstract boolean groupHasPermission(String group, String perm);
 
     private static PermissionUtils getRank(){
         try {

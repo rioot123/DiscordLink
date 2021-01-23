@@ -7,6 +7,8 @@ import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.Platform
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUser;
 
 import javax.annotation.Nullable;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -54,5 +56,22 @@ public class DefaultProvider extends PermissionUtils {
     public Optional<RankUpdate> modifyRank(@Nullable PlatformPlayer source, @Nullable UUID targetUUID, @Nullable String trackName, boolean promote) {
         //if (source != null) source.sendMessage("This version of luckperms is not supported!");
         return Optional.empty();
+    }
+
+    @Override
+    public Map<String, String> getUserGroupPrefixMap(PlatformUser user) {
+        return new HashMap<>();
+    }
+
+    public Optional<String> getGroupPrefix(String name){
+        return Optional.empty();
+    }
+
+    public boolean isInGroup(PlatformUser user, String group){
+        return false;
+    }
+
+    public boolean groupHasPermission(String group, String perm){
+        return false;
     }
 }

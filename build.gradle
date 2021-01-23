@@ -39,7 +39,12 @@ dependencies {
     shadow 'com.zaxxer:HikariCP:2.6.3'
     shadow 'org.mariadb.jdbc:mariadb-java-client:2.0.3'
     shadow 'com.h2database:h2:1.4.196'
+
     shadow group: 'com.google.code.gson', name: 'gson', version: '2.3.1'
+
+    //Permission APIs
+    compile 'me.lucko.luckperms:luckperms-api:4.4'
+    compile 'net.luckperms:api:5.1'
 }
 
 import org.apache.tools.ant.filters.ReplaceTokens

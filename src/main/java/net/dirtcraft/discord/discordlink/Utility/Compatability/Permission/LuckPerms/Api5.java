@@ -5,21 +5,26 @@ import net.dirtcraft.discord.discordlink.API.MessageSource;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.PermissionUtils;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformPlayer;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUser;
+import net.dirtcraft.discord.discordlink.Utility.Pair;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
+import net.luckperms.api.cacheddata.CachedDataManager;
+import net.luckperms.api.cacheddata.CachedMetaData;
 import net.luckperms.api.context.ImmutableContextSet;
+import net.luckperms.api.model.PermissionHolder;
 import net.luckperms.api.model.data.NodeMap;
+import net.luckperms.api.model.group.Group;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.model.user.UserManager;
 import net.luckperms.api.node.Node;
 import net.luckperms.api.node.NodeEqualityPredicate;
 import net.luckperms.api.node.NodeType;
 import net.luckperms.api.track.Track;
+import net.luckperms.api.util.Tristate;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import javax.annotation.Nullable;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -66,7 +71,7 @@ public class Api5 extends LuckPermissions {
                 .asBoolean();
     }
 
-    private String getGroups(net.luckperms.api.model.user.User user, ImmutableContextSet contexts, boolean negate){
+    private String getGroups(User user, ImmutableContextSet contexts, boolean negate){
         return user.getDistinctNodes().parallelStream()
                 .filter(node->node.getType() == NodeType.INHERITANCE && !node.isNegated())
                 .filter(node -> node.getContexts().isSatisfiedBy(contexts) ^ negate)
@@ -77,7 +82,7 @@ public class Api5 extends LuckPermissions {
                 .collect(Collectors.joining("\n"));
     }
 
-    private String getKits(net.luckperms.api.model.user.User user, ImmutableContextSet contexts, boolean negate){
+    private String getKits(User user, ImmutableContextSet contexts, boolean negate){
         return user.getDistinctNodes().parallelStream()
                 .filter(node->node.getType() == NodeType.PERMISSION && !node.isNegated())
                 .filter(node->node.getKey().startsWith("nucleus.kits."))
@@ -99,6 +104,15 @@ public class Api5 extends LuckPermissions {
         if (source == null || !target.isPresent() || !track.isPresent()) return Optional.empty();
         else if (promote) return promoteTarget(source, target.get(), track.get());
         else return demoteTarget(source, target.get(), track.get());
+    }
+
+    @Override
+    public Map<String, String> getUserGroupPrefixMap(PlatformUser user) {
+        @NonNull Set<Group> groups = api.getGroupManager().getLoadedGroups();
+        return groups.stream()
+                .filter(g->user.hasPermission(g.getName()))
+                .map(g->new Pair<>(g.getDisplayName(), g.getCachedData().getMetaData().getPrefix()))
+                .collect(Collectors.toMap(Pair::getKey, Pair::getValue));
     }
 
     private Optional<PermissionUtils.RankUpdate> demoteTarget(PlatformPlayer source, net.luckperms.api.model.user.User targetUser, Track track) {
@@ -165,5 +179,27 @@ public class Api5 extends LuckPermissions {
     public Optional<String> getPrefix(UUID uuid){
         return Optional.ofNullable(api.getUserManager().getUser(uuid))
                 .map(u-> u.getCachedData().getMetaData().getPrefix());
+    }
+
+    public Optional<String> getGroupPrefix(String name){
+        Group group = api.getGroupManager().getGroup(name);
+        return Optional.ofNullable(group)
+                .map(PermissionHolder::getCachedData)
+                .map(CachedDataManager::getMetaData)
+                .map(CachedMetaData::getPrefix);
+    }
+
+    public boolean isInGroup(PlatformUser user, String group){
+        return user.hasPermission(group);
+    }
+
+    public boolean groupHasPermission(String group, String perm){
+        Group g = api.getGroupManager().getGroup(group);
+        return Optional.ofNullable(g)
+                .map(PermissionHolder::getCachedData)
+                .map(CachedDataManager::getPermissionData)
+                .map(pd->pd.checkPermission(perm))
+                .map(Tristate::asBoolean)
+                .orElse(false);
     }
 }

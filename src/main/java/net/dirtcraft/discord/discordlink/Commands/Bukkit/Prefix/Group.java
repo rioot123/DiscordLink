@@ -4,7 +4,6 @@ import net.dirtcraft.discord.discordlink.Commands.Bukkit.ThermosSubCommand;
 import net.dirtcraft.discord.discordlink.Commands.Sources.ConsoleSource;
 import net.dirtcraft.discord.discordlink.Storage.Permission;
 import net.dirtcraft.discord.discordlink.Storage.Settings;
-import net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.Pex.PexProvider;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Permission.PermissionUtils;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUser;
 import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.PlatformUtils;
@@ -37,7 +36,7 @@ public class Group extends ThermosSubCommand {
 
     public void usage(CommandSender source, PlatformUser target){
         AtomicBoolean flip = new AtomicBoolean(false);
-        Map<String, String> groups = ((PexProvider) PexProvider.INSTANCE).getUserGroupPrefixMap(target);
+        Map<String, String> groups = PermissionUtils.INSTANCE.getUserGroupPrefixMap(target);
         if (!(source instanceof Player)){
             groups.keySet().forEach(source::sendMessage);
         } else {
@@ -54,21 +53,21 @@ public class Group extends ThermosSubCommand {
     }
 
     public void command(CommandSender source, PlatformUser target, String group){
-        Optional<String> prefix = ((PexProvider) PexProvider.INSTANCE).getGroupPrefix(group);
+        Optional<String> prefix = PermissionUtils.INSTANCE.getGroupPrefix(group);
         if (source instanceof Player && !prefix.isPresent()){
             ((Player)source).spigot().sendMessage(Utility.format("&cThe specified group does not have a prefix or does not exist."));
         } else if (!prefix.isPresent()) {
             source.sendMessage("The specified group does not have a prefix or does not exist.");
-        } else if (source instanceof Player && !((PexProvider)PexProvider.INSTANCE).isInGroup(target, group)){
+        } else if (source instanceof Player && !PermissionUtils.INSTANCE.isInGroup(target, group)){
             ((Player)source).spigot().sendMessage(Utility.format("&cThe target is not a member of that group."));
-        } else if (!((PexProvider)PexProvider.INSTANCE).isInGroup(target, group)){
+        } else if (!PermissionUtils.INSTANCE.isInGroup(target, group)){
             source.sendMessage("The target is not a member of that group.");
         } else {
             final Map.Entry<String,String> indicatorSet = Settings.STAFF_PREFIXES.entrySet().stream()
                     .filter(p->target.hasPermission(p.getKey()))
                     .findFirst()
                     .orElse(null);
-            boolean applyIndicator = indicatorSet != null && !((PexProvider)PexProvider.INSTANCE).groupHasPermission(group, indicatorSet.getKey());
+            boolean applyIndicator = indicatorSet != null && !PermissionUtils.INSTANCE.groupHasPermission(group, indicatorSet.getKey());
             if (applyIndicator){
                 String indicator = prefix.get().replaceAll("(?i)^.*?(([§&][0-9a-frlonm])+) *\\[.*", "$1");
                 if (indicator.equalsIgnoreCase(prefix.get())) indicator = "&f";
