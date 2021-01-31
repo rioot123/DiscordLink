@@ -1,9 +1,10 @@
 package net.dirtcraft.discordlink.users.permission.luckperms;
 
 
-import net.dirtcraft.discordlink.users.MessageSource;
+import net.dirtcraft.discordlink.users.MessageSourceImpl;
 import net.dirtcraft.discordlink.storage.Permission;
 import net.dirtcraft.discordlink.users.permission.PermissionProvider;
+import net.dirtcraft.spongediscordlib.users.MessageSource;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.context.ImmutableContextSet;

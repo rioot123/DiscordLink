@@ -1,9 +1,9 @@
 package net.dirtcraft.discordlink.users.permission.luckperms;
 
-import net.dirtcraft.discordlink.users.MessageSource;
-import net.dirtcraft.discordlink.commands.sources.ConsoleSource;
 import net.dirtcraft.discordlink.users.permission.PermissionProvider;
 import net.dirtcraft.discordlink.users.platform.PlatformProvider;
+import net.dirtcraft.spongediscordlib.users.MessageSource;
+import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.entity.living.player.User;
 
 public abstract class LuckPermissions extends PermissionProvider {

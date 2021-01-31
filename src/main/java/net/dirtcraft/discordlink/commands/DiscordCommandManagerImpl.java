@@ -1,10 +1,11 @@
 package net.dirtcraft.discordlink.commands;
 
-import net.dirtcraft.discordlink.api.users.roles.DiscordRoles;
+import net.dirtcraft.spongediscordlib.users.MessageSource;
+import net.dirtcraft.spongediscordlib.users.roles.DiscordRoles;
 import net.dirtcraft.discordlink.commands.discord.mute.MuteBase;
 import net.dirtcraft.discordlink.commands.discord.notify.NotifyBase;
-import net.dirtcraft.discordlink.users.MessageSource;
-import net.dirtcraft.discordlink.api.exceptions.DiscordCommandException;
+import net.dirtcraft.discordlink.users.MessageSourceImpl;
+import net.dirtcraft.spongediscordlib.exceptions.DiscordCommandException;
 import net.dirtcraft.discordlink.storage.PluginConfiguration;
 import net.dirtcraft.discordlink.utility.Utility;
 import net.dirtcraft.discordlink.commands.discord.*;
@@ -145,7 +146,7 @@ public class DiscordCommandManagerImpl extends DiscordCommandTree {
         register(inv, "inv");
     }
 
-    public void process(MessageSource member, String args){
+    public void process(MessageSourceImpl member, String args){
         try {
             String[] command = args == null || defaultAliases.contains(args)? new String[0] : args.split(" ");
             execute(member, null, new ArrayList<>(Arrays.asList(command)));

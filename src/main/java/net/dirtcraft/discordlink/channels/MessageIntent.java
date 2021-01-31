@@ -3,7 +3,7 @@ package net.dirtcraft.discordlink.channels;
 import net.dirtcraft.discordlink.commands.sources.ConsoleSource;
 import net.dirtcraft.discordlink.commands.sources.DiscordResponder;
 import net.dirtcraft.discordlink.storage.PluginConfiguration;
-import net.dirtcraft.discordlink.users.MessageSource;
+import net.dirtcraft.discordlink.users.MessageSourceImpl;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.Arrays;
@@ -72,7 +72,7 @@ public enum MessageIntent {
         return prefix;
     }
 
-    public ConsoleSource getCommandSource(MessageSource sender, String command){
+    public ConsoleSource getCommandSource(MessageSourceImpl sender, String command){
         if (this.sender == Sender.PRIVATE) {
             return DiscordResponder.getSender(sender);
         } else {

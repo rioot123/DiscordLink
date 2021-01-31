@@ -1,12 +1,14 @@
 package net.dirtcraft.discordlink.commands;
 
 import com.google.common.collect.Lists;
-import net.dirtcraft.discordlink.api.commands.DiscordCommand;
-import net.dirtcraft.discordlink.api.commands.DiscordCommandExecutor;
+import net.dirtcraft.spongediscordlib.commands.DiscordCommand;
+import net.dirtcraft.spongediscordlib.commands.DiscordCommandExecutor;
 import net.dirtcraft.discordlink.users.GuildMember;
-import net.dirtcraft.discordlink.users.MessageSource;
-import net.dirtcraft.discordlink.api.users.roles.DiscordRole;
-import net.dirtcraft.discordlink.api.exceptions.DiscordPermissionException;
+import net.dirtcraft.discordlink.users.MessageSourceImpl;
+import net.dirtcraft.spongediscordlib.users.DiscordMember;
+import net.dirtcraft.spongediscordlib.users.MessageSource;
+import net.dirtcraft.spongediscordlib.users.roles.DiscordRole;
+import net.dirtcraft.spongediscordlib.exceptions.DiscordPermissionException;
 import net.dirtcraft.discordlink.users.platform.PlatformProvider;
 import net.dirtcraft.discordlink.utility.Utility;
 
@@ -48,7 +50,7 @@ public class DiscordCommandImpl implements DiscordCommand {
         }
     }
 
-    public boolean hasPermission(GuildMember member){
+    public boolean hasPermission(DiscordMember member){
         return allowedRoles.stream().allMatch(member::hasRole);
     }
 

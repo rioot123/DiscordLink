@@ -1,12 +1,14 @@
 package net.dirtcraft.discordlink.commands.discord.item;
 
 import net.dirtcraft.discordlink.DiscordLink;
-import net.dirtcraft.discordlink.users.MessageSource;
-import net.dirtcraft.discordlink.api.commands.DiscordCommandExecutor;
-import net.dirtcraft.discordlink.api.exceptions.DiscordCommandException;
+import net.dirtcraft.discordlink.users.MessageSourceImpl;
+import net.dirtcraft.spongediscordlib.commands.DiscordCommandExecutor;
+import net.dirtcraft.spongediscordlib.exceptions.DiscordCommandException;
 import net.dirtcraft.discordlink.users.UserManagerImpl;
 import net.dirtcraft.discordlink.users.platform.PlatformUserImpl;
 import net.dirtcraft.discordlink.utility.Pair;
+import net.dirtcraft.spongediscordlib.users.MessageSource;
+import net.dirtcraft.spongediscordlib.users.platform.PlatformUser;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.item.inventory.property.SlotIndex;
 
@@ -28,7 +30,7 @@ public class ItemList implements DiscordCommandExecutor {
         ).collect(Collectors.toMap(Pair::getKey, Pair::getValue));
         UserManagerImpl userManager = DiscordLink.get().getUserManager();
         User player = removeIfPresent(args, userManager::getUser)
-                .map(PlatformUserImpl::getUser)
+                .map(PlatformUser::<User>getOfflinePlayer)
                 .orElseThrow(()->new DiscordCommandException("Player not online / Specified!"));
         List<String> slots = new ArrayList<>();
         slots.add(String.format("``%-2s | %-7s | %s``", "Id", "Type", "Contents"));
@@ -38,6 +40,6 @@ public class ItemList implements DiscordCommandExecutor {
             String name = slot.peek().map(i->i.getType().getTranslation().get()).orElse("Empty");
             slots.add(String.format("``%02d | %-7s | %s``", index, type, name));
         });
-        source.sendMessage(String.join("\n", slots));
+        source.sendPrivateMessage(String.join("\n", slots));
     }
 }

@@ -2,9 +2,11 @@ package net.dirtcraft.discordlink.commands.discord;
 
 import net.dirtcraft.discordlink.DiscordLink;
 import net.dirtcraft.discordlink.users.GuildMember;
-import net.dirtcraft.discordlink.users.MessageSource;
-import net.dirtcraft.discordlink.api.commands.DiscordCommandExecutor;
-import net.dirtcraft.discordlink.api.exceptions.DiscordCommandException;
+import net.dirtcraft.discordlink.users.MessageSourceImpl;
+import net.dirtcraft.spongediscordlib.commands.DiscordCommandExecutor;
+import net.dirtcraft.spongediscordlib.exceptions.DiscordCommandException;
+import net.dirtcraft.spongediscordlib.users.DiscordMember;
+import net.dirtcraft.spongediscordlib.users.MessageSource;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.user.UserStorageService;
@@ -28,7 +30,7 @@ public class Discord implements DiscordCommandExecutor {
         } else {
             optUser = userStorageService.get(minecraftIdentifier).orElseThrow(()->new DiscordCommandException("Invalid username."));
         }
-        Optional<GuildMember> optDiscordSource = DiscordLink.get().getUserManager().getMember(optUser.getUniqueId());
+        Optional<DiscordMember> optDiscordSource = DiscordLink.get().getUserManager().getMember(optUser.getUniqueId());
         if (!optDiscordSource.isPresent()) throw new DiscordCommandException("User not verified.");
         source.sendCommandResponse("Discord Username", "\\" + optDiscordSource.get().getAsMention());
     }

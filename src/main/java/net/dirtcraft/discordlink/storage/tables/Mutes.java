@@ -1,6 +1,8 @@
 package net.dirtcraft.discordlink.storage.tables;
 
-import net.dirtcraft.discordlink.api.users.roles.DiscordRoles;
+import net.dirtcraft.spongediscordlib.users.DiscordMember;
+import net.dirtcraft.spongediscordlib.users.platform.PlatformUser;
+import net.dirtcraft.spongediscordlib.users.roles.DiscordRoles;
 import net.dirtcraft.discordlink.users.GuildMember;
 import net.dirtcraft.discordlink.users.platform.PlatformUserImpl;
 import net.dirtcraft.discordlink.utility.Utility;
@@ -16,13 +18,13 @@ public abstract class Mutes extends Votes {
     protected abstract Connection getConnection();
     private final UUID DEFAULT = new UUID(0,0);
 
-    public void registerMute(UUID staff, GuildMember subject, Timestamp expires, String reason){
+    public void registerMute(UUID staff, DiscordMember subject, Timestamp expires, String reason){
         try (Connection connection = getConnection();
              PreparedStatement ps = connection.prepareStatement("INSERT INTO discordmutedata " +
                      "(submitterMinecraft, subjectDiscord, subjectMinecraft, expires, reason) " +
                      "VALUES (?, ?, ?, ?, ?)")) {
             final String subjectUuid = subject.getPlayerData()
-                    .map(PlatformUserImpl::getUUID)
+                    .map(PlatformUser::getUUID)
                     .map(UUID::toString)
                     .orElse(null);
             ps.setString(1, staff == null? DEFAULT.toString(): staff.toString());
@@ -36,13 +38,13 @@ public abstract class Mutes extends Votes {
         }
     }
 
-    public void registerMute(long staff, GuildMember subject, Timestamp expires, String reason){
+    public void registerMute(long staff, DiscordMember subject, Timestamp expires, String reason){
         try (Connection connection = getConnection();
              PreparedStatement ps = connection.prepareStatement("INSERT INTO discordmutedata " +
                      "(submitterDiscord, subjectDiscord, subjectMinecraft, expires, reason) " +
                      "VALUES (?, ?, ?, ?, ?)")) {
             final String subjectUuid = subject.getPlayerData()
-                    .map(PlatformUserImpl::getUUID)
+                    .map(PlatformUser::getUUID)
                     .map(UUID::toString)
                     .orElse(null);
             ps.setLong(1, staff);

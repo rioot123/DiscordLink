@@ -1,6 +1,6 @@
 package net.dirtcraft.discordlink.channels;
 
-import net.dirtcraft.discordlink.api.channels.GameChatChannel;
+import net.dirtcraft.spongediscordlib.channels.GameChatChannel;
 import net.dirtcraft.discordlink.commands.sources.ResponseScheduler;
 import net.dirtcraft.discordlink.storage.PluginConfiguration;
 import net.dv8tion.jda.api.JDA;

@@ -6,6 +6,7 @@ import net.dirtcraft.discordlink.storage.Database;
 import net.dirtcraft.discordlink.storage.tables.Verification;
 import net.dirtcraft.discordlink.users.platform.PlatformProvider;
 import net.dirtcraft.discordlink.utility.Utility;
+import net.dirtcraft.spongediscordlib.users.DiscordMember;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -57,7 +58,7 @@ public class Verify implements CommandExecutor {
             return;
         }
 
-        GuildMember member = optData.flatMap(Verification.VerificationData::getGuildMember).orElse(null);
+        DiscordMember member = optData.flatMap(Verification.VerificationData::getGuildMember).orElse(null);
         if (member == null && !optData.flatMap(Verification.VerificationData::getDiscordUser).isPresent()) {
             player.sendMessage(Utility.format("&cCould not verify your Discord account, please contact an Administrator!"));
         } else if (member == null) {

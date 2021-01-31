@@ -1,10 +1,10 @@
 package net.dirtcraft.discordlink.utility;
 
-import net.dirtcraft.discordlink.users.MessageSource;
+import net.dirtcraft.discordlink.users.MessageSourceImpl;
 import net.dirtcraft.discordlink.DiscordLink;
 import net.dirtcraft.discordlink.storage.PluginConfiguration;
 import net.dirtcraft.discordlink.users.platform.PlatformUserImpl;
-import net.dirtcraft.discordlink.utility.Utility;
+import net.dirtcraft.spongediscordlib.users.platform.PlatformUser;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.User;
@@ -23,16 +23,16 @@ import static net.dirtcraft.discordlink.utility.Utility.*;
 
 public class PlatformChat {
 
-    public static void discordToMCAsync(MessageSource sender, MessageReceivedEvent event){
+    public static void discordToMCAsync(MessageSourceImpl sender, MessageReceivedEvent event){
         Task.builder()
                 .async()
                 .execute(() -> discordToMc(sender, event.getMessage().getContentDisplay()))
                 .submit(DiscordLink.get());
     }
 
-    private static void discordToMc(MessageSource sender, String message){
+    private static void discordToMc(MessageSourceImpl sender, String message){
         try {
-            final Optional<User> optUser = sender.getPlayerData().map(PlatformUserImpl::getUser);
+            final Optional<User> optUser = sender.getPlayerData().map(PlatformUser::getOfflinePlayer);
             final String mcUsername = optUser.map(User::getName).orElse(null);
             final Text.Builder toBroadcast = Text.builder();
             final String username;
@@ -92,7 +92,7 @@ public class PlatformChat {
         return text;
     }
 
-    private static Text formatNonContentElements(MessageSource sender, String mcUsername, String element){
+    private static Text formatNonContentElements(MessageSourceImpl sender, String mcUsername, String element){
         Text.Builder text = Text.builder().append(TextSerializers.FORMATTING_CODE.deserialize(element));
         List<String> tooltip = new ArrayList<>();
 

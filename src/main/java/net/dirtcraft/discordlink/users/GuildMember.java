@@ -1,9 +1,11 @@
 package net.dirtcraft.discordlink.users;
 
-import net.dirtcraft.discordlink.api.users.DiscordMember;
-import net.dirtcraft.discordlink.api.users.roles.DiscordRole;
-import net.dirtcraft.discordlink.api.users.roles.DiscordRoles;
-import net.dirtcraft.discordlink.api.users.roles.RoleManager;
+import net.dirtcraft.spongediscordlib.users.DiscordMember;
+import net.dirtcraft.spongediscordlib.users.platform.PlatformPlayer;
+import net.dirtcraft.spongediscordlib.users.platform.PlatformUser;
+import net.dirtcraft.spongediscordlib.users.roles.DiscordRole;
+import net.dirtcraft.spongediscordlib.users.roles.DiscordRoles;
+import net.dirtcraft.spongediscordlib.users.roles.RoleManager;
 import net.dirtcraft.discordlink.storage.Database;
 import net.dirtcraft.discordlink.storage.tables.Verification;
 import net.dirtcraft.discordlink.users.discord.WrappedMember;
@@ -19,7 +21,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import java.util.*;
 
 public class GuildMember extends WrappedMember implements DiscordMember {
-    PlatformUserImpl user;
+    PlatformUser user;
     boolean retrievedPlayer;
     private final RoleManager roleManager;
     private final Database storage;
@@ -40,20 +42,20 @@ public class GuildMember extends WrappedMember implements DiscordMember {
                 .orElse(DiscordRoles.NONE);
 
         roleManager.getRoles().stream()
-                .filter(e->(e.isStaff() && highestRank.getStaffLevel() <= e.getStaffLevel()) || (discordRoles.contains(e.getRole())))
+                .filter(e->(e.isStaff() && highestRank.getStaffLevel() >= e.getStaffLevel()) || (discordRoles.contains(e.getRole())))
                 .forEach(roles::add);
     }
 
     @Override
-    public Optional<PlatformPlayerImpl> getPlayer(){
+    public Optional<PlatformPlayer> getPlayer(){
         if (!retrievedPlayer) return getPlayerData().flatMap(PlatformProvider::getPlayer);
         else return Optional.ofNullable(user).flatMap(PlatformProvider::getPlayer);
     }
 
     @Override
-    public Optional<PlatformUserImpl> getPlayerData(){
+    public Optional<PlatformUser> getPlayerData(){
         if (!retrievedPlayer) {
-            final Optional<PlatformUserImpl> optData = storage.getVerificationData(getId())
+            final Optional<PlatformUser> optData = storage.getVerificationData(getId())
                     .flatMap(Verification.VerificationData::getUUID)
                     .flatMap(PlatformProvider::getPlayerOffline);
             retrievedPlayer = true;
@@ -62,12 +64,12 @@ public class GuildMember extends WrappedMember implements DiscordMember {
     }
 
     @Override
-    public void sendMessage(MessageEmbed embed) {
+    public void sendPrivateMessage(MessageEmbed embed) {
         member.getUser().openPrivateChannel().queue(dm-> dm.sendMessage(embed).queue());
     }
 
     @Override
-    public void sendMessage(String message) {
+    public void sendPrivateMessage(String message) {
         member.getUser().openPrivateChannel().queue(dm-> dm.sendMessage(message).queue());
     }
 

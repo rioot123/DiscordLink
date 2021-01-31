@@ -1,11 +1,10 @@
 package net.dirtcraft.discordlink.commands.sponge;
 
 import net.dirtcraft.discordlink.DiscordLink;
-import net.dirtcraft.discordlink.api.users.roles.DiscordRoles;
+import net.dirtcraft.spongediscordlib.users.roles.DiscordRoles;
 import net.dirtcraft.discordlink.storage.Database;
 import net.dirtcraft.discordlink.storage.tables.Verification;
 import net.dirtcraft.discordlink.utility.Utility;
-import net.dv8tion.jda.api.entities.Guild;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;

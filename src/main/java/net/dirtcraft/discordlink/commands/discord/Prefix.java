@@ -1,12 +1,14 @@
 package net.dirtcraft.discordlink.commands.discord;
 
-import net.dirtcraft.discordlink.users.MessageSource;
-import net.dirtcraft.discordlink.api.commands.DiscordCommandExecutor;
-import net.dirtcraft.discordlink.api.exceptions.DiscordCommandException;
+import net.dirtcraft.discordlink.users.MessageSourceImpl;
+import net.dirtcraft.spongediscordlib.commands.DiscordCommandExecutor;
+import net.dirtcraft.spongediscordlib.exceptions.DiscordCommandException;
 import net.dirtcraft.discordlink.storage.Permission;
 import net.dirtcraft.discordlink.storage.Settings;
 import net.dirtcraft.discordlink.users.permission.PermissionProvider;
 import net.dirtcraft.discordlink.users.platform.PlatformUserImpl;
+import net.dirtcraft.spongediscordlib.users.MessageSource;
+import net.dirtcraft.spongediscordlib.users.platform.PlatformUser;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.permission.Subject;
@@ -22,7 +24,7 @@ public class Prefix implements DiscordCommandExecutor {
     @Override
     public void execute(MessageSource source, String command, List<String> args) throws DiscordCommandException {
         final User target = source.getPlayerData()
-                .map(PlatformUserImpl::getUser)
+                .map(PlatformUser::<User>getOfflinePlayer)
                 .map(u->getTarget(u, args).orElse(u))
                 .orElseThrow(()->new DiscordCommandException("No player present for Discord User."));
         String arrow = getChevron(target, args);

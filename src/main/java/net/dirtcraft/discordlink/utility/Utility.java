@@ -1,14 +1,17 @@
 package net.dirtcraft.discordlink.utility;
 
-import net.dirtcraft.discordlink.api.users.roles.DiscordRole;
-import net.dirtcraft.discordlink.api.users.roles.DiscordRoles;
+import net.dirtcraft.spongediscordlib.users.DiscordMember;
+import net.dirtcraft.spongediscordlib.users.MessageSource;
+import net.dirtcraft.spongediscordlib.users.platform.PlatformPlayer;
+import net.dirtcraft.spongediscordlib.users.roles.DiscordRole;
+import net.dirtcraft.spongediscordlib.users.roles.DiscordRoles;
 import net.dirtcraft.discordlink.channels.MessageIntent;
 import net.dirtcraft.discordlink.commands.sources.ConsoleSource;
 import net.dirtcraft.discordlink.DiscordLink;
 import net.dirtcraft.discordlink.storage.Permission;
 import net.dirtcraft.discordlink.storage.PluginConfiguration;
 import net.dirtcraft.discordlink.users.GuildMember;
-import net.dirtcraft.discordlink.users.MessageSource;
+import net.dirtcraft.discordlink.users.MessageSourceImpl;
 import net.dirtcraft.discordlink.users.UserManagerImpl;
 import net.dirtcraft.discordlink.users.platform.PlatformPlayerImpl;
 import net.dirtcraft.discord.spongediscordlib.DiscordUtil;
@@ -103,14 +106,14 @@ public class Utility {
                 .queue();
     }
 
-    public static void setRoles(PlatformPlayerImpl player){
+    public static void setRoles(PlatformPlayer player){
         DiscordLink discordLink = DiscordLink.get();
         UserManagerImpl userManager = discordLink.getUserManager();
         CompletableFuture.runAsync(()-> userManager.getMember(player.getUUID())
                 .ifPresent(member->setRoles(player, member)));
     }
 
-    public static void setRoles(PlatformPlayerImpl player, GuildMember member) {
+    public static void setRoles(PlatformPlayer player, DiscordMember member) {
         if (player.hasPermission(Permission.ROLES_DONOR)) member.setRoleIfAbsent(DiscordRoles.DONOR);
         if (!member.getRoles().contains(DiscordRoles.STAFF.getRole())) member.tryChangeNickname(player.getName());
         member.setRoleIfAbsent(DiscordRoles.VERIFIED);
@@ -132,7 +135,7 @@ public class Utility {
         DiscordUtil.setStatus(Activity.ActivityType.STREAMING, SpongeDiscordLib.getServerName(), "https://www.twitch.tv/dirtcraft/");
     }
 
-    public static boolean toConsole(String command, MessageSource sender, MessageIntent type) {
+    public static boolean toConsole(String command, MessageSourceImpl sender, MessageIntent type) {
         if (PluginConfiguration.Command.ignored.stream().anyMatch(e->command.matches("^\\b" + e + "\\b(.|\n)*?$"))) return false;
         if (canUseCommand(sender, command)) {
             final ConsoleSource commandSender = type.getCommandSource(sender, command);
@@ -167,7 +170,7 @@ public class Utility {
     }
 
     public static void logCommand(MessageSource event, String message){
-        DiscordLink.get().getJdaInstance()
+        DiscordLink.get().getJda()
                 .getTextChannelsByName("command-log", true).get(0)
                 .sendMessage(Utility.embedBuilder()
                         .addField(message, event.getMessage().getContentDisplay(), false)
@@ -230,5 +233,13 @@ public class Utility {
             salt.append(SALTCHARS.charAt(index));
         }
         return salt.toString();
+    }
+
+    public static void trySleep(long ms){
+        try{
+            Thread.sleep(ms);
+        } catch (Exception ignored){
+
+        }
     }
 }

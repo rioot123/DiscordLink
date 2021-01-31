@@ -1,10 +1,11 @@
 package net.dirtcraft.discordlink.commands.discord.notify;
 
-import net.dirtcraft.discordlink.users.MessageSource;
-import net.dirtcraft.discordlink.api.commands.DiscordCommandExecutor;
+import net.dirtcraft.discordlink.users.MessageSourceImpl;
+import net.dirtcraft.spongediscordlib.commands.DiscordCommandExecutor;
 import net.dirtcraft.discordlink.DiscordLink;
-import net.dirtcraft.discordlink.api.exceptions.DiscordCommandException;
+import net.dirtcraft.spongediscordlib.exceptions.DiscordCommandException;
 import net.dirtcraft.discordlink.storage.PluginConfiguration;
+import net.dirtcraft.spongediscordlib.users.MessageSource;
 
 import java.util.List;
 

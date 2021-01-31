@@ -1,14 +1,15 @@
 package net.dirtcraft.discordlink.commands.discord.mute;
 
-import net.dirtcraft.discordlink.api.users.roles.DiscordRoles;
+import net.dirtcraft.spongediscordlib.users.DiscordMember;
+import net.dirtcraft.spongediscordlib.users.MessageSource;
+import net.dirtcraft.spongediscordlib.users.roles.DiscordRoles;
 import net.dirtcraft.discordlink.users.GuildMember;
-import net.dirtcraft.discordlink.users.MessageSource;
+import net.dirtcraft.discordlink.users.MessageSourceImpl;
 import net.dirtcraft.discordlink.users.UserManagerImpl;
-import net.dirtcraft.discordlink.api.commands.DiscordCommandExecutor;
+import net.dirtcraft.spongediscordlib.commands.DiscordCommandExecutor;
 import net.dirtcraft.discordlink.DiscordLink;
-import net.dirtcraft.discordlink.api.exceptions.DiscordCommandException;
+import net.dirtcraft.spongediscordlib.exceptions.DiscordCommandException;
 import net.dirtcraft.discordlink.storage.Database;
-import net.dirtcraft.discordlink.utility.Utility;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -20,7 +21,7 @@ public class Mute implements DiscordCommandExecutor {
     public void execute(MessageSource source, String command, List<String> args) throws DiscordCommandException {
         DiscordLink discordLink = DiscordLink.get();
         UserManagerImpl userManager = discordLink.getUserManager();
-        GuildMember target = removeIfPresent(args, userManager::getMember)
+        DiscordMember target = removeIfPresent(args, userManager::getMember)
                 .orElseThrow(() -> new DiscordCommandException("Discord user not specified."));
         Database storage = discordLink.getStorage();
         Timestamp expires = getExpireDate(args);
@@ -32,7 +33,7 @@ public class Mute implements DiscordCommandExecutor {
                 "```\n" + reason + "\n```" +
                 "\nThe mute " + getDuration(expires) + "" +
                 "\nFeel free to make an appeal in <#590388043379376158>.";
-        target.sendMessage(message);
+        target.sendPrivateMessage(message);
 
         source.sendCommandResponse(source.getAsMention() + " Mute has been applied to user " + target.getAsMention(), 30);
         storage.hasActiveMute(target.getIdLong())

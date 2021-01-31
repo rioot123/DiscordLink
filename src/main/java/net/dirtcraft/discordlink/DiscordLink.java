@@ -1,8 +1,8 @@
 package net.dirtcraft.discordlink;
 
 import com.google.inject.Inject;
-import net.dirtcraft.discordlink.api.commands.DiscordCommand;
-import net.dirtcraft.discordlink.api.users.roles.RoleManager;
+import net.dirtcraft.spongediscordlib.commands.DiscordCommand;
+import net.dirtcraft.spongediscordlib.users.roles.RoleManager;
 import net.dirtcraft.discordlink.channels.ChannelManagerImpl;
 import net.dirtcraft.discordlink.commands.DiscordCommandImpl;
 import net.dirtcraft.discordlink.commands.DiscordCommandManagerImpl;
@@ -10,16 +10,13 @@ import net.dirtcraft.discordlink.commands.sponge.UnVerify;
 import net.dirtcraft.discordlink.commands.sponge.Verify;
 import net.dirtcraft.discordlink.commands.sponge.prefix.*;
 import net.dirtcraft.discordlink.events.*;
-import net.dirtcraft.discordlink.storage.ConfigManager;
-import net.dirtcraft.discordlink.storage.Database;
-import net.dirtcraft.discordlink.storage.Permission;
-import net.dirtcraft.discordlink.storage.Settings;
+import net.dirtcraft.discordlink.storage.*;
 import net.dirtcraft.discordlink.users.UserManagerImpl;
 import net.dirtcraft.discordlink.users.discord.RoleManagerImpl;
 import net.dirtcraft.discordlink.utility.Utility;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
-import net.dirtcraft.discordlink.api.DiscordApi;
-import net.dirtcraft.discordlink.api.DiscordApiProvider;
+import net.dirtcraft.spongediscordlib.DiscordApi;
+import net.dirtcraft.spongediscordlib.DiscordApiProvider;
 import net.dv8tion.jda.api.JDA;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
@@ -59,12 +56,15 @@ import java.util.function.Supplier;
         }
 )
 public class DiscordLink extends ServerBootHandler implements DiscordApi {
+    private static DiscordLink instance;
+
     @DefaultConfig(sharedRoot = false)
     @Inject private ConfigurationLoader<CommentedConfigurationNode> loader;
     @Inject private Logger logger;
     @Inject private PluginContainer container;
     private ChannelBinding.RawDataChannel channel;
     private boolean gameListenersRegistered;
+    private boolean shouldDoPostInit;
     private DiscordCommandManagerImpl commandManager;
     private ChannelManagerImpl channelManager;
     private UserManagerImpl userManager;
@@ -74,11 +74,11 @@ public class DiscordLink extends ServerBootHandler implements DiscordApi {
     private JDA jda;
 
     public static DiscordLink get(){
-        return (DiscordLink) DiscordApiProvider.getInstance();
+        return instance;
     }
 
     @Override
-    public JDA getJdaInstance() {
+    public JDA getJda() {
         return jda;
     }
 
@@ -123,10 +123,6 @@ public class DiscordLink extends ServerBootHandler implements DiscordApi {
         return channel;
     }
 
-    {
-        System.out.println("!!!!!!! GENERATE INSTANCE !!!!!!!");
-    }
-
     @Override
     @Listener (order = Order.PRE)
     public void onGameConstruction(GameConstructionEvent event) {
@@ -138,6 +134,7 @@ public class DiscordLink extends ServerBootHandler implements DiscordApi {
     @Override
     @Listener(order = Order.PRE)
     public void onGameInitialization(GameInitializationEvent event) {
+        shouldDoPostInit = true;
         postInitialize();
     }
 
@@ -150,7 +147,6 @@ public class DiscordLink extends ServerBootHandler implements DiscordApi {
                 return;
             }
 
-            setInstance();
             this.configManager = new ConfigManager(loader);
             this.storage = new Database();
             this.roleManager = new RoleManagerImpl(jda);
@@ -158,18 +154,19 @@ public class DiscordLink extends ServerBootHandler implements DiscordApi {
             this.userManager = new UserManagerImpl(channelManager, roleManager, storage);
             this.commandManager = new DiscordCommandManagerImpl();
             jda.addEventListener(new DiscordEvents(this));
+            instance = this;
             isReady = true;
-            Task.builder()
+            if (shouldDoPostInit) Task.builder()
                     .execute(this::postInitialize)
-                    .submit(this);
-
+                    .submit(container);
+            sendGameStageEmbed(Sponge.getGame().getState());
             logger.info("Discord Link pre=initialized");
         });
     }
 
     private void postInitialize(){
         logger.info("Discord Link post=initializing...");
-        if (!isReady || gameListenersRegistered) return;
+        if (!isReady || !shouldDoPostInit || gameListenersRegistered) return;
         gameListenersRegistered = true;
         this.registerCommands();
         Utility.setStatus();
@@ -183,8 +180,9 @@ public class DiscordLink extends ServerBootHandler implements DiscordApi {
         } else {
             Sponge.getEventManager().registerListeners(this, new UltimateChat(this));
         }
-        logger.info("Discord Link post=initialized");
         if (Sponge.getGame().getState() == GameState.SERVER_STARTED) sendLaunchedEmbed();
+        setInstance();
+        logger.info("Discord Link post=initialized");
     }
 
     private void registerCommands(){
@@ -260,7 +258,8 @@ public class DiscordLink extends ServerBootHandler implements DiscordApi {
         try {
             registerProvider();
             Supplier<DiscordCommand.Builder> supplier = DiscordCommandImpl::builder;
-            Method setter = DiscordApiProvider.class.getDeclaredMethod("setProvider", DiscordApi.class, Supplier.class);
+            Method setter = DiscordApiProvider.class
+                    .getDeclaredMethod("setProvider", DiscordApi.class, Supplier.class);
             setter.setAccessible(true);
             setter.invoke(null, this, supplier);
         } catch (Exception e){

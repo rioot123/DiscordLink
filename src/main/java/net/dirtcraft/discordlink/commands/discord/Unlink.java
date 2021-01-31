@@ -1,12 +1,14 @@
 package net.dirtcraft.discordlink.commands.discord;
 
-import net.dirtcraft.discordlink.api.users.roles.DiscordRoles;
+import net.dirtcraft.spongediscordlib.users.MessageSource;
+import net.dirtcraft.spongediscordlib.users.platform.PlatformUser;
+import net.dirtcraft.spongediscordlib.users.roles.DiscordRoles;
 import net.dirtcraft.discordlink.users.GuildMember;
-import net.dirtcraft.discordlink.users.MessageSource;
+import net.dirtcraft.discordlink.users.MessageSourceImpl;
 import net.dirtcraft.discordlink.users.UserManagerImpl;
-import net.dirtcraft.discordlink.api.commands.DiscordCommandExecutor;
+import net.dirtcraft.spongediscordlib.commands.DiscordCommandExecutor;
 import net.dirtcraft.discordlink.DiscordLink;
-import net.dirtcraft.discordlink.api.exceptions.DiscordCommandException;
+import net.dirtcraft.spongediscordlib.exceptions.DiscordCommandException;
 import net.dirtcraft.discordlink.storage.Database;
 import net.dirtcraft.discordlink.storage.PluginConfiguration;
 import net.dirtcraft.discordlink.storage.tables.Verification;
@@ -39,7 +41,7 @@ public class Unlink implements DiscordCommandExecutor {
             if (donorRole !=  null && source.getRoles().contains(donorRole)) {
                 guild.removeRoleFromMember(source, donorRole).queue();
             }
-            source.sendCommandResponse("Successfully executed command:", "Successfully unlinked " + source.getPlayerData().flatMap(PlatformUserImpl::getNameIfPresent).orElse("your account") + ".");
+            source.sendCommandResponse("Successfully executed command:", "Successfully unlinked " + source.getPlayerData().flatMap(PlatformUser::getNameIfPresent).orElse("your account") + ".");
             return;
         } else if (!source.hasRole(DiscordRoles.ADMIN)) throw new DiscordCommandException("You do not have permission to use this command on other users.");
 
@@ -50,10 +52,10 @@ public class Unlink implements DiscordCommandExecutor {
         if (!matcher.matches() || !(member = Utility.getMemberById(matcher.group(1))).isPresent()) throw new DiscordCommandException("Invalid Discord ID");
 
         final GuildMember player = userManager.getMember(member.get());
-        final Optional<PlatformUserImpl> user = player.getPlayerData();
+        final Optional<PlatformUser> user = player.getPlayerData();
         String response;
         if (user.isPresent()) {
-            response = user.flatMap(PlatformUserImpl::getNameIfPresent).get();
+            response = user.flatMap(PlatformUser::getNameIfPresent).get();
         } else {
             response = storage.getLastKnownUsername(matcher.group(1));
             if (response == null) response = storage.getVerificationData(matcher.group(1))

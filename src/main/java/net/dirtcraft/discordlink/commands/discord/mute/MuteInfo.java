@@ -2,16 +2,19 @@ package net.dirtcraft.discordlink.commands.discord.mute;
 
 import net.dirtcraft.discordlink.channels.ChannelManagerImpl;
 import net.dirtcraft.discordlink.users.GuildMember;
-import net.dirtcraft.discordlink.users.MessageSource;
-import net.dirtcraft.discordlink.api.commands.DiscordCommandExecutor;
+import net.dirtcraft.discordlink.users.MessageSourceImpl;
+import net.dirtcraft.spongediscordlib.commands.DiscordCommandExecutor;
 import net.dirtcraft.discordlink.DiscordLink;
-import net.dirtcraft.discordlink.api.exceptions.DiscordCommandException;
+import net.dirtcraft.spongediscordlib.exceptions.DiscordCommandException;
 import net.dirtcraft.discordlink.storage.Database;
 import net.dirtcraft.discordlink.storage.tables.Mutes;
 import net.dirtcraft.discordlink.users.UserManagerImpl;
 import net.dirtcraft.discordlink.users.platform.PlatformUserImpl;
 import net.dirtcraft.discordlink.users.platform.PlatformProvider;
 import net.dirtcraft.discordlink.utility.Utility;
+import net.dirtcraft.spongediscordlib.users.DiscordMember;
+import net.dirtcraft.spongediscordlib.users.MessageSource;
+import net.dirtcraft.spongediscordlib.users.platform.PlatformUser;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.requests.RestAction;
 
@@ -28,7 +31,7 @@ public class MuteInfo implements DiscordCommandExecutor {
         DiscordLink discordLink = DiscordLink.get();
         Database database = discordLink.getStorage();
         UserManagerImpl userManager = discordLink.getUserManager();
-        GuildMember target =removeIfPresent(args, userManager::getMember).orElseThrow(() -> new DiscordCommandException("Discord user not specified."));
+        DiscordMember target =removeIfPresent(args, userManager::getMember).orElseThrow(() -> new DiscordCommandException("Discord user not specified."));
         Mutes.MuteData data = database.hasActiveMute(target.getIdLong()).orElseThrow(()->new DiscordCommandException("The player does not have an active mute!"));
 
         source.sendCommandResponse(getInfo(data));
@@ -46,7 +49,7 @@ public class MuteInfo implements DiscordCommandExecutor {
                         .map(GuildMember::getEffectiveName),
                 ()->data.getSubmitterUUID()
                         .flatMap(PlatformProvider::getPlayerOffline)
-                        .flatMap(PlatformUserImpl::getNameIfPresent)
+                        .flatMap(PlatformUser::getNameIfPresent)
         );
         if (!data.getSubmitter().isPresent()) name += " (via MC/Proxy)";
         else name += " (via Discord)";

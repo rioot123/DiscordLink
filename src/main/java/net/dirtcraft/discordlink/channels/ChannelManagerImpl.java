@@ -1,7 +1,6 @@
 package net.dirtcraft.discordlink.channels;
 
-import net.dirtcraft.discordlink.api.channels.ChannelManager;
-import net.dirtcraft.discordlink.commands.sources.ResponseScheduler;
+import net.dirtcraft.spongediscordlib.channels.ChannelManager;
 import net.dirtcraft.discordlink.storage.PluginConfiguration;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;

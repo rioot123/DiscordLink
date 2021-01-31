@@ -4,6 +4,7 @@ import net.dirtcraft.discordlink.channels.ChannelManagerImpl;
 import net.dirtcraft.discordlink.DiscordLink;
 import net.dirtcraft.discordlink.channels.GameChatChannelImpl;
 import net.dirtcraft.discordlink.storage.PluginConfiguration;
+import net.dirtcraft.discordlink.utility.Pair;
 import net.dirtcraft.discordlink.utility.Utility;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.api.entities.*;
@@ -14,8 +15,12 @@ import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.game.state.*;
 
 import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ServerBootHandler {
     final private long second = 1000;
@@ -23,55 +28,69 @@ public class ServerBootHandler {
     final private long time = System.currentTimeMillis();
     private volatile GameState state;
     protected boolean isReady;
+    private Map<GameState, String> humanReadable = Stream.of(
+            new Pair<>(GameState.CONSTRUCTION,          "Constructing Game Instance"    ),
+            new Pair<>(GameState.PRE_INITIALIZATION,    "Pre-Initializing Game Instance"),
+            new Pair<>(GameState.INITIALIZATION,        "Initializing Game"             ),
+            new Pair<>(GameState.POST_INITIALIZATION,   "Post-Initializing Game"        ),
+            new Pair<>(GameState.LOAD_COMPLETE,         "Game Loaded"                   ),
+            new Pair<>(GameState.SERVER_STARTED,        "Loading Server"                ),
+            new Pair<>(GameState.SERVER_ABOUT_TO_START, "Server Starting"               ),
+            new Pair<>(GameState.SERVER_STARTING,       "Finishing Up"                  ),
+            new Pair<>(GameState.SERVER_STOPPING,       "Stopping Server"               ),
+            new Pair<>(GameState.SERVER_STOPPED,        "Stopped Server"                ),
+            new Pair<>(GameState.GAME_STOPPING,         "Game Stopping"                 ),
+            new Pair<>(GameState.GAME_STOPPED,          "Game Stopped"                  )
+    ).collect(Collectors.toMap(Pair::getKey, Pair::getValue));
 
     private CompletableFuture<Message> future;
 
     public void onGameConstruction(GameConstructionEvent event){
         if (!isReady) return;
         startTimer(event.getState());
-        sendGameStageEmbed("Constructing Game Instance", 1);
+        sendGameStageEmbed(event.getState());
     }
 
     @Listener(order = Order.FIRST)
     public void onGamePreInitialization(GamePreInitializationEvent event){
         if (!isReady) return;
         startTimer(event.getState());
-        sendGameStageEmbed("Pre-Initializing Game Instance", 2);
+        sendGameStageEmbed(event.getState());
     }
 
     @Listener(order = Order.FIRST)
     public void onGameInitialization(GameInitializationEvent event){
         if (!isReady) return;
         startTimer(event.getState());
-        sendGameStageEmbed("Initializing Game Instance", 3);
+        sendGameStageEmbed(event.getState());
     }
 
     @Listener(order = Order.FIRST)
     public void onGamePostInitialization(GamePostInitializationEvent event){
         if (!isReady) return;
         startTimer(event.getState());
-        sendGameStageEmbed("Post-Initializing Game Instance", 4);
+        sendGameStageEmbed(event.getState());
     }
 
     @Listener(order = Order.FIRST)
     public void onGameLoadComplete(GameLoadCompleteEvent event){
         if (!isReady) return;
         startTimer(event.getState());
-        sendGameStageEmbed("Loading Game Instance", 5);
+        sendGameStageEmbed(event.getState());
     }
 
     @Listener(order = Order.FIRST)
     public void onGameAboutToStartServer(GameAboutToStartServerEvent event){
         if (!isReady) return;
         startTimer(event.getState());
-        sendGameStageEmbed("Preparing To Start Server", 6);
+        sendGameStageEmbed(event.getState());
     }
 
     @Listener(order = Order.FIRST)
     public void onGameStartingServerEvent(GameStartingServerEvent event){
         if (!isReady) return;
         startTimer(event.getState());
-        sendGameStageEmbed("Starting Server", 7);
+        sendGameStageEmbed(event.getState());
     }
 
     @Listener(order = Order.POST)
@@ -107,11 +126,14 @@ public class ServerBootHandler {
                         ).build());
     }
 
-    private void sendGameStageEmbed(String state, int order) {
+    protected void sendGameStageEmbed(GameState state) {
         TextChannel gameChat = DiscordLink.get().getChannelManager().getDefaultChannel();
+        String stage = humanReadable.get(state);
+        int level = state.ordinal() + 1;
+        String content = String.format("The server is currently booting... Please wait...\n**%s** (%d/7)", stage, level);
         MessageEmbed embed = Utility.embedBuilder()
                 .setColor(Color.ORANGE)
-                .setDescription("The server is currently booting... Please wait...\n**" + state + "** ("+ order + "/7)")
+                .setDescription(content)
                 .build();
         if (future != null) future = future
                 .whenComplete((message, throwable) -> message.delete().queue())

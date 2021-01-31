@@ -1,12 +1,12 @@
 package net.dirtcraft.discordlink.commands.discord;
 
-import net.dirtcraft.discordlink.users.MessageSource;
-import net.dirtcraft.discordlink.api.commands.DiscordCommandExecutor;
-import net.dirtcraft.discordlink.commands.sources.ConsoleSource;
+import net.dirtcraft.spongediscordlib.commands.DiscordCommandExecutor;
 import net.dirtcraft.discordlink.DiscordLink;
-import net.dirtcraft.discordlink.api.exceptions.DiscordCommandException;
-import net.dirtcraft.discordlink.users.platform.PlatformUserImpl;
+import net.dirtcraft.spongediscordlib.exceptions.DiscordCommandException;
+import net.dirtcraft.spongediscordlib.users.MessageSource;
+import net.dirtcraft.spongediscordlib.users.platform.PlatformUser;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.scheduler.Task;
 
 import java.util.List;
@@ -17,9 +17,9 @@ public class SilentSeen implements DiscordCommandExecutor {
     public void execute(MessageSource source, String cmd, List<String> args) throws DiscordCommandException {
         String target;
         if (args.isEmpty()){
-            Optional<PlatformUserImpl> optUser = source.getPlayerData();
+            Optional<? extends PlatformUser> optUser = source.getPlayerData();
             if (!optUser.isPresent()) throw new DiscordCommandException("You must be verified in order to not specify a player!");
-            else target = optUser.flatMap(PlatformUserImpl::getNameIfPresent).get();
+            else target = optUser.flatMap(PlatformUser::getNameIfPresent).get();
         } else {
             target = args.get(0);
         }

@@ -1,6 +1,5 @@
 package net.dirtcraft.discordlink.commands.sources;
 
-import net.dirtcraft.dirtlocker.API.ConsoleLock.SecuredSource;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.context.Context;
@@ -15,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-public abstract class ConsoleSource implements org.spongepowered.api.command.source.ConsoleSource, SecuredSource {
+public abstract class ConsoleSource implements org.spongepowered.api.command.source.ConsoleSource {
 
     private CommandSource actualSource;
 

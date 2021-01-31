@@ -1,9 +1,9 @@
 package net.dirtcraft.discordlink.events;
 
-import net.dirtcraft.discordlink.api.users.roles.DiscordRoles;
+import net.dirtcraft.spongediscordlib.users.roles.DiscordRoles;
 import net.dirtcraft.discordlink.channels.MessageIntent;
 import net.dirtcraft.discordlink.channels.ChannelManagerImpl;
-import net.dirtcraft.discordlink.users.MessageSource;
+import net.dirtcraft.discordlink.users.MessageSourceImpl;
 import net.dirtcraft.discordlink.users.UserManagerImpl;
 import net.dirtcraft.discordlink.commands.DiscordCommandManagerImpl;
 import net.dirtcraft.discordlink.DiscordLink;
@@ -45,7 +45,7 @@ public class DiscordEvents extends ListenerAdapter {
         if (!gamechat && !privateDm || event.getAuthor().isBot() || hasAttachment(event)) return;
         CompletableFuture.runAsync(()->{
             try {
-                final MessageSource sender = userManager.getMember(event);
+                final MessageSourceImpl sender = userManager.getMember(event);
                 if (!sender.isVerified() && !sender.isStaff()) processUnverifiedMessage(sender, event);
                 else if (privateDm) processPrivateMessage(sender, event);
                 else processGuildMessage(sender, event);
@@ -56,10 +56,10 @@ public class DiscordEvents extends ListenerAdapter {
         });
     }
 
-    public void processGuildMessage(MessageSource sender, MessageReceivedEvent event) {
+    public void processGuildMessage(MessageSourceImpl sender, MessageReceivedEvent event) {
         if (sender.isMuted() && !sender.isStaff()) {
             if (event.getChannelType() != ChannelType.PRIVATE) event.getMessage().delete().queue(s->{},e->{});
-            sender.sendMessage("<@" + sender.getId() + "> You are **not** allowed to talk there! Please open an appeal in <#590388043379376158> to lift your sanction.");
+            sender.sendPrivateMessage("<@" + sender.getId() + "> You are **not** allowed to talk there! Please open an appeal in <#590388043379376158> to lift your sanction.");
             return;
         }
 
@@ -74,7 +74,7 @@ public class DiscordEvents extends ListenerAdapter {
         }
     }
 
-    public void processPrivateMessage(MessageSource sender, MessageReceivedEvent event) {
+    public void processPrivateMessage(MessageSourceImpl sender, MessageReceivedEvent event) {
         if (!PlatformProvider.isGameReady()) return;
         final MessageIntent intent = MessageIntent.fromMessageRaw(event.getMessage().getContentRaw()) == MessageIntent.DISCORD_COMMAND? MessageIntent.DISCORD_COMMAND: MessageIntent.PRIVATE_COMMAND;
         final String message = MessageIntent.filterConsolePrefixes(event.getMessage().getContentRaw());
@@ -82,7 +82,7 @@ public class DiscordEvents extends ListenerAdapter {
         else if (toConsole(message, sender, intent)) logCommand(sender, "__Executed Private Command via DM__");
     }
 
-    public void processUnverifiedMessage(MessageSource sender, MessageReceivedEvent event){
+    public void processUnverifiedMessage(MessageSourceImpl sender, MessageReceivedEvent event){
         if (event.getChannelType() != ChannelType.PRIVATE) event.getMessage().delete().queue();
         Database database = storage;
         Verification.VerificationData data = database.getVerificationData(sender.getId()).orElse(null);

@@ -1,10 +1,10 @@
 package net.dirtcraft.discordlink.users.permission;
 
-import net.dirtcraft.discordlink.users.MessageSource;
-import net.dirtcraft.discordlink.commands.sources.ConsoleSource;
 import net.dirtcraft.discordlink.users.permission.dummy.DefaultProvider;
 import net.dirtcraft.discordlink.users.permission.luckperms.Api4;
 import net.dirtcraft.discordlink.users.permission.luckperms.Api5;
+import net.dirtcraft.spongediscordlib.users.MessageSource;
+import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 

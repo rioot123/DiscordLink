@@ -1,8 +1,9 @@
 package net.dirtcraft.discordlink.commands.discord;
 
-import net.dirtcraft.discordlink.users.MessageSource;
-import net.dirtcraft.discordlink.api.commands.DiscordCommandExecutor;
-import net.dirtcraft.discordlink.api.exceptions.DiscordCommandException;
+import net.dirtcraft.discordlink.users.MessageSourceImpl;
+import net.dirtcraft.spongediscordlib.commands.DiscordCommandExecutor;
+import net.dirtcraft.spongediscordlib.exceptions.DiscordCommandException;
+import net.dirtcraft.spongediscordlib.users.MessageSource;
 
 import java.io.File;
 import java.nio.file.Paths;
@@ -30,9 +31,9 @@ public class Logs implements DiscordCommandExecutor {
             Arrays.sort(logs);
             if (logs.length < MAX_ENTRIES) newOnly = logs;
             else System.arraycopy(logs, logs.length - (MAX_ENTRIES), newOnly, 0, MAX_ENTRIES);
-            source.sendMessage(String.join("\n", newOnly));
+            source.sendPrivateMessage(String.join("\n", newOnly));
         } else  if (log.contains("\\") || log.contains("/")) {
-            source.sendMessage("Filename contains illegal characters!");
+            source.sendPrivateMessage("Filename contains illegal characters!");
         } else {
             final File logs = Paths.get("crash-reports", log).toFile();
             source.sendPrivateFile(logs);
@@ -46,9 +47,9 @@ public class Logs implements DiscordCommandExecutor {
             Arrays.sort(logs);
             if (logs.length < MAX_ENTRIES) newOnly = logs;
             else System.arraycopy(logs, logs.length - (MAX_ENTRIES), newOnly, 0, MAX_ENTRIES);
-            source.sendMessage(String.join("\n", newOnly));
+            source.sendPrivateMessage(String.join("\n", newOnly));
         } else  if (log.contains("\\") || log.contains("/")) {
-            source.sendMessage("Filename contains illegal characters!");
+            source.sendPrivateMessage("Filename contains illegal characters!");
         } else {
             final File logs = Paths.get("logs", log).toFile();
             source.sendPrivateFile(logs);

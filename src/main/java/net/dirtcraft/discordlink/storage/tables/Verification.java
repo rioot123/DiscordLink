@@ -6,6 +6,8 @@ import net.dirtcraft.discordlink.users.UserManagerImpl;
 import net.dirtcraft.discordlink.users.platform.PlatformUserImpl;
 import net.dirtcraft.discordlink.users.platform.PlatformProvider;
 import net.dirtcraft.discordlink.utility.Utility;
+import net.dirtcraft.spongediscordlib.users.DiscordMember;
+import net.dirtcraft.spongediscordlib.users.platform.PlatformUser;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
@@ -156,14 +158,14 @@ public abstract class Verification extends Mutes {
 
         public Optional<User> getDiscordUser() {
             DiscordLink discordLink = DiscordLink.get();
-            JDA jda = discordLink.getJdaInstance();
+            JDA jda = discordLink.getJda();
             return getDiscordId()
                     .map(jda::retrieveUserById)
                     .map(RestAction::submit)
                     .map(CompletableFuture::join);
         }
 
-        public Optional<PlatformUserImpl> getMinecraftUser() {
+        public Optional<PlatformUser> getMinecraftUser() {
             return getUUID().flatMap(PlatformProvider::getPlayerOffline);
         }
 
@@ -171,14 +173,14 @@ public abstract class Verification extends Mutes {
             return getDiscordId().flatMap(Utility::getMemberById);
         }
 
-        public Optional<GuildMember> getGuildMember() {
+        public Optional<DiscordMember> getGuildMember() {
             DiscordLink discordLink = DiscordLink.get();
             UserManagerImpl userManager = discordLink.getUserManager();
             return getMember().map(userManager::getMember);
         }
 
         public Optional<String> getName() {
-            Optional<String> name = getMinecraftUser().flatMap(PlatformUserImpl::getNameIfPresent);
+            Optional<String> name = getMinecraftUser().flatMap(PlatformUser::getNameIfPresent);
             if (name.isPresent()) return name;
             else return getUUID()
                     .map(UUID::toString)

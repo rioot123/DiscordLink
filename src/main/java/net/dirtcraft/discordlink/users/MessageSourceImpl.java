@@ -7,18 +7,17 @@ import net.dirtcraft.discordlink.storage.Database;
 import net.dirtcraft.discordlink.users.discord.RoleManagerImpl;
 import net.dirtcraft.discordlink.utility.Utility;
 import net.dirtcraft.discordlink.channels.DiscordChannelImpl;
-import net.dirtcraft.discordlink.channels.ChannelManagerImpl;
-import net.dv8tion.jda.api.JDA;
+import net.dirtcraft.spongediscordlib.users.MessageSource;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.io.File;
 
-public class MessageSource extends GuildMember implements DiscordResponder {
+public class MessageSourceImpl extends GuildMember implements DiscordResponder, MessageSource {
     private final Message message;
     private final DiscordChannelImpl source;
 
-    public MessageSource(Database storage, Member author, DiscordChannelImpl discordChannel, RoleManagerImpl roleManager, MessageReceivedEvent event){
+    public MessageSourceImpl(Database storage, Member author, DiscordChannelImpl discordChannel, RoleManagerImpl roleManager, MessageReceivedEvent event){
         super(storage,roleManager, author);
         this.message = event.getMessage();
         this.source = discordChannel;
@@ -31,7 +30,7 @@ public class MessageSource extends GuildMember implements DiscordResponder {
     @Override
     public void sendDiscordResponse(String message) {
         if (message.length() > getCharLimit()) return;
-        sendMessage("``" + message + "``");
+        sendPrivateMessage("``" + message + "``");
     }
 
     @Override
@@ -90,10 +89,6 @@ public class MessageSource extends GuildMember implements DiscordResponder {
                 .setFooter(getUser().getAsTag(), getUser().getAvatarUrl())
                 .build();
         sendCommandResponse(embed, duration);
-    }
-
-    public void sendPrivateMessage(MessageEmbed message){
-        getUser().openPrivateChannel().queue(dm -> dm.sendMessage(message).queue());
     }
 
     public void sendPrivateFile(File file){

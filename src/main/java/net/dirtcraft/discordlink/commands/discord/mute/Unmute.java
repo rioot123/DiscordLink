@@ -1,13 +1,15 @@
 package net.dirtcraft.discordlink.commands.discord.mute;
 
-import net.dirtcraft.discordlink.api.users.roles.DiscordRoles;
+import net.dirtcraft.spongediscordlib.users.DiscordMember;
+import net.dirtcraft.spongediscordlib.users.MessageSource;
+import net.dirtcraft.spongediscordlib.users.roles.DiscordRoles;
 import net.dirtcraft.discordlink.storage.Database;
 import net.dirtcraft.discordlink.users.GuildMember;
-import net.dirtcraft.discordlink.users.MessageSource;
+import net.dirtcraft.discordlink.users.MessageSourceImpl;
 import net.dirtcraft.discordlink.users.UserManagerImpl;
-import net.dirtcraft.discordlink.api.commands.DiscordCommandExecutor;
+import net.dirtcraft.spongediscordlib.commands.DiscordCommandExecutor;
 import net.dirtcraft.discordlink.DiscordLink;
-import net.dirtcraft.discordlink.api.exceptions.DiscordCommandException;
+import net.dirtcraft.spongediscordlib.exceptions.DiscordCommandException;
 import net.dirtcraft.discordlink.storage.tables.Mutes;
 import net.dirtcraft.discordlink.utility.Utility;
 
@@ -19,7 +21,7 @@ public class Unmute implements DiscordCommandExecutor {
         DiscordLink discordLink = DiscordLink.get();
         Database database = discordLink.getStorage();
         UserManagerImpl userManager = discordLink.getUserManager();
-        GuildMember target = removeIfPresent(args, userManager::getMember).orElseThrow(()->new DiscordCommandException("Discord user not specified."));
+        DiscordMember target = removeIfPresent(args, userManager::getMember).orElseThrow(()->new DiscordCommandException("Discord user not specified."));
         Utility.removeRoleIfPresent(target.getIdLong(), DiscordRoles.MUTED);
         Mutes.MuteData data = database.hasActiveMute(target.getIdLong()).orElseThrow(()->new DiscordCommandException("The user was never muted."));
         database.deactivateMute(source.getIdLong(), target.getIdLong());

@@ -2,12 +2,14 @@ package net.dirtcraft.discordlink.commands.discord;
 
 import net.dirtcraft.discordlink.DiscordLink;
 import net.dirtcraft.discordlink.users.GuildMember;
-import net.dirtcraft.discordlink.users.MessageSource;
-import net.dirtcraft.discordlink.api.commands.DiscordCommandExecutor;
-import net.dirtcraft.discordlink.api.exceptions.DiscordCommandException;
+import net.dirtcraft.discordlink.users.MessageSourceImpl;
+import net.dirtcraft.spongediscordlib.commands.DiscordCommandExecutor;
+import net.dirtcraft.spongediscordlib.exceptions.DiscordCommandException;
 import net.dirtcraft.discordlink.users.UserManagerImpl;
 import net.dirtcraft.discordlink.users.platform.PlatformUserImpl;
 import net.dirtcraft.discordlink.utility.Utility;
+import net.dirtcraft.spongediscordlib.users.MessageSource;
+import net.dirtcraft.spongediscordlib.users.platform.PlatformUser;
 import net.dv8tion.jda.api.entities.Member;
 
 import java.util.List;
@@ -28,8 +30,8 @@ public class Username implements DiscordCommandExecutor {
         if (!matcher.matches() || !(member = Utility.getMemberById(matcher.group(1))).isPresent()) throw new DiscordCommandException("Invalid Discord ID");
 
         final GuildMember player =userManager.getMember(member.get());
-        final Optional<PlatformUserImpl> user = player.getPlayerData();
+        final Optional<PlatformUser> user = player.getPlayerData();
         if (!user.isPresent()) throw new DiscordCommandException("The user was not verified!");
-        source.sendCommandResponse("Minecraft Username:", user.flatMap(PlatformUserImpl::getNameIfPresent).get());
+        source.sendCommandResponse("Minecraft Username:", user.flatMap(PlatformUser::getNameIfPresent).get());
     }
 }

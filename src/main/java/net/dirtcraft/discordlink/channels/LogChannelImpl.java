@@ -1,7 +1,7 @@
 package net.dirtcraft.discordlink.channels;
 
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
-import net.dirtcraft.discordlink.api.channels.LogChannel;
+import net.dirtcraft.spongediscordlib.channels.LogChannel;
 import net.dirtcraft.discordlink.utility.Utility;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.MessageEmbed;

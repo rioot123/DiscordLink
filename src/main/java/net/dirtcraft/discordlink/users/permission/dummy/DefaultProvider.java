@@ -1,8 +1,8 @@
 package net.dirtcraft.discordlink.users.permission.dummy;
 
-import net.dirtcraft.discordlink.users.MessageSource;
-import net.dirtcraft.discordlink.commands.sources.ConsoleSource;
 import net.dirtcraft.discordlink.users.permission.PermissionProvider;
+import net.dirtcraft.spongediscordlib.users.MessageSource;
+import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.text.Text;

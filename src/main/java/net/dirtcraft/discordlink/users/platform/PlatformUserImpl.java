@@ -1,6 +1,7 @@
 package net.dirtcraft.discordlink.users.platform;
 
-import net.dirtcraft.discordlink.api.users.platform.PlatformUser;
+import net.dirtcraft.spongediscordlib.users.platform.PlatformPlayer;
+import net.dirtcraft.spongediscordlib.users.platform.PlatformUser;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 
@@ -30,7 +31,7 @@ public class PlatformUserImpl implements PlatformUser {
     }
 
     @Override
-    public Optional<PlatformPlayerImpl> getPlatformPlayer(){
+    public Optional<PlatformPlayer> getPlatformPlayer(){
         return user.getPlayer().map(PlatformPlayerImpl::new);
     }
 
