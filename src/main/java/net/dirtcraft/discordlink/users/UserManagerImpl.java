@@ -6,6 +6,7 @@ import net.dirtcraft.discordlink.channels.ChannelManagerImpl;
 import net.dirtcraft.discordlink.channels.DiscordChannelImpl;
 import net.dirtcraft.discordlink.storage.Database;
 import net.dirtcraft.discordlink.storage.tables.Verification;
+import net.dirtcraft.discordlink.users.discord.RoleManagerImpl;
 import net.dirtcraft.discordlink.users.platform.PlatformPlayerImpl;
 import net.dirtcraft.discordlink.users.platform.PlatformProvider;
 import net.dirtcraft.discordlink.users.platform.PlatformUserImpl;
@@ -20,10 +21,12 @@ import java.util.UUID;
 
 public class UserManagerImpl implements UserManager {
     private final ChannelManagerImpl channelManager;
+    private final RoleManagerImpl roleManager;
     private final Database storage;
 
-    public UserManagerImpl(ChannelManagerImpl channelManager, Database storage){
+    public UserManagerImpl(ChannelManagerImpl channelManager, RoleManagerImpl roleManager, Database storage){
         this.channelManager = channelManager;
+        this.roleManager = roleManager;
         this.storage = storage;
     }
 
@@ -32,7 +35,7 @@ public class UserManagerImpl implements UserManager {
         if (s.matches("<?@?!?(\\d+)>?")){
             long discordId = Long.parseLong(s.replaceAll("<?@?!?(\\d+)>?", "$1"));
             return Optional.ofNullable(channelManager.getGuild().getMemberById(discordId))
-                    .map(m->new GuildMember(storage, m))
+                    .map(m->new GuildMember(storage, roleManager, m))
                     .flatMap(GuildMember::getPlayerData);
         } else {
             return PlatformProvider.getPlayerOffline(s);
@@ -47,7 +50,7 @@ public class UserManagerImpl implements UserManager {
     @Override
     public Optional<GuildMember> getMember(long id){
         return Optional.ofNullable(DiscordLink.get().getChannelManager().getGuild().getMemberById(id))
-                .map(m->new GuildMember(storage, m));
+                .map(m->new GuildMember(storage, roleManager, m));
     }
 
     @Override
@@ -55,7 +58,7 @@ public class UserManagerImpl implements UserManager {
         final Optional<GuildMember> profile =  storage.getVerificationData(player)
                 .flatMap(Verification.VerificationData::getDiscordId)
                 .flatMap(Utility::getMemberById)
-                .map(member->new GuildMember(storage, member));
+                .map(member->new GuildMember(storage, roleManager, member));
         profile.ifPresent(member-> {
             member.retrievedPlayer = true;
             member.user = PlatformProvider.getPlayerOffline(player)
@@ -69,7 +72,7 @@ public class UserManagerImpl implements UserManager {
         if (s.matches("<?@?!?(\\d+)>?")){
             long discordId = Long.parseLong(s.replaceAll("<?@?!?(\\d+)>?", "$1"));
             return Optional.ofNullable(channelManager.getGuild().getMemberById(discordId))
-                    .map(m->new GuildMember(storage, m));
+                    .map(m->new GuildMember(storage, roleManager, m));
         } else {
             return PlatformProvider.getPlayerOffline(s)
                     .map(PlatformUserImpl::getUUID)
@@ -87,10 +90,10 @@ public class UserManagerImpl implements UserManager {
         boolean isPrivate = event.getMessage().isFromType(ChannelType.PRIVATE);
         long channelId = event.getChannel().getIdLong();
         DiscordChannelImpl channel = channelManager.getChannel(channelId, isPrivate);
-        return new MessageSource(storage, event.getMember(), channel, event);
+        return new MessageSource(storage, event.getMember(), channel, roleManager, event);
     }
 
     public GuildMember getMember(Member member){
-        return new GuildMember(storage, member);
+        return new GuildMember(storage, roleManager, member);
     }
 }

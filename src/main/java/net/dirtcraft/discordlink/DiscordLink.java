@@ -2,6 +2,7 @@ package net.dirtcraft.discordlink;
 
 import com.google.inject.Inject;
 import net.dirtcraft.discordlink.api.commands.DiscordCommand;
+import net.dirtcraft.discordlink.api.users.roles.RoleManager;
 import net.dirtcraft.discordlink.channels.ChannelManagerImpl;
 import net.dirtcraft.discordlink.commands.DiscordCommandImpl;
 import net.dirtcraft.discordlink.commands.DiscordCommandManagerImpl;
@@ -14,6 +15,7 @@ import net.dirtcraft.discordlink.storage.Database;
 import net.dirtcraft.discordlink.storage.Permission;
 import net.dirtcraft.discordlink.storage.Settings;
 import net.dirtcraft.discordlink.users.UserManagerImpl;
+import net.dirtcraft.discordlink.users.discord.RoleManagerImpl;
 import net.dirtcraft.discordlink.utility.Utility;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dirtcraft.discordlink.api.DiscordApi;
@@ -66,6 +68,7 @@ public class DiscordLink extends ServerBootHandler implements DiscordApi {
     private DiscordCommandManagerImpl commandManager;
     private ChannelManagerImpl channelManager;
     private UserManagerImpl userManager;
+    private RoleManagerImpl roleManager;
     private ConfigManager configManager;
     private Database storage;
     private JDA jda;
@@ -95,6 +98,11 @@ public class DiscordLink extends ServerBootHandler implements DiscordApi {
     }
 
     @Override
+    public RoleManager getRoleManager() {
+        return roleManager;
+    }
+
+    @Override
     public boolean isLoaded() {
         return isReady;
     }
@@ -115,6 +123,10 @@ public class DiscordLink extends ServerBootHandler implements DiscordApi {
         return channel;
     }
 
+    {
+        System.out.println("!!!!!!! GENERATE INSTANCE !!!!!!!");
+    }
+
     @Override
     @Listener (order = Order.PRE)
     public void onGameConstruction(GameConstructionEvent event) {
@@ -130,6 +142,7 @@ public class DiscordLink extends ServerBootHandler implements DiscordApi {
     }
 
     private void preInitialize(){
+        logger.info("Requesting JDA!");
         SpongeDiscordLib.getJDA(jda->{
             logger.info("Discord Link pre=initializing...");
             if ((this.jda = jda) == null) {
@@ -140,8 +153,9 @@ public class DiscordLink extends ServerBootHandler implements DiscordApi {
             setInstance();
             this.configManager = new ConfigManager(loader);
             this.storage = new Database();
+            this.roleManager = new RoleManagerImpl(jda);
             this.channelManager = new ChannelManagerImpl(jda);
-            this.userManager = new UserManagerImpl(channelManager, storage);
+            this.userManager = new UserManagerImpl(channelManager, roleManager, storage);
             this.commandManager = new DiscordCommandManagerImpl();
             jda.addEventListener(new DiscordEvents(this));
             isReady = true;
@@ -244,7 +258,7 @@ public class DiscordLink extends ServerBootHandler implements DiscordApi {
 
     public void setInstance(){
         try {
-            Sponge.getServiceManager().setProvider(this, DiscordApi.class, this);
+            registerProvider();
             Supplier<DiscordCommand.Builder> supplier = DiscordCommandImpl::builder;
             Method setter = DiscordApiProvider.class.getDeclaredMethod("setProvider", DiscordApi.class, Supplier.class);
             setter.setAccessible(true);
@@ -252,6 +266,12 @@ public class DiscordLink extends ServerBootHandler implements DiscordApi {
         } catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    public void registerProvider(){
+        Task.builder()
+                .execute(()-> Sponge.getServiceManager().setProvider(this, DiscordApi.class, this))
+                .submit(this);
     }
 
 }

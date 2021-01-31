@@ -1,9 +1,9 @@
 package net.dirtcraft.discordlink.commands;
 
+import net.dirtcraft.discordlink.api.users.roles.DiscordRoles;
 import net.dirtcraft.discordlink.commands.discord.mute.MuteBase;
 import net.dirtcraft.discordlink.commands.discord.notify.NotifyBase;
 import net.dirtcraft.discordlink.users.MessageSource;
-import net.dirtcraft.discordlink.users.discord.Roles;
 import net.dirtcraft.discordlink.api.exceptions.DiscordCommandException;
 import net.dirtcraft.discordlink.storage.PluginConfiguration;
 import net.dirtcraft.discordlink.utility.Utility;
@@ -22,7 +22,7 @@ public class DiscordCommandManagerImpl extends DiscordCommandTree {
         DiscordCommandImpl mute = DiscordCommandImpl.builder()
             .setDescription("Command base for mute manipulation")
             .setCommandExecutor(new MuteBase())
-            .setRequiredRoles(Roles.STAFF)
+            .setRequiredRoles(DiscordRoles.STAFF)
             .build();
 
         DiscordCommandImpl list = DiscordCommandImpl.builder()
@@ -34,59 +34,59 @@ public class DiscordCommandManagerImpl extends DiscordCommandTree {
                 .setDescription("Stops the server abruptly.")
                 .setCommandExecutor(new StopServer(false))
                 .setPreBootEnabled(true)
-                .setRequiredRoles(Roles.ADMIN)
+                .setRequiredRoles(DiscordRoles.ADMIN)
                 .build();
 
         DiscordCommandImpl stop = DiscordCommandImpl.builder()
                 .setDescription("Stops the server gracefully.")
                 .setCommandExecutor(new StopServer(true))
                 .setPreBootEnabled(true)
-                .setRequiredRoles(Roles.ADMIN)
+                .setRequiredRoles(DiscordRoles.ADMIN)
                 .build();
 
         DiscordCommandImpl unstuck = DiscordCommandImpl.builder()
                 .setDescription("Teleports you to spawn if you are verified.")
                 .setCommandExecutor(new Unstuck())
-                .setRequiredRoles(Roles.VERIFIED)
+                .setRequiredRoles(DiscordRoles.VERIFIED)
                 .build();
 
         DiscordCommandImpl seen = DiscordCommandImpl.builder()
                 .setDescription("Sends you a DM with a players info.")
                 .setCommandExecutor(new SilentSeen())
                 .setCommandUsage("<Player>")
-                .setRequiredRoles(Roles.STAFF)
+                .setRequiredRoles(DiscordRoles.STAFF)
                 .build();
 
         DiscordCommandImpl username = DiscordCommandImpl.builder()
                 .setDescription("Reveals a verified players minecraft username.")
                 .setCommandExecutor(new Username())
                 .setCommandUsage("<@Discord>")
-                .setRequiredRoles(Roles.STAFF)
+                .setRequiredRoles(DiscordRoles.STAFF)
                 .build();
 
         DiscordCommandImpl discord = DiscordCommandImpl.builder()
                 .setDescription("Reveals a verified players discord username.")
                 .setCommandExecutor(new Discord())
                 .setCommandUsage("<Player>")
-                .setRequiredRoles(Roles.STAFF)
+                .setRequiredRoles(DiscordRoles.STAFF)
                 .build();
 
         DiscordCommandImpl ranks = DiscordCommandImpl.builder()
                 .setDescription("Reveals a players ranks.")
                 .setCommandExecutor(new Ranks())
-                .setRequiredRoles(Roles.VERIFIED)
+                .setRequiredRoles(DiscordRoles.VERIFIED)
                 .build();
 
         DiscordCommandImpl kits = DiscordCommandImpl.builder()
                 .setDescription("Reveals a players kits.")
                 .setCommandExecutor(new Kits())
-                .setRequiredRoles(Roles.VERIFIED)
+                .setRequiredRoles(DiscordRoles.VERIFIED)
                 .build();
 
         DiscordCommandImpl sync = DiscordCommandImpl.builder()
                 .setDescription("Runs LP Sync to re-sync the perms")
                 .setCommandExecutor(new IngameCommand("lp sync"))
-                .setRequiredRoles(Roles.ADMIN)
+                .setRequiredRoles(DiscordRoles.ADMIN)
                 .build();
 
         DiscordCommandImpl unverify = DiscordCommandImpl.builder()
@@ -103,25 +103,25 @@ public class DiscordCommandManagerImpl extends DiscordCommandTree {
         DiscordCommandImpl prefix = DiscordCommandImpl.builder()
                 .setDescription("Sets prefixes")
                 .setCommandUsage("<title>")
-                .setRequiredRoles(Roles.STAFF)
+                .setRequiredRoles(DiscordRoles.STAFF)
                 .setCommandExecutor(new Prefix())
                 .build();
 
         DiscordCommandImpl version = DiscordCommandImpl.builder()
                 .setDescription("Shows the current version")
-                .setRequiredRoles(Roles.DIRTY)
+                .setRequiredRoles(DiscordRoles.DIRTY)
                 .setCommandExecutor(new Version())
                 .build();
 
         DiscordCommandImpl inv = DiscordCommandImpl.builder()
                 .setDescription("Debug")
-                .setRequiredRoles(Roles.MOD)
+                .setRequiredRoles(DiscordRoles.MOD)
                 .setCommandExecutor(new ItemBase())
                 .build();
 
         DiscordCommandImpl logs = DiscordCommandImpl.builder()
                 .setDescription("Shows latest logs")
-                .setRequiredRoles(Roles.ADMIN)
+                .setRequiredRoles(DiscordRoles.ADMIN)
                 .setCommandExecutor(new Logs())
                 .setPreBootEnabled(true)
                 .build();

@@ -16,6 +16,13 @@ public interface PlatformUser {
 
     Optional<PlatformPlayerImpl> getPlatformPlayer();
 
-    @SuppressWarnings("unchecked")
+
+    /**
+     * Returns an offline player object specific of the platform
+     * Sponge: User
+     * Spigot: OfflinePlayer
+     * Forge:  GameProfile
+     * @return Platform specific representation of an offline player.
+     */
     <T> T getOfflinePlayer();
 }

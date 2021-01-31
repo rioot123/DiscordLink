@@ -1,8 +1,7 @@
 package net.dirtcraft.discordlink.commands.sponge;
 
-import net.dirtcraft.discordlink.channels.ChannelManagerImpl;
-import net.dirtcraft.discordlink.users.discord.Roles;
 import net.dirtcraft.discordlink.DiscordLink;
+import net.dirtcraft.discordlink.api.users.roles.DiscordRoles;
 import net.dirtcraft.discordlink.storage.Database;
 import net.dirtcraft.discordlink.storage.tables.Verification;
 import net.dirtcraft.discordlink.utility.Utility;
@@ -40,12 +39,11 @@ public class UnVerify implements CommandExecutor {
             player.sendMessage(Utility.format("&cYour account is not verified!"));
         } else {
             data.deleteRecord();
-            Guild guild = DiscordLink.get().getChannelManager().getGuild();
             String response = data.getDiscordUser()
                     .map(user->"&7The account &6" + user.getName() + "&8#&7" + user.getDiscriminator() + " has been &cunverified")
                     .orElse("&7Your account has been &cunverified");
             player.sendMessage(Utility.format(response));
-            data.getGuildMember().ifPresent(member-> Utility.removeRoleIfPresent(guild, member, Roles.VERIFIED));
+            data.getGuildMember().ifPresent(member-> member.removeRoleIfPresent(DiscordRoles.VERIFIED));
         }
     }
 }

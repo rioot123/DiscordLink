@@ -1,8 +1,9 @@
-package net.dirtcraft.discordlink.users.platform;
+package net.dirtcraft.discordlink.utility;
 
 import net.dirtcraft.discordlink.users.MessageSource;
 import net.dirtcraft.discordlink.DiscordLink;
 import net.dirtcraft.discordlink.storage.PluginConfiguration;
+import net.dirtcraft.discordlink.users.platform.PlatformUserImpl;
 import net.dirtcraft.discordlink.utility.Utility;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.spongepowered.api.Sponge;

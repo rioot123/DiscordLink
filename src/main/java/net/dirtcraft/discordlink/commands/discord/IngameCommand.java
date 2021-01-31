@@ -1,7 +1,8 @@
 package net.dirtcraft.discordlink.commands.discord;
 
+import net.dirtcraft.discordlink.api.users.roles.DiscordRoles;
 import net.dirtcraft.discordlink.users.MessageSource;
-import net.dirtcraft.discordlink.users.discord.Roles;
+import net.dirtcraft.discordlink.api.users.roles.DiscordRole;
 import net.dirtcraft.discordlink.api.commands.DiscordCommandExecutor;
 import net.dirtcraft.discordlink.commands.sources.ConsoleSource;
 import net.dirtcraft.discordlink.DiscordLink;
@@ -14,15 +15,15 @@ import java.util.List;
 public class IngameCommand implements DiscordCommandExecutor {
     private final String command;
     private final boolean args;
-    private final Roles argsReq;
+    private final DiscordRole argsReq;
 
     public IngameCommand(String command){
         this.command = command;
         this.args = false;
-        this.argsReq = Roles.NONE;
+        this.argsReq = DiscordRoles.NONE;
     }
 
-    public IngameCommand(String command, Roles role){
+    public IngameCommand(String command, DiscordRole role){
         this.command = command;
         this.args = true;
         this.argsReq = role;
@@ -38,7 +39,7 @@ public class IngameCommand implements DiscordCommandExecutor {
     }
 
     private boolean canUseArgs(MessageSource source){
-        return args && argsReq == Roles.NONE || source.hasRole(argsReq);
+        return args && argsReq == DiscordRoles.NONE || source.hasRole(argsReq);
     }
 
     private String parseCommand(MessageSource source, String command, List<String> args) throws DiscordCommandException{

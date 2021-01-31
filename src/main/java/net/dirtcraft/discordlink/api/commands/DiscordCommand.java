@@ -1,7 +1,7 @@
 package net.dirtcraft.discordlink.api.commands;
 
 import net.dirtcraft.discordlink.commands.DiscordCommandImpl;
-import net.dirtcraft.discordlink.users.discord.Roles;
+import net.dirtcraft.discordlink.api.users.roles.DiscordRole;
 
 import java.util.function.Supplier;
 
@@ -13,7 +13,7 @@ public interface DiscordCommand {
     abstract class Builder {
         static Supplier<Builder> builderSupplier;
 
-        public abstract DiscordCommandImpl.BuilderImpl setRequiredRoles(Roles... roles);
+        public abstract DiscordCommandImpl.BuilderImpl setRequiredRoles(DiscordRole... roles);
 
         public abstract DiscordCommandImpl.BuilderImpl setCommandExecutor(DiscordCommandExecutor executor);
 

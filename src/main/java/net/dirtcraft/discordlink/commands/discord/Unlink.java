@@ -1,9 +1,9 @@
 package net.dirtcraft.discordlink.commands.discord;
 
+import net.dirtcraft.discordlink.api.users.roles.DiscordRoles;
 import net.dirtcraft.discordlink.users.GuildMember;
 import net.dirtcraft.discordlink.users.MessageSource;
 import net.dirtcraft.discordlink.users.UserManagerImpl;
-import net.dirtcraft.discordlink.users.discord.Roles;
 import net.dirtcraft.discordlink.api.commands.DiscordCommandExecutor;
 import net.dirtcraft.discordlink.DiscordLink;
 import net.dirtcraft.discordlink.api.exceptions.DiscordCommandException;
@@ -41,7 +41,7 @@ public class Unlink implements DiscordCommandExecutor {
             }
             source.sendCommandResponse("Successfully executed command:", "Successfully unlinked " + source.getPlayerData().flatMap(PlatformUserImpl::getNameIfPresent).orElse("your account") + ".");
             return;
-        } else if (!source.hasRole(Roles.ADMIN)) throw new DiscordCommandException("You do not have permission to use this command on other users.");
+        } else if (!source.hasRole(DiscordRoles.ADMIN)) throw new DiscordCommandException("You do not have permission to use this command on other users.");
 
         final String discordID = args.get(0);
         Pattern pattern = Pattern.compile("<?@?!?(\\d+)>?");

@@ -1,5 +1,7 @@
 package net.dirtcraft.discordlink.utility;
 
+import net.dirtcraft.discordlink.api.users.roles.DiscordRole;
+import net.dirtcraft.discordlink.api.users.roles.DiscordRoles;
 import net.dirtcraft.discordlink.channels.MessageIntent;
 import net.dirtcraft.discordlink.commands.sources.ConsoleSource;
 import net.dirtcraft.discordlink.DiscordLink;
@@ -8,7 +10,6 @@ import net.dirtcraft.discordlink.storage.PluginConfiguration;
 import net.dirtcraft.discordlink.users.GuildMember;
 import net.dirtcraft.discordlink.users.MessageSource;
 import net.dirtcraft.discordlink.users.UserManagerImpl;
-import net.dirtcraft.discordlink.users.discord.Roles;
 import net.dirtcraft.discordlink.users.platform.PlatformPlayerImpl;
 import net.dirtcraft.discord.spongediscordlib.DiscordUtil;
 import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
@@ -110,22 +111,12 @@ public class Utility {
     }
 
     public static void setRoles(PlatformPlayerImpl player, GuildMember member) {
-        DiscordLink discordLink = DiscordLink.get();
-        Guild guild = discordLink.getChannelManager().getGuild();
-        if (player.hasPermission(Permission.ROLES_DONOR)) setRoleIfAbsent(guild, member, Roles.DONOR);
-        if (!member.getRoles().contains(Roles.STAFF.getRole())) tryChangeNickname(guild, member, player.getName());
-        setRoleIfAbsent(guild, member, Roles.VERIFIED);
+        if (player.hasPermission(Permission.ROLES_DONOR)) member.setRoleIfAbsent(DiscordRoles.DONOR);
+        if (!member.getRoles().contains(DiscordRoles.STAFF.getRole())) member.tryChangeNickname(player.getName());
+        member.setRoleIfAbsent(DiscordRoles.VERIFIED);
     }
 
-    public static void setRoleIfAbsent(Guild guild, GuildMember member, Roles role){
-        try {
-            Role discordRole = role.getRole();
-            if (discordRole == null || member.hasRole(role)) return;
-            guild.addRoleToMember(member, discordRole).submit();
-        } catch (Exception ignored){}
-    }
-
-    public static void setRoleIfAbsent(long id, Roles role){
+    public static void removeRoleIfPresent(long id, DiscordRole role){
         try {
             DiscordLink discordLink = DiscordLink.get();
             UserManagerImpl userManager = discordLink.getUserManager();
@@ -133,40 +124,8 @@ public class Utility {
             Member discord = guild.retrieveMemberById(id).complete();
             if (discord == null) return;
             GuildMember member = userManager.getMember(discord);
-            Role discordRole = role.getRole();
-            if (discordRole == null || member.hasRole(role)) return;
-            guild.addRoleToMember(member, discordRole).submit();
+            member.removeRoleIfPresent(role);
         } catch (Exception ignored){}
-    }
-
-
-    public static void removeRoleIfPresent(Guild guild, GuildMember member, Roles role){
-        try {
-            Role discordRole = role.getRole();
-            if (discordRole == null || !member.hasRole(role)) return;
-            guild.removeRoleFromMember(member, discordRole).submit();
-        } catch (Exception ignored){}
-    }
-
-    public static void removeRoleIfPresent(long id, Roles role){
-        try {
-            DiscordLink discordLink = DiscordLink.get();
-            UserManagerImpl userManager = discordLink.getUserManager();
-            Guild guild = discordLink.getChannelManager().getGuild();
-            Member discord = guild.retrieveMemberById(id).complete();
-            if (discord == null) return;
-            GuildMember member = userManager.getMember(discord);
-            Role discordRole = role.getRole();
-            if (discordRole == null || !member.hasRole(role)) return;
-            guild.removeRoleFromMember(member, discordRole).submit();
-        } catch (Exception ignored){}
-    }
-
-    public static void tryChangeNickname(Guild guild, GuildMember member, String name){
-        try {
-            if (name == null) return;
-            guild.modifyNickname(member, name).submit();
-        } catch (Exception ignored){ }
     }
 
     public static void setStatus() {
@@ -192,8 +151,8 @@ public class Utility {
     }
 
     private static boolean canUseCommand(GuildMember sender, String command){
-        return sender.hasRole(Roles.DIRTY) ||
-               sender.hasRole(Roles.ADMIN) &&
+        return sender.hasRole(DiscordRoles.DIRTY) ||
+               sender.hasRole(DiscordRoles.ADMIN) &&
                PluginConfiguration.Command.blacklist.stream().noneMatch(e->command.matches("^\\b" + e + "\\b(.|\n)*?$"));
     }
 

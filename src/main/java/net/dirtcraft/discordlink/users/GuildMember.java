@@ -1,13 +1,16 @@
 package net.dirtcraft.discordlink.users;
 
 import net.dirtcraft.discordlink.api.users.DiscordMember;
+import net.dirtcraft.discordlink.api.users.roles.DiscordRole;
+import net.dirtcraft.discordlink.api.users.roles.DiscordRoles;
+import net.dirtcraft.discordlink.api.users.roles.RoleManager;
 import net.dirtcraft.discordlink.storage.Database;
 import net.dirtcraft.discordlink.storage.tables.Verification;
-import net.dirtcraft.discordlink.users.discord.Roles;
 import net.dirtcraft.discordlink.users.discord.WrappedMember;
 import net.dirtcraft.discordlink.users.platform.PlatformPlayerImpl;
 import net.dirtcraft.discordlink.users.platform.PlatformUserImpl;
 import net.dirtcraft.discordlink.users.platform.PlatformProvider;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
@@ -18,32 +21,36 @@ import java.util.*;
 public class GuildMember extends WrappedMember implements DiscordMember {
     PlatformUserImpl user;
     boolean retrievedPlayer;
+    private final RoleManager roleManager;
     private final Database storage;
-    private List<Roles> roles;
-    private Roles highestRank;
+    private Set<DiscordRole> roles;
+    private DiscordRole highestRank;
 
-    public GuildMember(Database storage, Member member){
+    public GuildMember(Database storage, RoleManager roleManager, Member member){
         super(member);
+        this.roleManager = roleManager;
         this.storage = storage;
         Collection<Role> discordRoles = member.getRoles();
-        roles = new ArrayList<>();
-        highestRank = Arrays.stream(Roles.values())
+        roles = new HashSet<>();
+        highestRank = roleManager.getRoles().stream()
                 .filter(e->discordRoles.contains(e.getRole()))
-                .map(Roles::ordinal)
+                .map(DiscordRole::ordinal)
                 .reduce(Integer::min)
-                .map(integer -> Roles.values()[integer])
-                .orElse(Roles.NONE);
+                .map(roleManager::getRole)
+                .orElse(DiscordRoles.NONE);
 
-        Arrays.stream(Roles.values())
-                .filter(e->(e.isStaff() && highestRank.ordinal() <= e.ordinal()) || (discordRoles.contains(e.getRole())))
+        roleManager.getRoles().stream()
+                .filter(e->(e.isStaff() && highestRank.getStaffLevel() <= e.getStaffLevel()) || (discordRoles.contains(e.getRole())))
                 .forEach(roles::add);
     }
 
+    @Override
     public Optional<PlatformPlayerImpl> getPlayer(){
         if (!retrievedPlayer) return getPlayerData().flatMap(PlatformProvider::getPlayer);
         else return Optional.ofNullable(user).flatMap(PlatformProvider::getPlayer);
     }
 
+    @Override
     public Optional<PlatformUserImpl> getPlayerData(){
         if (!retrievedPlayer) {
             final Optional<PlatformUserImpl> optData = storage.getVerificationData(getId())
@@ -54,47 +61,103 @@ public class GuildMember extends WrappedMember implements DiscordMember {
         } else return Optional.ofNullable(user);
     }
 
+    @Override
     public void sendMessage(MessageEmbed embed) {
         member.getUser().openPrivateChannel().queue(dm-> dm.sendMessage(embed).queue());
     }
 
+    @Override
     public void sendMessage(String message) {
         member.getUser().openPrivateChannel().queue(dm-> dm.sendMessage(message).queue());
     }
 
+    @Override
     public boolean isStaff(){
-        return roles.contains(Roles.STAFF);
+        return roles.contains(DiscordRoles.STAFF);
     }
 
+    @Override
     public boolean isMuted(){
-        return roles.contains(Roles.MUTED);
+        return roles.contains(DiscordRoles.MUTED);
     }
 
+    @Override
     public boolean isDonor(){
-        return roles.contains(Roles.DONOR);
+        return roles.contains(DiscordRoles.DONOR);
     }
 
+    @Override
     public boolean isBoosting(){
-        return roles.contains(Roles.NITRO);
+        return roles.contains(DiscordRoles.NITRO);
     }
 
+    @Override
     public boolean isVerified(){
-        return roles.contains(Roles.VERIFIED);
+        return roles.contains(DiscordRoles.VERIFIED);
     }
 
-    public boolean hasRole(Roles role){
+    @Override
+    public boolean hasRole(DiscordRole role){
         return roles.contains(role);
     }
 
+    @Override
     public String getChevron(){
         return highestRank.getChevron();
     }
 
+    @Override
     public String getNameStyle(){
         return highestRank.getStyle();
     }
 
-    @NonNull public Roles getHighestRank(){
+    @Override
+    @NonNull public DiscordRole getHighestRank(){
         return highestRank;
     }
+
+    @Override
+    public void setRoleIfAbsent(DiscordRole role){
+        try {
+            Guild guild = getGuild();
+            Role discordRole = role.getRole();
+            if (discordRole == null || hasRole(role)) return;
+            guild.addRoleToMember(member, discordRole).submit();
+        } catch (Exception ignored){}
+    }
+
+    @Override
+    public void removeRoleIfPresent(DiscordRole role){
+        try {
+            Guild guild = getGuild();
+            Role discordRole = role.getRole();
+            if (discordRole == null || !hasRole(role)) return;
+            guild.removeRoleFromMember(member, discordRole).submit();
+        } catch (Exception ignored){}
+    }
+
+    @Override
+    public void tryChangeNickname(String name){
+        try {
+            if (name == null) return;
+            getGuild().modifyNickname(this, name).submit();
+        } catch (Exception ignored){ }
+    }
+
+    @Override
+    public void reloadRoles(){
+        Collection<Role> discordRoles = member.getRoles();
+        roles = new HashSet<>();
+        highestRank = roleManager.getRoles().stream()
+                .filter(e->discordRoles.contains(e.getRole()))
+                .map(DiscordRole::ordinal)
+                .reduce(Integer::min)
+                .map(roleManager::getRole)
+                .orElse(DiscordRoles.NONE);
+
+        roleManager.getRoles().stream()
+                .filter(e->(e.isStaff() && highestRank.getStaffLevel() <= e.getStaffLevel()) || (discordRoles.contains(e.getRole())))
+                .forEach(roles::add);
+    }
+
 }

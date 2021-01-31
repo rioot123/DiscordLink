@@ -1,11 +1,7 @@
 package net.dirtcraft.discordlink.commands.discord.notify;
 
+import net.dirtcraft.discordlink.api.users.roles.DiscordRoles;
 import net.dirtcraft.discordlink.users.MessageSource;
-import net.dirtcraft.discordlink.users.discord.Roles;
-import net.dirtcraft.discordlink.commands.discord.notify.Add;
-import net.dirtcraft.discordlink.commands.discord.notify.List;
-import net.dirtcraft.discordlink.commands.discord.notify.Remove;
-import net.dirtcraft.discordlink.commands.discord.notify.Time;
 import net.dirtcraft.discordlink.commands.DiscordCommandImpl;
 import net.dirtcraft.discordlink.commands.DiscordCommandTree;
 import net.dirtcraft.discordlink.api.exceptions.DiscordCommandException;
@@ -18,7 +14,7 @@ public class NotifyBase extends DiscordCommandTree {
         DiscordCommandImpl time = DiscordCommandImpl.builder()
                 .setDescription("Sets when the boot failure threshold is reached, In minutes")
                 .setPreBootEnabled(true)
-                .setRequiredRoles(Roles.ADMIN)
+                .setRequiredRoles(DiscordRoles.ADMIN)
                 .setCommandUsage("[<number>]")
                 .setCommandExecutor(new Time())
                 .build();
@@ -26,21 +22,21 @@ public class NotifyBase extends DiscordCommandTree {
         DiscordCommandImpl add = DiscordCommandImpl.builder()
                 .setDescription("Starts notifying you when the boot failure threshold is reached.")
                 .setPreBootEnabled(true)
-                .setRequiredRoles(Roles.ADMIN)
+                .setRequiredRoles(DiscordRoles.ADMIN)
                 .setCommandExecutor(new Add())
                 .build();
 
         DiscordCommandImpl list = DiscordCommandImpl.builder()
                 .setDescription("List anyone to be notified when the boot failure threshold is reached.")
                 .setPreBootEnabled(true)
-                .setRequiredRoles(Roles.ADMIN)
+                .setRequiredRoles(DiscordRoles.ADMIN)
                 .setCommandExecutor(new List())
                 .build();
 
         DiscordCommandImpl remove = DiscordCommandImpl.builder()
                 .setDescription("Stops notifying you when the boot failure threshold is reached.")
                 .setPreBootEnabled(true)
-                .setRequiredRoles(Roles.VERIFIED)
+                .setRequiredRoles(DiscordRoles.VERIFIED)
                 .setCommandExecutor(new Remove())
                 .build();
 

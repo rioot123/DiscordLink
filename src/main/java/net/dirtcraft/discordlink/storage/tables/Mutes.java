@@ -1,7 +1,7 @@
 package net.dirtcraft.discordlink.storage.tables;
 
+import net.dirtcraft.discordlink.api.users.roles.DiscordRoles;
 import net.dirtcraft.discordlink.users.GuildMember;
-import net.dirtcraft.discordlink.users.discord.Roles;
 import net.dirtcraft.discordlink.users.platform.PlatformUserImpl;
 import net.dirtcraft.discordlink.utility.Utility;
 
@@ -126,7 +126,7 @@ public abstract class Mutes extends Votes {
     public void deactivateExpiredMutes(){
         getActiveMutes().stream()
                 .filter(MuteData::expired)
-                .peek(e->Utility.removeRoleIfPresent(e.subjectDiscord, Roles.MUTED))
+                .peek(e->Utility.removeRoleIfPresent(e.subjectDiscord, DiscordRoles.MUTED))
                 .forEach(e-> setMuteExpired(e.id));
     }
 

@@ -1,7 +1,7 @@
 package net.dirtcraft.discordlink.commands.discord;
 
+import net.dirtcraft.discordlink.api.users.roles.DiscordRoles;
 import net.dirtcraft.discordlink.users.MessageSource;
-import net.dirtcraft.discordlink.users.discord.Roles;
 import net.dirtcraft.discordlink.commands.discord.item.ItemList;
 import net.dirtcraft.discordlink.commands.discord.item.ItemRemove;
 import net.dirtcraft.discordlink.commands.DiscordCommandImpl;
@@ -15,7 +15,7 @@ public class ItemBase extends DiscordCommandTree {
     DiscordCommandImpl list = DiscordCommandImpl.builder()
             .setDescription("Lists a players items via DM.")
             .setCommandUsage("<Username>")
-            .setRequiredRoles(Roles.MOD)
+            .setRequiredRoles(DiscordRoles.MOD)
             .setCommandExecutor(new ItemList())
             .build();
 
@@ -23,7 +23,7 @@ public class ItemBase extends DiscordCommandTree {
         DiscordCommandImpl remove = DiscordCommandImpl.builder()
                 .setDescription("Removes a specific slot from a player.")
                 .setCommandUsage("<Username> <ID>")
-                .setRequiredRoles(Roles.MOD)
+                .setRequiredRoles(DiscordRoles.MOD)
                 .setCommandExecutor(new ItemRemove())
                 .build();
 

@@ -4,6 +4,7 @@ package net.dirtcraft.discordlink.users;
 import net.dirtcraft.discordlink.commands.sources.ConsoleSource;
 import net.dirtcraft.discordlink.commands.sources.DiscordResponder;
 import net.dirtcraft.discordlink.storage.Database;
+import net.dirtcraft.discordlink.users.discord.RoleManagerImpl;
 import net.dirtcraft.discordlink.utility.Utility;
 import net.dirtcraft.discordlink.channels.DiscordChannelImpl;
 import net.dirtcraft.discordlink.channels.ChannelManagerImpl;
@@ -17,8 +18,8 @@ public class MessageSource extends GuildMember implements DiscordResponder {
     private final Message message;
     private final DiscordChannelImpl source;
 
-    public MessageSource(Database storage, Member author, DiscordChannelImpl discordChannel, MessageReceivedEvent event){
-        super(storage, author);
+    public MessageSource(Database storage, Member author, DiscordChannelImpl discordChannel, RoleManagerImpl roleManager, MessageReceivedEvent event){
+        super(storage,roleManager, author);
         this.message = event.getMessage();
         this.source = discordChannel;
     }

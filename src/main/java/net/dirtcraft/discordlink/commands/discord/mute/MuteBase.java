@@ -1,7 +1,7 @@
 package net.dirtcraft.discordlink.commands.discord.mute;
 
+import net.dirtcraft.discordlink.api.users.roles.DiscordRoles;
 import net.dirtcraft.discordlink.users.MessageSource;
-import net.dirtcraft.discordlink.users.discord.Roles;
 import net.dirtcraft.discordlink.commands.DiscordCommandImpl;
 import net.dirtcraft.discordlink.commands.DiscordCommandTree;
 import net.dirtcraft.discordlink.api.exceptions.DiscordCommandException;
@@ -13,7 +13,7 @@ public class MuteBase extends DiscordCommandTree {
     DiscordCommandImpl add = DiscordCommandImpl.builder()
             .setDescription("Mutes a player!")
             .setCommandUsage("<@Discord> [duration] [reason]")
-            .setRequiredRoles(Roles.MOD)
+            .setRequiredRoles(DiscordRoles.MOD)
             .setCommandExecutor(new Mute())
             .build();
 
@@ -21,14 +21,14 @@ public class MuteBase extends DiscordCommandTree {
         DiscordCommandImpl remove = DiscordCommandImpl.builder()
                 .setDescription("Removes a players mute")
                 .setCommandUsage("<@Discord>")
-                .setRequiredRoles(Roles.MOD)
+                .setRequiredRoles(DiscordRoles.MOD)
                 .setCommandExecutor(new Unmute())
                 .build();
 
         DiscordCommandImpl info = DiscordCommandImpl.builder()
                 .setDescription("Shows the details of a mute")
                 .setCommandUsage("<@Discord>")
-                .setRequiredRoles(Roles.STAFF)
+                .setRequiredRoles(DiscordRoles.STAFF)
                 .setCommandExecutor(new MuteInfo())
                 .build();
 

@@ -5,7 +5,7 @@ import net.dirtcraft.discordlink.api.commands.DiscordCommand;
 import net.dirtcraft.discordlink.api.commands.DiscordCommandExecutor;
 import net.dirtcraft.discordlink.users.GuildMember;
 import net.dirtcraft.discordlink.users.MessageSource;
-import net.dirtcraft.discordlink.users.discord.Roles;
+import net.dirtcraft.discordlink.api.users.roles.DiscordRole;
 import net.dirtcraft.discordlink.api.exceptions.DiscordPermissionException;
 import net.dirtcraft.discordlink.users.platform.PlatformProvider;
 import net.dirtcraft.discordlink.utility.Utility;
@@ -14,13 +14,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DiscordCommandImpl implements DiscordCommand {
-    private final List<Roles> allowedRoles;
+    private final List<DiscordRole> allowedRoles;
     private final String description;
     private final DiscordCommandExecutor executor;
     private final String commandUsage;
     private final boolean preBoot;
 
-    private DiscordCommandImpl(List<Roles> allowed, DiscordCommandExecutor executor, String commandUsage, String description, boolean preBoot){
+    private DiscordCommandImpl(List<DiscordRole> allowed, DiscordCommandExecutor executor, String commandUsage, String description, boolean preBoot){
         this.allowedRoles = allowed;
         this.executor = executor;
         this.commandUsage = commandUsage;
@@ -61,7 +61,7 @@ public class DiscordCommandImpl implements DiscordCommand {
     }
 
     public static class BuilderImpl extends DiscordCommand.Builder {
-        private List<Roles> allowedRoles;
+        private List<DiscordRole> allowedRoles;
         private DiscordCommandExecutor executor;
         private String commandUsage;
         private String description;
@@ -70,7 +70,7 @@ public class DiscordCommandImpl implements DiscordCommand {
         private BuilderImpl(){}
 
         @Override
-        public final BuilderImpl setRequiredRoles(Roles... roles){
+        public final BuilderImpl setRequiredRoles(DiscordRole... roles){
             allowedRoles = Lists.newArrayList(roles);
             return this;
         }

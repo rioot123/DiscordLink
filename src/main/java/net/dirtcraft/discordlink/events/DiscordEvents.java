@@ -1,15 +1,15 @@
 package net.dirtcraft.discordlink.events;
 
+import net.dirtcraft.discordlink.api.users.roles.DiscordRoles;
 import net.dirtcraft.discordlink.channels.MessageIntent;
 import net.dirtcraft.discordlink.channels.ChannelManagerImpl;
 import net.dirtcraft.discordlink.users.MessageSource;
 import net.dirtcraft.discordlink.users.UserManagerImpl;
-import net.dirtcraft.discordlink.users.discord.Roles;
 import net.dirtcraft.discordlink.commands.DiscordCommandManagerImpl;
 import net.dirtcraft.discordlink.DiscordLink;
 import net.dirtcraft.discordlink.storage.Database;
 import net.dirtcraft.discordlink.storage.tables.Verification;
-import net.dirtcraft.discordlink.users.platform.PlatformChat;
+import net.dirtcraft.discordlink.utility.PlatformChat;
 import net.dirtcraft.discordlink.users.platform.PlatformProvider;
 import net.dirtcraft.discordlink.utility.Utility;
 import net.dv8tion.jda.api.entities.ChannelType;
@@ -87,7 +87,7 @@ public class DiscordEvents extends ListenerAdapter {
         Database database = storage;
         Verification.VerificationData data = database.getVerificationData(sender.getId()).orElse(null);
         if (data != null && data.getUUID().isPresent()) {
-            Utility.setRoleIfAbsent(channelManager.getGuild(), sender, Roles.VERIFIED);
+            sender.setRoleIfAbsent(DiscordRoles.VERIFIED);
             sender.sendCommandResponse("Verified role was missing, But you appear to be verified so it has been added again. Please send message or command again.");
         } else if (data != null && data.getCode().isPresent()) {
             String code = data.getCode().get();

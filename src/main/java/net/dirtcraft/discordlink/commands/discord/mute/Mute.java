@@ -1,9 +1,9 @@
 package net.dirtcraft.discordlink.commands.discord.mute;
 
+import net.dirtcraft.discordlink.api.users.roles.DiscordRoles;
 import net.dirtcraft.discordlink.users.GuildMember;
 import net.dirtcraft.discordlink.users.MessageSource;
 import net.dirtcraft.discordlink.users.UserManagerImpl;
-import net.dirtcraft.discordlink.users.discord.Roles;
 import net.dirtcraft.discordlink.api.commands.DiscordCommandExecutor;
 import net.dirtcraft.discordlink.DiscordLink;
 import net.dirtcraft.discordlink.api.exceptions.DiscordCommandException;
@@ -25,7 +25,7 @@ public class Mute implements DiscordCommandExecutor {
         Database storage = discordLink.getStorage();
         Timestamp expires = getExpireDate(args);
         String reason = args.isEmpty() ? "None given." : String.join(" ", args);
-        Utility.setRoleIfAbsent(discordLink.getChannelManager().getGuild(), target, Roles.MUTED);
+        target.setRoleIfAbsent(DiscordRoles.MUTED);
         storage.deactivateMute(source.getIdLong(), target.getIdLong());
         storage.registerMute(source.getIdLong(), target, expires, reason);
         String message = "You have been muted by " + source.getEffectiveName() + " for " +
