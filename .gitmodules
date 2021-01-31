@@ -1,0 +1,4 @@
+[submodule "Sponge-Discord-Lib"]
+	path = Sponge-Discord-Lib
+	url = https://github.com/Dirt-Craft/Sponge-Discord-Lib
+	branch = 2.0.0
