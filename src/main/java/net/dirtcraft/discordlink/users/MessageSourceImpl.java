@@ -23,6 +23,7 @@ public class MessageSourceImpl extends GuildMember implements DiscordResponder, 
         this.source = discordChannel;
     }
 
+    @Override
     public Message getMessage() {
         return message;
     }
@@ -43,35 +44,43 @@ public class MessageSourceImpl extends GuildMember implements DiscordResponder, 
         return false;
     }
 
+    @Override
     public DiscordChannelImpl getChannel(){
         return source;
     }
 
+    @Override
     public ConsoleSource getCommandSource(String command){
         DiscordResponder responder = source.getCommandResponder(this, command);
         return DiscordResponder.getSender(responder);
     }
 
+    @Override
     public boolean isPrivateMessage(){
         return source.getChannel().getType() == ChannelType.PRIVATE;
     }
 
+    @Override
     public void sendCommandResponse(String message){
         source.sendMessage(message);
     }
 
+    @Override
     public void sendCommandResponse(MessageEmbed message){
         source.sendMessage(message);
     }
 
+    @Override
     public void sendCommandResponse(String message, int delay){
         source.sendMessage(message, delay);
     }
 
+    @Override
     public void sendCommandResponse(MessageEmbed message, int delay){
         source.sendMessage(message, delay);
     }
 
+    @Override
     public void sendCommandResponse(String header, String message) {
         header = header == null? "" : header;
         MessageEmbed embed = Utility.embedBuilder()
@@ -81,6 +90,7 @@ public class MessageSourceImpl extends GuildMember implements DiscordResponder, 
         sendCommandResponse(embed);
     }
 
+    @Override
     public void sendCommandResponse(String header, String message, int duration) {
         header = header == null? "" : header;
         message = message == null? "" : message;
@@ -91,6 +101,7 @@ public class MessageSourceImpl extends GuildMember implements DiscordResponder, 
         sendCommandResponse(embed, duration);
     }
 
+    @Override
     public void sendPrivateFile(File file){
         getUser().openPrivateChannel()
                 .flatMap(a->a.sendFile(file))
