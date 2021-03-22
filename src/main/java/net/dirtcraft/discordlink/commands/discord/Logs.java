@@ -1,6 +1,5 @@
 package net.dirtcraft.discordlink.commands.discord;
 
-import net.dirtcraft.discordlink.users.MessageSourceImpl;
 import net.dirtcraft.spongediscordlib.commands.DiscordCommandExecutor;
 import net.dirtcraft.spongediscordlib.exceptions.DiscordCommandException;
 import net.dirtcraft.spongediscordlib.exceptions.DiscordPermissionException;
@@ -12,7 +11,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.ListIterator;
 
 public class Logs implements DiscordCommandExecutor {
     private static final int MAX_ENTRIES = 20;

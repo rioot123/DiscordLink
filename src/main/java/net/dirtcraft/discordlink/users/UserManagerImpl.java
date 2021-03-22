@@ -1,8 +1,6 @@
 package net.dirtcraft.discordlink.users;
 
 import net.dirtcraft.discordlink.DiscordLink;
-import net.dirtcraft.spongediscordlib.users.DiscordMember;
-import net.dirtcraft.spongediscordlib.users.UserManager;
 import net.dirtcraft.discordlink.channels.ChannelManagerImpl;
 import net.dirtcraft.discordlink.channels.DiscordChannelImpl;
 import net.dirtcraft.discordlink.storage.Database;
@@ -10,6 +8,8 @@ import net.dirtcraft.discordlink.storage.tables.Verification;
 import net.dirtcraft.discordlink.users.discord.RoleManagerImpl;
 import net.dirtcraft.discordlink.users.platform.PlatformProvider;
 import net.dirtcraft.discordlink.utility.Utility;
+import net.dirtcraft.spongediscordlib.users.DiscordMember;
+import net.dirtcraft.spongediscordlib.users.UserManager;
 import net.dirtcraft.spongediscordlib.users.platform.PlatformPlayer;
 import net.dirtcraft.spongediscordlib.users.platform.PlatformUser;
 import net.dv8tion.jda.api.entities.ChannelType;

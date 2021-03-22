@@ -1,12 +1,10 @@
 package net.dirtcraft.discordlink.commands.discord.item;
 
 import net.dirtcraft.discordlink.DiscordLink;
-import net.dirtcraft.discordlink.users.MessageSourceImpl;
+import net.dirtcraft.discordlink.users.UserManagerImpl;
+import net.dirtcraft.discordlink.utility.Pair;
 import net.dirtcraft.spongediscordlib.commands.DiscordCommandExecutor;
 import net.dirtcraft.spongediscordlib.exceptions.DiscordCommandException;
-import net.dirtcraft.discordlink.users.UserManagerImpl;
-import net.dirtcraft.discordlink.users.platform.PlatformUserImpl;
-import net.dirtcraft.discordlink.utility.Pair;
 import net.dirtcraft.spongediscordlib.users.MessageSource;
 import net.dirtcraft.spongediscordlib.users.platform.PlatformUser;
 import org.spongepowered.api.entity.living.player.User;

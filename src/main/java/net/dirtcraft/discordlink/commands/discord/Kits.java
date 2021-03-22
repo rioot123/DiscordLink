@@ -1,14 +1,11 @@
 package net.dirtcraft.discordlink.commands.discord;
 
 import net.dirtcraft.discordlink.DiscordLink;
-import net.dirtcraft.discordlink.users.GuildMember;
-import net.dirtcraft.discordlink.users.MessageSourceImpl;
+import net.dirtcraft.discordlink.users.permission.PermissionProvider;
+import net.dirtcraft.discordlink.users.platform.PlatformProvider;
 import net.dirtcraft.spongediscordlib.commands.DiscordCommandExecutor;
 import net.dirtcraft.spongediscordlib.exceptions.DiscordCommandException;
 import net.dirtcraft.spongediscordlib.exceptions.DiscordPermissionException;
-import net.dirtcraft.discordlink.users.permission.PermissionProvider;
-import net.dirtcraft.discordlink.users.platform.PlatformUserImpl;
-import net.dirtcraft.discordlink.users.platform.PlatformProvider;
 import net.dirtcraft.spongediscordlib.users.DiscordMember;
 import net.dirtcraft.spongediscordlib.users.MessageSource;
 import net.dirtcraft.spongediscordlib.users.platform.PlatformUser;

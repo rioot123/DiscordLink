@@ -1,8 +1,8 @@
 package net.dirtcraft.discordlink.users.platform;
 
 
-import net.dirtcraft.spongediscordlib.users.platform.PlatformPlayer;
 import net.dirtcraft.discordlink.users.permission.PermissionProvider;
+import net.dirtcraft.spongediscordlib.users.platform.PlatformPlayer;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 

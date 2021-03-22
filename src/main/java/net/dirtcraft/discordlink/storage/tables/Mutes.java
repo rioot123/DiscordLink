@@ -1,11 +1,9 @@
 package net.dirtcraft.discordlink.storage.tables;
 
+import net.dirtcraft.discordlink.utility.Utility;
 import net.dirtcraft.spongediscordlib.users.DiscordMember;
 import net.dirtcraft.spongediscordlib.users.platform.PlatformUser;
 import net.dirtcraft.spongediscordlib.users.roles.DiscordRoles;
-import net.dirtcraft.discordlink.users.GuildMember;
-import net.dirtcraft.discordlink.users.platform.PlatformUserImpl;
-import net.dirtcraft.discordlink.utility.Utility;
 
 import java.sql.*;
 import java.time.Instant;

@@ -1,11 +1,11 @@
 package net.dirtcraft.discordlink.commands.discord;
 
-import net.dirtcraft.spongediscordlib.users.MessageSource;
-import net.dirtcraft.spongediscordlib.users.roles.DiscordRoles;
-import net.dirtcraft.spongediscordlib.users.roles.DiscordRole;
-import net.dirtcraft.spongediscordlib.commands.DiscordCommandExecutor;
 import net.dirtcraft.discordlink.DiscordLink;
+import net.dirtcraft.spongediscordlib.commands.DiscordCommandExecutor;
 import net.dirtcraft.spongediscordlib.exceptions.DiscordCommandException;
+import net.dirtcraft.spongediscordlib.users.MessageSource;
+import net.dirtcraft.spongediscordlib.users.roles.DiscordRole;
+import net.dirtcraft.spongediscordlib.users.roles.DiscordRoles;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.scheduler.Task;

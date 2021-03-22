@@ -1,8 +1,6 @@
 package net.dirtcraft.discordlink.commands.discord;
 
 import net.dirtcraft.discordlink.DiscordLink;
-import net.dirtcraft.discordlink.users.GuildMember;
-import net.dirtcraft.discordlink.users.MessageSourceImpl;
 import net.dirtcraft.spongediscordlib.commands.DiscordCommandExecutor;
 import net.dirtcraft.spongediscordlib.exceptions.DiscordCommandException;
 import net.dirtcraft.spongediscordlib.users.DiscordMember;

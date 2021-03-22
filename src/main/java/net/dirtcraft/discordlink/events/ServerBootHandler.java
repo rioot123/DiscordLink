@@ -1,12 +1,10 @@
 package net.dirtcraft.discordlink.events;
 
-import net.dirtcraft.discordlink.channels.ChannelManagerImpl;
+import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dirtcraft.discordlink.DiscordLink;
-import net.dirtcraft.discordlink.channels.GameChatChannelImpl;
 import net.dirtcraft.discordlink.storage.PluginConfiguration;
 import net.dirtcraft.discordlink.utility.Pair;
 import net.dirtcraft.discordlink.utility.Utility;
-import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.requests.RestAction;
 import org.spongepowered.api.GameState;
@@ -15,7 +13,6 @@ import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.game.state.*;
 
 import java.awt.*;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;

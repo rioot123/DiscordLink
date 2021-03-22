@@ -1,9 +1,7 @@
 package net.dirtcraft.discordlink.storage.tables;
 
-import net.dirtcraft.discordlink.users.GuildMember;
 import net.dirtcraft.discordlink.DiscordLink;
 import net.dirtcraft.discordlink.users.UserManagerImpl;
-import net.dirtcraft.discordlink.users.platform.PlatformUserImpl;
 import net.dirtcraft.discordlink.users.platform.PlatformProvider;
 import net.dirtcraft.discordlink.utility.Utility;
 import net.dirtcraft.spongediscordlib.users.DiscordMember;

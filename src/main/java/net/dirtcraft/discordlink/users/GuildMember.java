@@ -1,27 +1,28 @@
 package net.dirtcraft.discordlink.users;
 
+import net.dirtcraft.discordlink.DiscordLink;
+import net.dirtcraft.discordlink.channels.DiscordChannelImpl;
+import net.dirtcraft.discordlink.commands.sources.ConsoleSource;
+import net.dirtcraft.discordlink.commands.sources.DiscordResponder;
+import net.dirtcraft.discordlink.storage.Database;
+import net.dirtcraft.discordlink.storage.tables.Verification;
+import net.dirtcraft.discordlink.users.discord.WrappedMember;
 import net.dirtcraft.discordlink.users.permission.PermissionProvider;
 import net.dirtcraft.discordlink.users.permission.subject.PermissionResolver;
+import net.dirtcraft.discordlink.users.platform.PlatformProvider;
 import net.dirtcraft.spongediscordlib.users.DiscordMember;
 import net.dirtcraft.spongediscordlib.users.platform.PlatformPlayer;
 import net.dirtcraft.spongediscordlib.users.platform.PlatformUser;
 import net.dirtcraft.spongediscordlib.users.roles.DiscordRole;
 import net.dirtcraft.spongediscordlib.users.roles.DiscordRoles;
 import net.dirtcraft.spongediscordlib.users.roles.RoleManager;
-import net.dirtcraft.discordlink.storage.Database;
-import net.dirtcraft.discordlink.storage.tables.Verification;
-import net.dirtcraft.discordlink.users.discord.WrappedMember;
-import net.dirtcraft.discordlink.users.platform.PlatformPlayerImpl;
-import net.dirtcraft.discordlink.users.platform.PlatformUserImpl;
-import net.dirtcraft.discordlink.users.platform.PlatformProvider;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.*;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.spongepowered.api.Sponge;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 
 public class GuildMember extends WrappedMember implements DiscordMember {
     PlatformUser user;
@@ -29,6 +30,7 @@ public class GuildMember extends WrappedMember implements DiscordMember {
     boolean retrievedPlayer;
     boolean retrievedPermissions;
     private final RoleManager roleManager;
+    private DiscordChannelImpl privateChannel;
     private final Database storage;
     private Set<DiscordRole> roles;
     private DiscordRole highestRank;
@@ -89,6 +91,20 @@ public class GuildMember extends WrappedMember implements DiscordMember {
     @Override
     public void sendPrivateMessage(String message) {
         member.getUser().openPrivateChannel().queue(dm-> dm.sendMessage(message).queue());
+    }
+
+    public DiscordChannelImpl getPrivateChannel() {
+        if (privateChannel == null) {
+            PrivateChannel channel = getUser().openPrivateChannel().complete();
+            privateChannel = DiscordLink.get().getChannelManager()
+                    .getChannel(channel.getIdLong(), true);
+        }
+        return privateChannel;
+    }
+
+    public ConsoleSource getPrivateSource(String command) {
+        DiscordResponder responder = getPrivateChannel().getCommandResponder(this, command);
+        return DiscordResponder.getSender(responder);
     }
 
     @Override

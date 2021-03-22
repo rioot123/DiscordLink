@@ -1,14 +1,17 @@
 package net.dirtcraft.discordlink.users;
 
 
+import net.dirtcraft.discordlink.channels.DiscordChannelImpl;
 import net.dirtcraft.discordlink.commands.sources.ConsoleSource;
 import net.dirtcraft.discordlink.commands.sources.DiscordResponder;
 import net.dirtcraft.discordlink.storage.Database;
 import net.dirtcraft.discordlink.users.discord.RoleManagerImpl;
 import net.dirtcraft.discordlink.utility.Utility;
-import net.dirtcraft.discordlink.channels.DiscordChannelImpl;
 import net.dirtcraft.spongediscordlib.users.MessageSource;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.ChannelType;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.io.File;
@@ -42,6 +45,12 @@ public class MessageSourceImpl extends GuildMember implements DiscordResponder, 
     @Override
     public boolean sanitise(){
         return false;
+    }
+
+    @Override
+    public DiscordChannelImpl getPrivateChannel() {
+        if (isPrivateMessage()) return source;
+        else return super.getPrivateChannel();
     }
 
     @Override

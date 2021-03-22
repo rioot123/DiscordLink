@@ -1,11 +1,10 @@
 package net.dirtcraft.discordlink.channels;
 
-import net.dirtcraft.spongediscordlib.channels.DiscordChannel;
-import net.dirtcraft.spongediscordlib.users.DiscordMember;
 import net.dirtcraft.discordlink.commands.sources.DiscordResponder;
 import net.dirtcraft.discordlink.users.GuildMember;
-import net.dirtcraft.discordlink.users.MessageSourceImpl;
 import net.dirtcraft.discordlink.utility.Utility;
+import net.dirtcraft.spongediscordlib.channels.DiscordChannel;
+import net.dirtcraft.spongediscordlib.users.DiscordMember;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -80,7 +79,7 @@ public class DiscordChannelImpl implements DiscordChannel {
         sendMessage(embed);
     }
 
-    public DiscordResponder getCommandResponder(MessageSourceImpl member, String command){
+    public DiscordResponder getCommandResponder(GuildMember member, String command){
         return new DiscordResponder() {
             @Override
             public void sendDiscordResponse(String message) {

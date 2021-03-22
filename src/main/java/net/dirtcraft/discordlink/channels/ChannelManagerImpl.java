@@ -1,7 +1,7 @@
 package net.dirtcraft.discordlink.channels;
 
-import net.dirtcraft.spongediscordlib.channels.ChannelManager;
 import net.dirtcraft.discordlink.storage.PluginConfiguration;
+import net.dirtcraft.spongediscordlib.channels.ChannelManager;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageChannel;

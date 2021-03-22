@@ -1,6 +1,5 @@
 package net.dirtcraft.discordlink.commands.sponge;
 
-import net.dirtcraft.discordlink.users.GuildMember;
 import net.dirtcraft.discordlink.DiscordLink;
 import net.dirtcraft.discordlink.storage.Database;
 import net.dirtcraft.discordlink.storage.tables.Verification;

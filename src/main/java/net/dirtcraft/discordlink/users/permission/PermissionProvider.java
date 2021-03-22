@@ -5,7 +5,6 @@ import net.dirtcraft.discordlink.users.permission.luckperms.Api4;
 import net.dirtcraft.discordlink.users.permission.luckperms.Api5;
 import net.dirtcraft.discordlink.users.permission.subject.PermissionResolver;
 import net.dirtcraft.spongediscordlib.users.MessageSource;
-import net.luckperms.api.cacheddata.CachedPermissionData;
 import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;

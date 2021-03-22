@@ -1,13 +1,12 @@
 package net.dirtcraft.discordlink.commands.discord.notify;
 
-import net.dirtcraft.spongediscordlib.users.MessageSource;
-import net.dirtcraft.spongediscordlib.users.roles.DiscordRoles;
-import net.dirtcraft.discordlink.users.MessageSourceImpl;
 import net.dirtcraft.discordlink.commands.DiscordCommandImpl;
 import net.dirtcraft.discordlink.commands.DiscordCommandTree;
-import net.dirtcraft.spongediscordlib.exceptions.DiscordCommandException;
 import net.dirtcraft.discordlink.storage.PluginConfiguration;
 import net.dirtcraft.discordlink.utility.Utility;
+import net.dirtcraft.spongediscordlib.exceptions.DiscordCommandException;
+import net.dirtcraft.spongediscordlib.users.MessageSource;
+import net.dirtcraft.spongediscordlib.users.roles.DiscordRoles;
 import net.dv8tion.jda.api.EmbedBuilder;
 
 public class NotifyBase extends DiscordCommandTree {

@@ -1,15 +1,13 @@
 package net.dirtcraft.discordlink.commands.discord.mute;
 
+import net.dirtcraft.discordlink.DiscordLink;
+import net.dirtcraft.discordlink.storage.Database;
+import net.dirtcraft.discordlink.users.UserManagerImpl;
+import net.dirtcraft.spongediscordlib.commands.DiscordCommandExecutor;
+import net.dirtcraft.spongediscordlib.exceptions.DiscordCommandException;
 import net.dirtcraft.spongediscordlib.users.DiscordMember;
 import net.dirtcraft.spongediscordlib.users.MessageSource;
 import net.dirtcraft.spongediscordlib.users.roles.DiscordRoles;
-import net.dirtcraft.discordlink.users.GuildMember;
-import net.dirtcraft.discordlink.users.MessageSourceImpl;
-import net.dirtcraft.discordlink.users.UserManagerImpl;
-import net.dirtcraft.spongediscordlib.commands.DiscordCommandExecutor;
-import net.dirtcraft.discordlink.DiscordLink;
-import net.dirtcraft.spongediscordlib.exceptions.DiscordCommandException;
-import net.dirtcraft.discordlink.storage.Database;
 
 import java.sql.Timestamp;
 import java.time.Instant;

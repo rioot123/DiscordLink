@@ -2,7 +2,6 @@ package net.dirtcraft.discordlink.events;
 
 import br.net.fabiozumbi12.UltimateChat.Sponge.API.SendChannelMessageEvent;
 import net.dirtcraft.discordlink.DiscordLink;
-import net.dirtcraft.discordlink.channels.ChannelManagerImpl;
 import net.dirtcraft.discordlink.channels.GameChatChannelImpl;
 import net.dirtcraft.discordlink.utility.Utility;
 import org.spongepowered.api.entity.living.player.Player;

@@ -1,6 +1,5 @@
 package net.dirtcraft.discordlink.users.permission.luckperms;
 
-import me.lucko.luckperms.api.caching.PermissionData;
 import net.dirtcraft.discordlink.storage.Permission;
 import net.dirtcraft.discordlink.users.permission.PermissionProvider;
 import net.dirtcraft.discordlink.users.permission.subject.PermissionResolver;
@@ -15,7 +14,6 @@ import net.luckperms.api.node.Node;
 import net.luckperms.api.node.NodeEqualityPredicate;
 import net.luckperms.api.node.NodeType;
 import net.luckperms.api.track.Track;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 

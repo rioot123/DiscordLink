@@ -3,7 +3,6 @@ package net.dirtcraft.discordlink.commands;
 import net.dirtcraft.spongediscordlib.commands.DiscordCommand;
 import net.dirtcraft.spongediscordlib.commands.DiscordCommandExecutor;
 import net.dirtcraft.spongediscordlib.commands.DiscordCommandManager;
-import net.dirtcraft.discordlink.users.MessageSourceImpl;
 import net.dirtcraft.spongediscordlib.exceptions.DiscordCommandException;
 import net.dirtcraft.spongediscordlib.users.MessageSource;
 

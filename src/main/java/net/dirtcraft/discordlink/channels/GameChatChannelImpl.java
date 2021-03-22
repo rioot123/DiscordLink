@@ -1,8 +1,8 @@
 package net.dirtcraft.discordlink.channels;
 
-import net.dirtcraft.spongediscordlib.channels.GameChatChannel;
 import net.dirtcraft.discordlink.commands.sources.ResponseScheduler;
 import net.dirtcraft.discordlink.storage.PluginConfiguration;
+import net.dirtcraft.spongediscordlib.channels.GameChatChannel;
 import net.dv8tion.jda.api.JDA;
 
 public class GameChatChannelImpl extends DiscordChannelImpl implements GameChatChannel {

@@ -1,17 +1,17 @@
 package net.dirtcraft.discordlink.events;
 
-import net.dirtcraft.spongediscordlib.users.roles.DiscordRoles;
-import net.dirtcraft.discordlink.channels.MessageIntent;
-import net.dirtcraft.discordlink.channels.ChannelManagerImpl;
-import net.dirtcraft.discordlink.users.MessageSourceImpl;
-import net.dirtcraft.discordlink.users.UserManagerImpl;
-import net.dirtcraft.discordlink.commands.DiscordCommandManagerImpl;
 import net.dirtcraft.discordlink.DiscordLink;
+import net.dirtcraft.discordlink.channels.ChannelManagerImpl;
+import net.dirtcraft.discordlink.channels.MessageIntent;
+import net.dirtcraft.discordlink.commands.DiscordCommandManagerImpl;
 import net.dirtcraft.discordlink.storage.Database;
 import net.dirtcraft.discordlink.storage.tables.Verification;
-import net.dirtcraft.discordlink.utility.PlatformChat;
+import net.dirtcraft.discordlink.users.MessageSourceImpl;
+import net.dirtcraft.discordlink.users.UserManagerImpl;
 import net.dirtcraft.discordlink.users.platform.PlatformProvider;
+import net.dirtcraft.discordlink.utility.PlatformChat;
 import net.dirtcraft.discordlink.utility.Utility;
+import net.dirtcraft.spongediscordlib.users.roles.DiscordRoles;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;

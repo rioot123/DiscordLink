@@ -1,12 +1,10 @@
 package net.dirtcraft.discordlink.commands.discord;
 
-import net.dirtcraft.discordlink.users.MessageSourceImpl;
-import net.dirtcraft.spongediscordlib.commands.DiscordCommandExecutor;
+import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
 import net.dirtcraft.discordlink.storage.Permission;
-import net.dirtcraft.discordlink.users.platform.PlatformPlayerImpl;
 import net.dirtcraft.discordlink.users.platform.PlatformProvider;
 import net.dirtcraft.discordlink.utility.Utility;
-import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
+import net.dirtcraft.spongediscordlib.commands.DiscordCommandExecutor;
 import net.dirtcraft.spongediscordlib.users.MessageSource;
 import net.dirtcraft.spongediscordlib.users.platform.PlatformPlayer;
 import net.dv8tion.jda.api.EmbedBuilder;

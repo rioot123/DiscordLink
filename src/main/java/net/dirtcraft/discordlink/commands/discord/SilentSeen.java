@@ -1,7 +1,8 @@
 package net.dirtcraft.discordlink.commands.discord;
 
-import net.dirtcraft.spongediscordlib.commands.DiscordCommandExecutor;
 import net.dirtcraft.discordlink.DiscordLink;
+import net.dirtcraft.discordlink.users.GuildMember;
+import net.dirtcraft.spongediscordlib.commands.DiscordCommandExecutor;
 import net.dirtcraft.spongediscordlib.exceptions.DiscordCommandException;
 import net.dirtcraft.spongediscordlib.users.MessageSource;
 import net.dirtcraft.spongediscordlib.users.platform.PlatformUser;
@@ -24,7 +25,7 @@ public class SilentSeen implements DiscordCommandExecutor {
             target = args.get(0);
         }
         String command = "seen " + target;
-        ConsoleSource sender = source.getCommandSource(command);
+        ConsoleSource sender = ((GuildMember)source).getPrivateSource(command);
         Task.builder()
                 .execute(() -> Sponge.getCommandManager().process(sender, command))
                 .submit(DiscordLink.get());

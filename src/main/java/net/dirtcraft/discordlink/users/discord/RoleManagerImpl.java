@@ -7,7 +7,10 @@ import net.dirtcraft.spongediscordlib.users.roles.DiscordRoles;
 import net.dirtcraft.spongediscordlib.users.roles.RoleManager;
 import net.dv8tion.jda.api.JDA;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import static net.dirtcraft.discordlink.storage.PluginConfiguration.Roles.*;
