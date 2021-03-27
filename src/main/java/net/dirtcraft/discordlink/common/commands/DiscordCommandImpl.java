@@ -1,6 +1,8 @@
 package net.dirtcraft.discordlink.common.commands;
 
 import com.google.common.collect.Lists;
+import net.dirtcraft.discordlink.api.DiscordApi;
+import net.dirtcraft.discordlink.api.DiscordApiProvider;
 import net.dirtcraft.discordlink.forge.platform.PlatformProvider;
 import net.dirtcraft.discordlink.common.utility.Utility;
 import net.dirtcraft.discordlink.api.commands.DiscordCommand;
@@ -14,15 +16,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DiscordCommandImpl implements DiscordCommand {
+    private final PlatformProvider provider;
     private final List<DiscordRole> allowedRoles;
     private final String description;
     private final DiscordCommandExecutor executor;
     private final String commandUsage;
     private final boolean preBoot;
 
-    private DiscordCommandImpl(List<DiscordRole> allowed, DiscordCommandExecutor executor, String commandUsage, String description, boolean preBoot){
+    private DiscordCommandImpl(PlatformProvider provider,
+                               List<DiscordRole> allowed,
+                               DiscordCommandExecutor executor,
+                               String commandUsage,
+                               String description,
+                               boolean preBoot) {
         this.allowedRoles = allowed;
         this.executor = executor;
+        this.provider = provider;
         this.commandUsage = commandUsage;
         this.description = description;
         this.preBoot = preBoot;
@@ -33,7 +42,7 @@ public class DiscordCommandImpl implements DiscordCommand {
     }
 
     public final void process(MessageSource member, String command, List<String> args) {
-        if (!preBoot && !PlatformProvider.isGameReady()) return;
+        if (!preBoot && !provider.isGameReady()) return;
         if (!allowedRoles.stream().allMatch(member::hasRole)) {
             Utility.sendPermissionError(member);
             return;
@@ -102,6 +111,7 @@ public class DiscordCommandImpl implements DiscordCommand {
         @Override
         public DiscordCommandImpl build(){
             return new DiscordCommandImpl(
+                    DiscordApiProvider.getApi().get().getPlatformProvider(),
                     allowedRoles != null ? allowedRoles : new ArrayList<>(),
                     executor     != null ? executor     : (member, command, event)->{},
                     commandUsage != null ? commandUsage : "",

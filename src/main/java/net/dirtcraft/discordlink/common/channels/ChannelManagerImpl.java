@@ -37,13 +37,13 @@ public class ChannelManagerImpl implements ChannelManager {
     public LogChannelImpl getLogChannel() {
         return logChannel;
     }
+    @Override
+    public boolean isGamechat(MessageChannel channel){
+        return channel.getIdLong() == defaultChannel.getId();
+    }
 
     public TextChannel getDefaultChannel(){
         return jda.getTextChannelById(defaultChannel.getId());
-    }
-
-    public boolean isGamechat(MessageChannel channel){
-        return channel.getIdLong() == defaultChannel.getId();
     }
 
     public Guild getGuild(){

@@ -4,16 +4,12 @@ import net.dirtcraft.discordlink.api.DiscordApi;
 import net.dirtcraft.discordlink.api.channels.ChannelManager;
 import net.dirtcraft.discordlink.api.commands.DiscordCommandManager;
 import net.dirtcraft.discordlink.api.users.UserManager;
-import net.dirtcraft.discordlink.forge.DiscordLink;
-import net.dirtcraft.discordlink.common.channels.ChannelManagerImpl;
 import net.dirtcraft.discordlink.common.channels.MessageIntent;
-import net.dirtcraft.discordlink.common.commands.DiscordCommandManagerImpl;
 import net.dirtcraft.discordlink.common.storage.Database;
 import net.dirtcraft.discordlink.common.storage.tables.Verification;
 import net.dirtcraft.discordlink.common.users.MessageSourceImpl;
 import net.dirtcraft.discordlink.common.users.UserManagerImpl;
 import net.dirtcraft.discordlink.forge.platform.PlatformProvider;
-import net.dirtcraft.discordlink.forge.platform.PlatformChat;
 import net.dirtcraft.discordlink.common.utility.Utility;
 import net.dirtcraft.discordlink.api.users.roles.DiscordRoles;
 import net.dv8tion.jda.api.entities.ChannelType;
@@ -36,10 +32,11 @@ public class DiscordEvents extends ListenerAdapter {
     private final UserManager userManager;
     private final Database storage;
 
-    public DiscordEvents(DiscordApi discordLink){
+    public DiscordEvents(DiscordApi discordLink, PlatformProvider provider){
         this.commandManager = discordLink.getCommandManager();
         this.channelManager = discordLink.getChannelManager();
         this.userManager = discordLink.getUserManager();
+        this.provider = provider;
         this.storage = discordLink.getStorage();
     }
 
@@ -50,7 +47,7 @@ public class DiscordEvents extends ListenerAdapter {
         if (!gamechat && !privateDm || event.getAuthor().isBot() || hasAttachment(event)) return;
         CompletableFuture.runAsync(()->{
             try {
-                final MessageSourceImpl sender = userManager.getMember(event);
+                final MessageSourceImpl sender = ((UserManagerImpl)userManager).getMember(event);
                 if (!sender.isVerified() && !sender.isStaff()) processUnverifiedMessage(sender, event);
                 else if (privateDm) processPrivateMessage(sender, event);
                 else processGuildMessage(sender, event);

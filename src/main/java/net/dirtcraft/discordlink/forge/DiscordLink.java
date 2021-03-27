@@ -98,7 +98,7 @@ public class DiscordLink extends ServerBootHandler implements DiscordApi {
             this.channelManager = new ChannelManagerImpl(jda);
             this.userManager = new UserManagerImpl(channelManager, roleManager, storage, provider);
             this.commandManager = new DiscordCommandManagerImpl();
-            jda.addEventListener(new DiscordEvents(this));
+            jda.addEventListener(new DiscordEvents(this, provider));
             instance = this;
             isReady = true;
             //todo platform executor
@@ -161,6 +161,11 @@ public class DiscordLink extends ServerBootHandler implements DiscordApi {
     }
 
     @Override
+    public PlatformProvider getPlatformProvider() {
+        return provider;
+    }
+
+    @Override
     public boolean isLoaded() {
         return isReady;
     }
@@ -169,6 +174,7 @@ public class DiscordLink extends ServerBootHandler implements DiscordApi {
         configManager.save();
     }
 
+    @Override
     public Database getStorage(){
         return storage;
     }

@@ -8,7 +8,7 @@ import net.dirtcraft.discordlink.api.users.MessageSource;
 
 import java.util.*;
 
-public abstract class DiscordCommandTree implements DiscordCommandExecutor, DiscordCommandManager {
+public abstract class DiscordCommandTree implements DiscordCommandExecutor, net.dirtcraft.discordlink.api.commands.DiscordCommandTree {
     protected final HashMap<String, DiscordCommandImpl> commandMap = new HashMap<>();
     protected final HashSet<String> defaults = new HashSet<>(Arrays.asList("help", "?"));
 

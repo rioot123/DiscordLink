@@ -1,9 +1,12 @@
 package net.dirtcraft.discordlink.common.users.permission.luckperms;
 
+import net.dirtcraft.discordlink.api.users.platform.PlatformPlayer;
+import net.dirtcraft.discordlink.api.users.platform.PlatformUser;
 import net.dirtcraft.discordlink.common.storage.Permission;
 import net.dirtcraft.discordlink.common.users.permission.PermissionProvider;
 import net.dirtcraft.discordlink.common.users.permission.subject.PermissionResolver;
 import net.dirtcraft.discordlink.api.users.MessageSource;
+import net.dirtcraft.discordlink.forge.platform.PlatformProvider;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.cacheddata.CachedPermissionData;
@@ -14,8 +17,6 @@ import net.luckperms.api.node.Node;
 import net.luckperms.api.node.NodeEqualityPredicate;
 import net.luckperms.api.node.NodeType;
 import net.luckperms.api.track.Track;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.entity.living.player.User;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -28,10 +29,14 @@ public class Api5 extends LuckPermissions {
     private final LuckPerms api = LuckPermsProvider.get();
     private final ImmutableContextSet contexts = api.getContextManager().getStaticContext();
 
+    public Api5(PlatformProvider provider){
+        super(provider);
+    }
+
     @Override
-    public void printUserGroups(MessageSource source, User player) {
+    public void printUserGroups(MessageSource source, PlatformUser player) {
         UserManager userManager = api.getUserManager();
-        CompletableFuture<net.luckperms.api.model.user.User> userFuture = userManager.loadUser(player.getUniqueId());
+        CompletableFuture<net.luckperms.api.model.user.User> userFuture = userManager.loadUser(player.getUUID());
         userFuture.whenComplete((user, throwable) -> {
             String local = getGroups(user, contexts, false);
             String remote = getGroups(user, contexts, true);
@@ -43,9 +48,9 @@ public class Api5 extends LuckPermissions {
     }
 
     @Override
-    public void printUserKits(MessageSource source, User player) {
+    public void printUserKits(MessageSource source, PlatformUser player) {
         UserManager userManager = api.getUserManager();
-        CompletableFuture<net.luckperms.api.model.user.User> userFuture = userManager.loadUser(player.getUniqueId());
+        CompletableFuture<net.luckperms.api.model.user.User> userFuture = userManager.loadUser(player.getUUID());
         userFuture.whenComplete((user, throwable) -> {
             String local = getKits(user, contexts, false);
             String remote = getKits(user, contexts, true);
@@ -79,7 +84,7 @@ public class Api5 extends LuckPermissions {
                 .collect(Collectors.joining("\n"));
     }
 
-    public Optional<PermissionProvider.RankUpdate> modifyRank(@Nullable Player source, @Nullable UUID targetUUID, @Nullable String trackName, boolean promote){
+    public Optional<PermissionProvider.RankUpdate> modifyRank(@Nullable PlatformPlayer source, @Nullable UUID targetUUID, @Nullable String trackName, boolean promote){
         Optional<net.luckperms.api.model.user.User> target = Optional.ofNullable(targetUUID)
                 .map(api.getUserManager()::loadUser)
                 .map(CompletableFuture::join);
@@ -91,7 +96,7 @@ public class Api5 extends LuckPermissions {
         else return demoteTarget(source, target.get(), track.get());
     }
 
-    private Optional<PermissionProvider.RankUpdate> demoteTarget(Player source, net.luckperms.api.model.user.User targetUser, Track track) {
+    private Optional<PermissionProvider.RankUpdate> demoteTarget(PlatformPlayer source, net.luckperms.api.model.user.User targetUser, Track track) {
         List<String> groups = track.getGroups();
         NodeMap targetNodes = targetUser.data();
         String previousGroup = "default";
@@ -114,7 +119,7 @@ public class Api5 extends LuckPermissions {
         } else return Optional.empty();
     }
 
-    private Optional<PermissionProvider.RankUpdate> promoteTarget(Player source, net.luckperms.api.model.user.User targetUser, Track track) {
+    private Optional<PermissionProvider.RankUpdate> promoteTarget(PlatformPlayer source, net.luckperms.api.model.user.User targetUser, Track track) {
         List<String> groups = track.getGroups();
         NodeMap targetNodes = targetUser.data();
         String previousGroup = "default";
@@ -143,7 +148,7 @@ public class Api5 extends LuckPermissions {
         LuckPermsProvider.get().getUserManager().saveUser(target);
     }
 
-    private boolean hasPermission(Player source, String group){
+    private boolean hasPermission(PlatformPlayer source, String group){
         if (group == null) return true;
         return source.hasPermission(Permission.PROMOTE_PERMISSION_GROUP_PREFIX + group);
     }

@@ -4,6 +4,7 @@ import net.dirtcraft.discordlink.api.channels.ChannelManager;
 import net.dirtcraft.discordlink.api.commands.DiscordCommandManager;
 import net.dirtcraft.discordlink.api.users.UserManager;
 import net.dirtcraft.discordlink.api.users.roles.RoleManager;
+import net.dirtcraft.discordlink.common.storage.Database;
 import net.dirtcraft.discordlink.forge.platform.PlatformProvider;
 import net.dv8tion.jda.api.JDA;
 
@@ -19,6 +20,8 @@ public interface DiscordApi {
     RoleManager getRoleManager();
 
     PlatformProvider getPlatformProvider();
+
+    Database getStorage();
 
     boolean isLoaded();
 }

@@ -1,23 +1,16 @@
 package net.dirtcraft.discordlink.forge.platform;
 
-import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.GameProfileRepository;
 import net.dirtcraft.discordlink.forge.DiscordLink;
 import net.dirtcraft.discordlink.api.users.platform.PlatformPlayer;
 import net.dirtcraft.discordlink.api.users.platform.PlatformUser;
 import net.dirtcraft.discordlink.common.commands.sources.ConsoleSource;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.command.CommandSource;
+import net.minecraft.command.Commands;
+import net.minecraft.command.ICommandSource;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.server.management.PlayerList;
 import net.minecraft.server.management.PlayerProfileCache;
-import org.spongepowered.api.GameState;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.service.user.UserStorageService;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,9 +21,11 @@ public class PlatformProvider {
     public static final String VERSION = "Forge-1.16.5";
     private final IntegratedServer server;
     private final PlayerProfileCache cache;
+    private final Commands commandManager;
     protected final PlayerList list;
 
     public PlatformProvider(IntegratedServer server){
+        this.commandManager = server.getCommandManager();
         this.cache = server.getPlayerProfileCache();
         this.list = server.getPlayerList();
         this.server = server;
@@ -69,17 +64,24 @@ public class PlatformProvider {
     }
 
     public void toConsole(String command) {
-        toConsole(Sponge.getServer().getConsole(), command);
+        toConsole(server.getCommandSource(), command);
+    }
+
+    public void toConsole(CommandSource source, String command) {
+        execute(() -> commandManager.handleCommand(source, command));
     }
 
     public void toConsole(ConsoleSource source, String command) {
-        Task.builder()
-                .execute(() -> Sponge.getCommandManager().process(source, command))
-                .submit(DiscordLink.get());
+        //todo Proxy method
+        execute(() -> commandManager.handleCommand(server.getCommandSource(), command));
     }
 
     public boolean isGameReady(){
         return DiscordLink.get().isStarted();
+    }
+
+    public void execute(Runnable runnable){
+        server.execute(runnable);
     }
 
 }

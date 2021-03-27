@@ -1,5 +1,6 @@
 package net.dirtcraft.discordlink.common.users.permission;
 
+import net.dirtcraft.discordlink.api.DiscordApiProvider;
 import net.dirtcraft.discordlink.api.users.platform.PlatformPlayer;
 import net.dirtcraft.discordlink.api.users.platform.PlatformUser;
 import net.dirtcraft.discordlink.common.commands.sources.ConsoleSource;
@@ -38,7 +39,7 @@ public abstract class PermissionProvider {
         try {
             Class.forName("net.luckperms.api.LuckPerms");
             VERSION = "LuckPerms API 5";
-            return new Api5();
+            return new Api5(DiscordApiProvider.getApi().get().getPlatformProvider());
         } catch (ClassNotFoundException ignored){}
         VERSION = "None";
         return new DefaultProvider();

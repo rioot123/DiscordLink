@@ -1,5 +1,6 @@
 package net.dirtcraft.discordlink.common.commands;
 
+import net.dirtcraft.discordlink.api.commands.DiscordCommandManager;
 import net.dirtcraft.discordlink.common.storage.PluginConfiguration;
 import net.dirtcraft.discordlink.common.users.MessageSourceImpl;
 import net.dirtcraft.discordlink.common.utility.Utility;
@@ -11,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 
-public class DiscordCommandManagerImpl extends DiscordCommandTree {
+public class DiscordCommandManagerImpl extends DiscordCommandTree implements DiscordCommandManager {
 
     private final HashSet<String> defaultAliases = new HashSet<>(Arrays.asList("", "help"));
 
@@ -19,6 +20,7 @@ public class DiscordCommandManagerImpl extends DiscordCommandTree {
 
     }
 
+    @Override
     public void process(MessageSourceImpl member, String args){
         try {
             String[] command = args == null || defaultAliases.contains(args)? new String[0] : args.split(" ");

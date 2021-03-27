@@ -1,9 +1,9 @@
 package net.dirtcraft.discordlink.api.commands;
 
+import net.dirtcraft.discordlink.common.users.MessageSourceImpl;
+
 import java.util.Map;
 
-public interface DiscordCommandManager {
-    void register(DiscordCommand command, String... alias);
-
-    Map<String, ? extends DiscordCommand> getCommandMap();
+public interface DiscordCommandManager extends DiscordCommandTree {
+    void process(MessageSourceImpl member, String args);
 }
