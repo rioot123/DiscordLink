@@ -9,8 +9,6 @@ public interface PlatformUser {
 
     String getName();
 
-    Optional<String> getNameIfPresent();
-
     UUID getUUID();
 
     boolean isOnline();

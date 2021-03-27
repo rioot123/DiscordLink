@@ -29,15 +29,17 @@ public class GuildMember extends WrappedMember implements DiscordMember {
     PermissionResolver permissions;
     boolean retrievedPlayer;
     boolean retrievedPermissions;
+    private PlatformProvider platformProvider;
     private final RoleManager roleManager;
     private DiscordChannelImpl privateChannel;
     private final Database storage;
     private Set<DiscordRole> roles;
     private DiscordRole highestRank;
 
-    public GuildMember(Database storage, RoleManager roleManager, Member member){
+    public GuildMember(Database storage, RoleManager roleManager, PlatformProvider provider, Member member){
         super(member);
         this.roleManager = roleManager;
+        this.platformProvider = provider;
         this.storage = storage;
         Collection<Role> discordRoles = member.getRoles();
         roles = new HashSet<>();
@@ -67,8 +69,8 @@ public class GuildMember extends WrappedMember implements DiscordMember {
 
     @Override
     public Optional<PlatformPlayer> getPlayer(){
-        if (!retrievedPlayer) return getPlayerData().flatMap(PlatformProvider::getPlayer);
-        else return Optional.ofNullable(user).flatMap(PlatformProvider::getPlayer);
+        if (!retrievedPlayer) return getPlayerData().flatMap(platformProvider::getPlayer);
+        else return Optional.ofNullable(user).flatMap(platformProvider::getPlayer);
     }
 
     @Override
@@ -76,7 +78,7 @@ public class GuildMember extends WrappedMember implements DiscordMember {
         if (!retrievedPlayer) {
             final Optional<PlatformUser> optData = storage.getVerificationData(getId())
                     .flatMap(Verification.VerificationData::getUUID)
-                    .flatMap(PlatformProvider::getPlayerOffline);
+                    .flatMap(platformProvider::getPlayerOffline);
             optData.ifPresent(u->this.user = u);
             retrievedPlayer = true;
             return optData;

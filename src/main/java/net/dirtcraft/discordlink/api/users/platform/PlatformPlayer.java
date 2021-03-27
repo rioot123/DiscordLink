@@ -23,7 +23,7 @@ public interface PlatformPlayer extends PlatformUser{
      * Returns an online player object specific of the platform
      * Sponge: Player
      * Spigot: Player
-     * Forge:  EntityPlayerMP
+     * Forge:  ServerPlayerEntity
      * @return Platform specific representation of an online player.
      */
     <T> T getOnlinePlayer();

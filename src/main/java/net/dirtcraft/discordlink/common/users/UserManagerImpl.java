@@ -23,13 +23,15 @@ public class UserManagerImpl implements UserManager {
     private static final String UID_REGEX = "<?@?!?(\\d+)>?";
     private static final long CACHE_DURATION = 1000 * 60 * 15;
     private final List<CachedMember> userCache;
+    private final PlatformProvider platformProvider;
     private final ChannelManagerImpl channelManager;
     private final RoleManagerImpl roleManager;
     private final Database storage;
 
-    public UserManagerImpl(ChannelManagerImpl channelManager, RoleManagerImpl roleManager, Database storage){
+    public UserManagerImpl(ChannelManagerImpl channelManager, RoleManagerImpl roleManager, Database storage, PlatformProvider provider){
         this.userCache = new ArrayList<>();
         this.channelManager = channelManager;
+        this.platformProvider = provider;
         this.roleManager = roleManager;
         this.storage = storage;
     }
@@ -43,7 +45,7 @@ public class UserManagerImpl implements UserManager {
             else if (cached.expired()) memberCache.remove();
         }
         Optional<GuildMember> optMember = Optional.ofNullable(DiscordLink.get().getChannelManager().getGuild().getMemberById(id))
-                .map(m->new GuildMember(storage, roleManager, m));
+                .map(m->new GuildMember(storage, roleManager, platformProvider, m));
         optMember.ifPresent(m->userCache.add(new CachedMember(m)));
         return optMember.map(DiscordMember.class::cast);
     }
@@ -59,18 +61,18 @@ public class UserManagerImpl implements UserManager {
         final Optional<GuildMember> profile =  storage.getVerificationData(player)
                 .flatMap(Verification.VerificationData::getDiscordId)
                 .flatMap(Utility::getMemberById)
-                .map(member->new GuildMember(storage, roleManager, member));
+                .map(member->new GuildMember(storage, roleManager, platformProvider, member));
         profile.ifPresent(m-> {
             userCache.add(new CachedMember(m));
             m.retrievedPlayer = true;
-            m.user = PlatformProvider.getPlayerOffline(player)
+            m.user = platformProvider.getPlayerOffline(player)
                     .orElse(null);
         });
         return profile.map(DiscordMember.class::cast);
     }
 
     private Optional<DiscordMember> getMemberByIgn(String s){
-        return PlatformProvider.getPlayerOffline(s, false)
+        return platformProvider.getPlayerOffline(s, false)
                 .map(PlatformUser::getUUID).flatMap(this::getMember);
     }
 
@@ -92,21 +94,21 @@ public class UserManagerImpl implements UserManager {
         if (s.matches(UID_REGEX)){
             long discordId = Long.parseLong(s.replaceAll(UID_REGEX, "$1"));
             return Optional.ofNullable(channelManager.getGuild().getMemberById(discordId))
-                    .map(m->new GuildMember(storage, roleManager, m))
+                    .map(m->new GuildMember(storage, roleManager, platformProvider, m))
                     .flatMap(GuildMember::getPlayerData);
         } else {
-            return PlatformProvider.getPlayerOffline(s);
+            return platformProvider.getPlayerOffline(s);
         }
     }
 
     @Override
     public Optional<PlatformUser> getUser(UUID uuid){
-        return PlatformProvider.getPlayerOffline(uuid);
+        return platformProvider.getPlayerOffline(uuid);
     }
 
     @Override
     public List<PlatformPlayer> getPlayers(){
-        return PlatformProvider.getPlayers();
+        return platformProvider.getPlayers();
     }
 
     public MessageSourceImpl getMember(MessageReceivedEvent event){
@@ -141,7 +143,7 @@ public class UserManagerImpl implements UserManager {
     }
 
     public GuildMember getMember(Member member){
-        return new GuildMember(storage, roleManager, member);
+        return new GuildMember(storage, roleManager, platformProvider, member);
     }
 
     private static class CachedMember {

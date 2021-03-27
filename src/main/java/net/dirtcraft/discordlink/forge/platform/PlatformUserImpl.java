@@ -1,51 +1,50 @@
 package net.dirtcraft.discordlink.forge.platform;
 
+import com.mojang.authlib.GameProfile;
 import net.dirtcraft.discordlink.api.users.platform.PlatformPlayer;
 import net.dirtcraft.discordlink.api.users.platform.PlatformUser;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.entity.living.player.User;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.server.management.PlayerList;
 
 import java.util.Optional;
 import java.util.UUID;
 
 public class PlatformUserImpl implements PlatformUser {
-    private final User user;
+    protected final PlatformProvider provider;
+    protected final PlayerList list;
+    protected final GameProfile user;
 
-    PlatformUserImpl(User user){
+    PlatformUserImpl(GameProfile user, PlayerList list, PlatformProvider provider){
+        this.provider = provider;
+        this.list = list;
         this.user = user;
     }
 
     @Override
-    public Optional<String> getNameIfPresent(){
-        return Optional.of(user.getName());
+    public String getName() {
+        return user.getName();
     }
 
     @Override
     public UUID getUUID(){
-        return user.getUniqueId();
+        return user.getId();
     }
 
     @Override
     public boolean isOnline(){
-        return user.isOnline();
+        return list.getPlayerByUUID(user.getId()) != null;
     }
 
     @Override
     public Optional<PlatformPlayer> getPlatformPlayer(){
-        return user.getPlayer().map(PlatformPlayerImpl::new);
+        ServerPlayerEntity player = list.getPlayerByUUID(getUUID());
+        if (player == null) return Optional.empty();
+        else return Optional.of(new PlatformPlayerImpl(player, list, provider));
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T> T getOfflinePlayer(){
         return (T) user;
-    }
-
-    public User getUser(){
-        return user;
-    }
-
-    public Optional<Player> getPlayerIfOnline(){
-        return user.getPlayer();
     }
 }

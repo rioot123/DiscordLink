@@ -1,9 +1,16 @@
 package net.dirtcraft.discordlink.forge.platform;
 
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.GameProfileRepository;
 import net.dirtcraft.discordlink.forge.DiscordLink;
 import net.dirtcraft.discordlink.api.users.platform.PlatformPlayer;
 import net.dirtcraft.discordlink.api.users.platform.PlatformUser;
 import net.dirtcraft.discordlink.common.commands.sources.ConsoleSource;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.server.integrated.IntegratedServer;
+import net.minecraft.server.management.PlayerList;
+import net.minecraft.server.management.PlayerProfileCache;
 import org.spongepowered.api.GameState;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
@@ -18,56 +25,61 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class PlatformProvider {
-    public static final String VERSION = "Sponge-" + Sponge.getPlatform().getMinecraftVersion().getName();
+    public static final String VERSION = "Forge-1.16.5";
+    private final IntegratedServer server;
+    private final PlayerProfileCache cache;
+    protected final PlayerList list;
 
-    public static Optional<PlatformUser> getPlayerOffline(UUID uuid){
-        return Sponge.getServiceManager().provide(UserStorageService.class)
-                .flatMap(uss->uss.get(uuid))
-                .map(PlatformUserImpl::new);
+    public PlatformProvider(IntegratedServer server){
+        this.cache = server.getPlayerProfileCache();
+        this.list = server.getPlayerList();
+        this.server = server;
     }
 
-    public static Optional<PlatformUser> getPlayerOffline(String identifier){
+    public Optional<PlatformUser> getPlayerOffline(UUID uuid){
+        return Optional.ofNullable(cache.getProfileByUUID(uuid))
+                .map(gp->new PlatformUserImpl(gp, list, this));
+    }
+
+    public Optional<PlatformUser> getPlayerOffline(String identifier){
         boolean isUUID = identifier.matches("(?i)[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
-        return Sponge.getServiceManager().provide(UserStorageService.class)
-                .flatMap(uss->isUUID? uss.get(UUID.fromString(identifier)): uss.get(identifier))
-                .map(PlatformUserImpl::new);
+        if (isUUID) return getPlayerOffline(UUID.fromString(identifier));
+        else return Optional.ofNullable(cache.getGameProfileForUsername(identifier))
+                    .map(gp->new PlatformUserImpl(gp, list, this));
     }
 
-    public static Optional<PlatformUser> getPlayerOffline(String identifier, boolean acceptUUID){
+    public Optional<PlatformUser> getPlayerOffline(String identifier, boolean acceptUUID){
         if (acceptUUID) return getPlayerOffline(identifier);
-        return Sponge.getServiceManager().provide(UserStorageService.class)
-                .flatMap(uss->uss.get(identifier))
-                .map(PlatformUserImpl::new);
+        else return Optional.ofNullable(cache.getGameProfileForUsername(identifier))
+                .map(gp->new PlatformUserImpl(gp, list, this));
     }
 
-    public static Optional<PlatformPlayer> getPlayer(PlatformUser player){
-        return player.<User>getOfflinePlayer()
-                .getPlayer()
-                .map(PlatformPlayerImpl::new);
+    public Optional<PlatformPlayer> getPlayer(PlatformUser player){
+        return player.getPlatformPlayer();
     }
 
-    public static PlatformPlayer getPlayer(Player player){
-        return new PlatformPlayerImpl(player);
+    public PlatformPlayer getPlayer(ServerPlayerEntity player){
+        return new PlatformPlayerImpl(player, list, this);
     }
 
-    public static List<PlatformPlayer> getPlayers(){
-        return Sponge.getServer().getOnlinePlayers().stream()
-                .map(PlatformPlayerImpl::new)
+    public List<PlatformPlayer> getPlayers(){
+        return server.getPlayerList().getPlayers().stream()
+                .map(player->new PlatformPlayerImpl(player, list, this))
                 .collect(Collectors.toList());
     }
 
-    public static void toConsole(String command) {
+    public void toConsole(String command) {
         toConsole(Sponge.getServer().getConsole(), command);
     }
 
-    public static void toConsole(ConsoleSource source, String command) {
+    public void toConsole(ConsoleSource source, String command) {
         Task.builder()
                 .execute(() -> Sponge.getCommandManager().process(source, command))
                 .submit(DiscordLink.get());
     }
 
-    public static boolean isGameReady(){
-        return Sponge.getGame().getState() == GameState.SERVER_STARTED;
+    public boolean isGameReady(){
+        return DiscordLink.get().isStarted();
     }
 
 }

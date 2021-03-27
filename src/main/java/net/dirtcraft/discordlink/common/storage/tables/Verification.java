@@ -1,5 +1,6 @@
 package net.dirtcraft.discordlink.common.storage.tables;
 
+import net.dirtcraft.discordlink.api.users.platform.PlatformPlayer;
 import net.dirtcraft.discordlink.forge.DiscordLink;
 import net.dirtcraft.discordlink.common.users.UserManagerImpl;
 import net.dirtcraft.discordlink.forge.platform.PlatformProvider;
@@ -20,6 +21,10 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public abstract class Verification extends Mutes {
+
+    public Verification(PlatformProvider provider){
+        super(provider);
+    }
 
     public void createRecord(String discordID, String code) {
         try (Connection connection = getConnection();
@@ -164,7 +169,7 @@ public abstract class Verification extends Mutes {
         }
 
         public Optional<PlatformUser> getMinecraftUser() {
-            return getUUID().flatMap(PlatformProvider::getPlayerOffline);
+            return getUUID().flatMap(provider::getPlayerOffline);
         }
 
         public Optional<Member> getMember() {
@@ -178,7 +183,9 @@ public abstract class Verification extends Mutes {
         }
 
         public Optional<String> getName() {
-            Optional<String> name = getMinecraftUser().flatMap(PlatformUser::getNameIfPresent);
+            Optional<String> name = getMinecraftUser()
+                    .flatMap(provider::getPlayer)
+                    .map(PlatformPlayer::getName);
             if (name.isPresent()) return name;
             else return getUUID()
                     .map(UUID::toString)

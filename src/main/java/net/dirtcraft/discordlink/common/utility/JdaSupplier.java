@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import org.spongepowered.configurate.CommentedConfigurationNode;
+import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
 import org.spongepowered.configurate.loader.ConfigurationLoader;
 
 import java.io.IOException;
@@ -17,19 +18,18 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Consumer;
 
 public class JdaSupplier {
+    private final long startTime = System.currentTimeMillis();
+    private final ConfigurationLoader<CommentedConfigurationNode> loader;
+    private final Queue<Consumer<JDA>> onJdaInit = new ConcurrentLinkedQueue<>();
     private CompletableFuture<JDA> jda;
-    private long startTime = System.currentTimeMillis();
-    private ConfigurationLoader<CommentedConfigurationNode> loader;
-    private Queue<Consumer<JDA>> onJdaInit = new ConcurrentLinkedQueue<>();
     Collection<GatewayIntent> intents = Arrays.asList(
             GatewayIntent.GUILD_MEMBERS,
             GatewayIntent.GUILD_MESSAGES,
             GatewayIntent.DIRECT_MESSAGES
     );
 
-    public JdaSupplier(){
-        //todo loader supplier
-        //this.loader = SpongeConfigManager.getSharedRoot(()->"sponge-discord-lib").getConfig();
+    public JdaSupplier(ConfigurationLoader<CommentedConfigurationNode> loader){
+        this.loader = loader;
         update();
         initialize();
     }

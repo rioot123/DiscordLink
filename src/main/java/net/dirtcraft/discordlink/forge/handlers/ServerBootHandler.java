@@ -1,97 +1,89 @@
 package net.dirtcraft.discordlink.forge.handlers;
 
-import net.dirtcraft.discordlink.api.spongediscordlib.SpongeDiscordLib;
 import net.dirtcraft.discordlink.forge.DiscordLink;
 import net.dirtcraft.discordlink.common.storage.PluginConfiguration;
-import net.dirtcraft.discordlink.common.utility.Pair;
 import net.dirtcraft.discordlink.common.utility.Utility;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.hooks.SubscribeEvent;
 import net.dv8tion.jda.api.requests.RestAction;
-import org.spongepowered.api.GameState;
-import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.Order;
-import org.spongepowered.api.event.game.state.*;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.ForgeI18n;
+import net.minecraftforge.fml.event.lifecycle.*;
+import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
+import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
+import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
+import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
 
 import java.awt.*;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class ServerBootHandler {
     final private long second = 1000;
     final private long minute = second * 60;
     final private long time = System.currentTimeMillis();
-    private volatile GameState state;
+    protected GameStage state;
     protected boolean isReady;
-    private Map<GameState, String> humanReadable = Stream.of(
-            new Pair<>(GameState.CONSTRUCTION,          "Constructing Game Instance"    ),
-            new Pair<>(GameState.PRE_INITIALIZATION,    "Pre-Initializing Game Instance"),
-            new Pair<>(GameState.INITIALIZATION,        "Initializing Game"             ),
-            new Pair<>(GameState.POST_INITIALIZATION,   "Post-Initializing Game"        ),
-            new Pair<>(GameState.LOAD_COMPLETE,         "Game Loaded"                   ),
-            new Pair<>(GameState.SERVER_STARTED,        "Loading Server"                ),
-            new Pair<>(GameState.SERVER_ABOUT_TO_START, "Server Starting"               ),
-            new Pair<>(GameState.SERVER_STARTING,       "Finishing Up"                  ),
-            new Pair<>(GameState.SERVER_STOPPING,       "Stopping Server"               ),
-            new Pair<>(GameState.SERVER_STOPPED,        "Stopped Server"                ),
-            new Pair<>(GameState.GAME_STOPPING,         "Game Stopping"                 ),
-            new Pair<>(GameState.GAME_STOPPED,          "Game Stopped"                  )
-    ).collect(Collectors.toMap(Pair::getKey, Pair::getValue));
 
     private CompletableFuture<Message> future;
 
-    public void onGameConstruction(GameConstructionEvent event){
-        if (!isReady) return;
-        startTimer(event.getState());
-        sendGameStageEmbed(event.getState());
+    public void onLateInitialization() {
+        sendGameStageEmbed(this.state);
+        if (this.state != GameStage.SERVER_STARTED) startTimer(this.state);
     }
 
-    @Listener(order = Order.FIRST)
-    public void onGamePreInitialization(GamePreInitializationEvent event){
+    @SubscribeEvent
+    public void commonSetup(FMLCommonSetupEvent event) {
+        this.state = GameStage.CONSTRUCT_MOD;
         if (!isReady) return;
-        startTimer(event.getState());
-        sendGameStageEmbed(event.getState());
+        startTimer(GameStage.CONSTRUCT_MOD);
+        sendGameStageEmbed(GameStage.CONSTRUCT_MOD);
     }
 
-    @Listener(order = Order.FIRST)
-    public void onGameInitialization(GameInitializationEvent event){
+    @SubscribeEvent
+    public void dedicatedSetup(FMLDedicatedServerSetupEvent event) {
+        this.state = GameStage.DEDICATED_SETUP;
         if (!isReady) return;
-        startTimer(event.getState());
-        sendGameStageEmbed(event.getState());
+        startTimer(GameStage.DEDICATED_SETUP);
+        sendGameStageEmbed(GameStage.DEDICATED_SETUP);
     }
 
-    @Listener(order = Order.FIRST)
-    public void onGamePostInitialization(GamePostInitializationEvent event){
+    @SubscribeEvent
+    public void interModEnqueue(InterModEnqueueEvent event){
+        this.state = GameStage.INTER_MOD_ENQUEUE;
         if (!isReady) return;
-        startTimer(event.getState());
-        sendGameStageEmbed(event.getState());
+        startTimer(GameStage.INTER_MOD_ENQUEUE);
+        sendGameStageEmbed(GameStage.INTER_MOD_ENQUEUE);
     }
 
-    @Listener(order = Order.FIRST)
-    public void onGameLoadComplete(GameLoadCompleteEvent event){
+
+    @SubscribeEvent
+    public void interModProcess(InterModProcessEvent event){
+        this.state = GameStage.INTER_MOD_PROCESS;
         if (!isReady) return;
-        startTimer(event.getState());
-        sendGameStageEmbed(event.getState());
+        startTimer(GameStage.INTER_MOD_PROCESS);
+        sendGameStageEmbed(GameStage.INTER_MOD_PROCESS);
     }
 
-    @Listener(order = Order.FIRST)
-    public void onGameAboutToStartServer(GameAboutToStartServerEvent event){
+    @SubscribeEvent
+    public void onGameAboutToStartServer(FMLServerAboutToStartEvent event){
+        this.state = GameStage.SERVER_ABOUT_TO_START;
         if (!isReady) return;
-        startTimer(event.getState());
-        sendGameStageEmbed(event.getState());
+        startTimer(GameStage.SERVER_ABOUT_TO_START);
+        sendGameStageEmbed(GameStage.SERVER_ABOUT_TO_START);
     }
 
-    @Listener(order = Order.FIRST)
-    public void onGameStartingServerEvent(GameStartingServerEvent event){
+    @SubscribeEvent
+    public void onGameStartingServerEvent(FMLServerStartingEvent event){
+        this.state = GameStage.SERVER_STARTING;
         if (!isReady) return;
-        startTimer(event.getState());
-        sendGameStageEmbed(event.getState());
+        startTimer(GameStage.SERVER_STARTING);
+        sendGameStageEmbed(GameStage.SERVER_STARTING);
     }
 
-    @Listener(order = Order.POST)
-    public void onGameStartedServer(GameStartedServerEvent event){
+    @SubscribeEvent
+    public void onGameStartedServer(FMLServerStartedEvent event){
+        this.state = GameStage.SERVER_STARTED;
         if (!isReady) return;
         if (future != null) future.whenComplete((message, throwable) -> message.delete().queue());
         state = null;
@@ -99,7 +91,22 @@ public class ServerBootHandler {
         sendLaunchedEmbed();
     }
 
+    @SubscribeEvent
+    public void onServerStopping(FMLServerStoppingEvent event) {
+        this.state = GameStage.SERVER_STOPPING;
+        String sName = PluginConfiguration.Main.SERVER_NAME;
+        DiscordLink.get()
+                .getChannelManager()
+                .getGameChat()
+                .sendMessage(
+                        Utility.embedBuilder()
+                                .setDescription(PluginConfiguration.Format.serverStop
+                                        .replace("{modpack}", sName)
+                                ).build());
+    }
+
     public void sendLaunchedEmbed() {
+        String sName = PluginConfiguration.Main.SERVER_NAME;
         DiscordLink.get()
                 .getChannelManager()
                 .getGameChat()
@@ -107,27 +114,15 @@ public class ServerBootHandler {
                 Utility.embedBuilder()
                         .setColor(Color.GREEN)
                         .setDescription(PluginConfiguration.Format.serverStart
-                                .replace("{modpack}", SpongeDiscordLib.getServerName())
+                                .replace("{modpack}", sName)
                         ).build());
     }
 
-    @Listener
-    public void onServerStopping(GameStoppingServerEvent event) {
-        DiscordLink.get()
-                .getChannelManager()
-                .getGameChat()
-                .sendMessage(
-                Utility.embedBuilder()
-                        .setDescription(PluginConfiguration.Format.serverStop
-                                .replace("{modpack}", SpongeDiscordLib.getServerName())
-                        ).build());
-    }
-
-    protected void sendGameStageEmbed(GameState state) {
+    protected void sendGameStageEmbed(GameStage state) {
         TextChannel gameChat = DiscordLink.get().getChannelManager().getDefaultChannel();
-        String stage = humanReadable.get(state);
-        int level = state.ordinal() + 1;
-        String content = String.format("The server is currently booting... Please wait...\n**%s** (%d/7)", stage, level);
+        String stage = state.getName();
+        int level = state.getStage();
+        String content = String.format("The server is currently booting... Please wait...\n**%s** (%d/4)", stage, level);
         MessageEmbed embed = Utility.embedBuilder()
                 .setColor(Color.ORANGE)
                 .setDescription(content)
@@ -140,11 +135,11 @@ public class ServerBootHandler {
 
     private void sendMessage(RestAction<PrivateChannel> channelRestAction){
         try {
-            final String name = SpongeDiscordLib.getServerName();
-            final String id = SpongeDiscordLib.getGamechatChannelID();
+            final String name = PluginConfiguration.Main.SERVER_NAME;
+            long id = PluginConfiguration.Main.defaultChannelID;
             long ms = (System.currentTimeMillis() - time);
             double minutes = (double) Math.max(ms, 1) / minute;
-            String template = "Server %s has been attempting to boot for %dms (%.1f minutes) @ <#%s>";
+            String template = "Server %s has been attempting to boot for %dms (%.1f minutes) @ <#%d>";
             String message = String.format(template, name, ms, minutes, id);
             channelRestAction.queue(m -> m.sendMessage(message).queue());
         } catch (Exception ignored){
@@ -152,7 +147,7 @@ public class ServerBootHandler {
         }
     }
 
-    public void startTimer(final GameState state){
+    public void startTimer(final GameStage state){
         this.state = state;
         CompletableFuture.runAsync(()->{
             try{
@@ -175,5 +170,34 @@ public class ServerBootHandler {
                 e.printStackTrace();
             }
         });
+    }
+
+    public boolean isStarted(){
+        return state == GameStage.SERVER_STARTED;
+    }
+
+    protected enum GameStage {
+        CONSTRUCT_MOD        (1, "Constructing Mod Instances"),
+        DEDICATED_SETUP      (2, "Preparing Dedicated Server"),
+        INTER_MOD_ENQUEUE    (3, "Running Cross-Mod Initializing"),
+        INTER_MOD_PROCESS    (4, "Running Cross-Mod Compat Setup"),
+        SERVER_ABOUT_TO_START(5, "Server Preparing to Start"),
+        SERVER_STARTING      (6, "Server Starting"),
+        SERVER_STARTED       (7, "Server Started"),
+        SERVER_STOPPING      (-1,"Server Shutting Down");
+        private final String name;
+        private final int stage;
+        GameStage(int stage, String name){
+            this.name = name;
+            this.stage = stage;
+        }
+
+        private String getName(){
+            return name;
+        }
+
+        private int getStage(){
+            return stage;
+        }
     }
 }

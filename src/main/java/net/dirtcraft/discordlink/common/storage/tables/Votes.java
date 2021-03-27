@@ -1,5 +1,7 @@
 package net.dirtcraft.discordlink.common.storage.tables;
 
+import net.dirtcraft.discordlink.forge.platform.PlatformProvider;
+
 import javax.annotation.Nullable;
 import java.sql.*;
 import java.time.Instant;
@@ -9,6 +11,11 @@ import java.util.UUID;
 
 public abstract class Votes {
     protected abstract Connection getConnection();
+    protected PlatformProvider provider;
+
+    public Votes(PlatformProvider provider){
+        this.provider = provider;
+    }
 
     @Nullable
     public String getLastKnownUsername(String uuid) {

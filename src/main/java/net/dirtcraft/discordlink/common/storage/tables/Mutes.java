@@ -4,6 +4,7 @@ import net.dirtcraft.discordlink.common.utility.Utility;
 import net.dirtcraft.discordlink.api.users.DiscordMember;
 import net.dirtcraft.discordlink.api.users.platform.PlatformUser;
 import net.dirtcraft.discordlink.api.users.roles.DiscordRoles;
+import net.dirtcraft.discordlink.forge.platform.PlatformProvider;
 
 import java.sql.*;
 import java.time.Instant;
@@ -15,6 +16,10 @@ import java.util.UUID;
 public abstract class Mutes extends Votes {
     protected abstract Connection getConnection();
     private final UUID DEFAULT = new UUID(0,0);
+
+    public Mutes(PlatformProvider provider){
+        super(provider);
+    }
 
     public void registerMute(UUID staff, DiscordMember subject, Timestamp expires, String reason){
         try (Connection connection = getConnection();

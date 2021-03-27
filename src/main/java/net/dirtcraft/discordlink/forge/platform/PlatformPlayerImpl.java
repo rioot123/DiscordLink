@@ -3,17 +3,17 @@ package net.dirtcraft.discordlink.forge.platform;
 
 import net.dirtcraft.discordlink.common.users.permission.PermissionProvider;
 import net.dirtcraft.discordlink.api.users.platform.PlatformPlayer;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.entity.living.player.Player;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.server.management.PlayerList;
 
 import java.util.Optional;
 import java.util.UUID;
 
-public class PlatformPlayerImpl extends PlatformUserImpl implements PlatformPlayer {
-    private final Player player;
+public final class PlatformPlayerImpl extends PlatformUserImpl implements PlatformPlayer {
+    private final ServerPlayerEntity player;
 
-    PlatformPlayerImpl(Player player){
-        super(player);
+    PlatformPlayerImpl(ServerPlayerEntity player, PlayerList list, PlatformProvider provider){
+        super(player.getGameProfile(), list, provider);
         this.player = player;
     }
 
@@ -25,48 +25,33 @@ public class PlatformPlayerImpl extends PlatformUserImpl implements PlatformPlay
     }
 
     @Override
-    public String getName(){
-        return player.getName();
-    }
-
-    @Override
     public Optional<String> getPrefix(){
-        if (player.getOption("prefix").isPresent()) return player.getOption("prefix");
-        else return PermissionProvider.INSTANCE.getPrefix(player.getUniqueId());
-    }
-
-    @Override
-    public UUID getUUID(){
-        return player.getUniqueId();
+        return Optional.empty();
     }
 
     @Override
     public boolean isVanished(){
-        return player.get(Keys.VANISH).orElse(false);
+        return false;
     }
 
     @Override
     public boolean notVanished(){
-        return !isVanished();
+        return true;
     }
 
     @Override
     public boolean hasPlayedBefore(){
-        return player.hasPlayedBefore();
+        return true;
     }
 
     @Override
     public boolean hasPermission(String perm){
-        return player.hasPermission(perm);
+        return false;
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T> T getOnlinePlayer(){
         return (T) player;
-    }
-
-    public Player getPlayer(){
-        return player;
     }
 }
