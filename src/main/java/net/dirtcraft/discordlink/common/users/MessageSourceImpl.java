@@ -8,6 +8,7 @@ import net.dirtcraft.discordlink.common.storage.Database;
 import net.dirtcraft.discordlink.common.users.discord.RoleManagerImpl;
 import net.dirtcraft.discordlink.common.utility.Utility;
 import net.dirtcraft.discordlink.api.users.MessageSource;
+import net.dirtcraft.discordlink.forge.platform.PlatformProvider;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -20,8 +21,8 @@ public class MessageSourceImpl extends GuildMember implements DiscordResponder, 
     private final Message message;
     private final DiscordChannelImpl source;
 
-    public MessageSourceImpl(Database storage, Member author, DiscordChannelImpl discordChannel, RoleManagerImpl roleManager, MessageReceivedEvent event){
-        super(storage,roleManager, author);
+    public MessageSourceImpl(Database storage, PlatformProvider provider, Member author, DiscordChannelImpl discordChannel, RoleManagerImpl roleManager, MessageReceivedEvent event){
+        super(storage, roleManager,provider, author);
         this.message = event.getMessage();
         this.source = discordChannel;
     }

@@ -123,7 +123,7 @@ public class UserManagerImpl implements UserManager {
             CachedMember cached = memberCache.next();
             if (cached.matches(memberId)) {
                 GuildMember previous = cached.getMember();
-                newSource = new MessageSourceImpl(storage, previous.getWrappedMember(), channel, roleManager, event);
+                newSource = new MessageSourceImpl(storage, platformProvider, previous.getWrappedMember(), channel, roleManager, event);
                 if (previous.user != null){
                     newSource.user = previous.user;
                     newSource.retrievedPlayer = previous.retrievedPlayer;
@@ -137,7 +137,7 @@ public class UserManagerImpl implements UserManager {
         }
         if (newSource != null) return newSource;
         Member member = channelManager.getGuild().retrieveMember(event.getAuthor()).complete();
-        MessageSourceImpl source = new MessageSourceImpl(storage, member, channel, roleManager, event);
+        MessageSourceImpl source = new MessageSourceImpl(storage, platformProvider, member, channel, roleManager, event);
         userCache.add(new CachedMember(source));
         return source;
     }

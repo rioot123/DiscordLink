@@ -10,19 +10,17 @@ import java.io.IOException;
 @SuppressWarnings("UnstableApiUsage")
 public class ConfigManager {
     private ConfigurationLoader<CommentedConfigurationNode> loader;
-    private ConfigurationOptions options;
     private PluginConfiguration config = new PluginConfiguration();
     private CommentedConfigurationNode node = null;
 
     public ConfigManager(ConfigurationLoader<CommentedConfigurationNode> loader) {
         this.loader = loader;
-        options = ConfigurationOptions.defaults().shouldCopyDefaults(true);
         this.load();
     }
 
     public void load() {
         try {
-            node = loader.load(options);
+            node = loader.load();
             config = node.get(PluginConfiguration.class, config);
             loader.save(node);
         } catch (IOException exception) {

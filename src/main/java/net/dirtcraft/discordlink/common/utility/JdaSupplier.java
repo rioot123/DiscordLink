@@ -1,15 +1,10 @@
 package net.dirtcraft.discordlink.common.utility;
 
-import net.dirtcraft.discordlink.common.storage.PluginConfiguration;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
-import org.spongepowered.configurate.CommentedConfigurationNode;
-import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
-import org.spongepowered.configurate.loader.ConfigurationLoader;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Queue;
@@ -19,7 +14,7 @@ import java.util.function.Consumer;
 
 public class JdaSupplier {
     private final long startTime = System.currentTimeMillis();
-    private final ConfigurationLoader<CommentedConfigurationNode> loader;
+    private final String token;
     private final Queue<Consumer<JDA>> onJdaInit = new ConcurrentLinkedQueue<>();
     private CompletableFuture<JDA> jda;
     Collection<GatewayIntent> intents = Arrays.asList(
@@ -28,18 +23,13 @@ public class JdaSupplier {
             GatewayIntent.DIRECT_MESSAGES
     );
 
-    public JdaSupplier(ConfigurationLoader<CommentedConfigurationNode> loader){
-        this.loader = loader;
-        update();
+    public JdaSupplier(String token){
+        this.token = token;
         initialize();
     }
 
     public JDA getJDA() {
-        while (!jda.isDone() && !initTimeExceeded()){
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException ignored) { }
-        }
+        while (!jda.isDone() && !initTimeExceeded()) trySleep(1000);
         return jda.getNow(null);
     }
 
@@ -56,7 +46,7 @@ public class JdaSupplier {
 
     private JDA tryGetJda() {
         try {
-            JDA jda = JDABuilder.createDefault(PluginConfiguration.Main.TOKEN, intents)
+            JDA jda = JDABuilder.createDefault(token, intents)
                     .setMemberCachePolicy(MemberCachePolicy.ALL)
                     .build();
             jda.awaitStatus(JDA.Status.CONNECTED, JDA.Status.FAILED_TO_LOGIN);
@@ -72,11 +62,9 @@ public class JdaSupplier {
         while (true) {
             int loops = i++;
             if (loops > 50) {
-                Utility.trySleep(150000);
-                update();
+                trySleep(150000);
             } else if (loops > 0) {
-                Utility.trySleep(30000);
-                update();
+                trySleep(30000);
             }
             if (jda.getNow(null) != null) return jda.join();
             JDA jda = tryGetJda();
@@ -102,13 +90,11 @@ public class JdaSupplier {
         return duration > 5 * MINUTE;
     }
 
-    public void update() {
-        try {
-            CommentedConfigurationNode node = loader.load();
-            node.set(PluginConfiguration.class, new PluginConfiguration());
-            loader.save(node);
-        } catch (IOException exception) {
-            exception.printStackTrace();
+    public static void trySleep(long ms){
+        try{
+            Thread.sleep(ms);
+        } catch (Exception ignored){
+
         }
     }
 }

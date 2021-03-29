@@ -78,16 +78,6 @@ public class WrappedMember implements Member {
     }
 
     @Override
-    public boolean canSync(@NotNull GuildChannel targetChannel, @NotNull GuildChannel syncSource) {
-        return member.canSync(targetChannel, syncSource);
-    }
-
-    @Override
-    public boolean canSync(@NotNull GuildChannel channel) {
-        return member.canSync(channel);
-    }
-
-    @Override
     public JDA getJDA() {
         return member.getJDA();
     }
@@ -198,11 +188,6 @@ public class WrappedMember implements Member {
     }
 
     @Override
-    public boolean isPending() {
-        return member.isPending();
-    }
-
-    @Override
     public boolean isFake() {
         return member.isFake();
     }
@@ -211,4 +196,21 @@ public class WrappedMember implements Member {
     public long getIdLong() {
         return member.getIdLong();
     }
+
+    /*
+    @Override
+    public boolean isPending() {
+        return member.isPending();
+    }
+
+    @Override
+    public boolean canSync(@NotNull GuildChannel targetChannel, @NotNull GuildChannel syncSource) {
+        return member.canSync(targetChannel, syncSource);
+    }
+
+    @Override
+    public boolean canSync(@NotNull GuildChannel channel) {
+        return member.canSync(channel);
+    }
+     */
 }

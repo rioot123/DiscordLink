@@ -11,19 +11,19 @@ import java.util.List;
 @ConfigSerializable
 public class PluginConfiguration {
     @Setting(value = "Main")
-    private PluginConfiguration.Main main = new PluginConfiguration.Main();
+    private static PluginConfiguration.Main main = new PluginConfiguration.Main();
     @Setting(value = "Format")
-    private PluginConfiguration.Format format = new PluginConfiguration.Format();
+    private static PluginConfiguration.Format format = new PluginConfiguration.Format();
     @Setting(value = "Embed")
-    private PluginConfiguration.Embed embed = new PluginConfiguration.Embed();
+    private static PluginConfiguration.Embed embed = new PluginConfiguration.Embed();
     @Setting(value = "Roles")
-    private PluginConfiguration.Roles roles = new PluginConfiguration.Roles();
+    private static PluginConfiguration.Roles roles = new PluginConfiguration.Roles();
     @Setting(value = "Commands")
-    private PluginConfiguration.Command command = new PluginConfiguration.Command();
+    private static PluginConfiguration.Command command = new PluginConfiguration.Command();
     @Setting(value = "Notifier")
-    private PluginConfiguration.Notifier notifier = new PluginConfiguration.Notifier();
-    @Setting
-    private PluginConfiguration.Database database = new PluginConfiguration.Database();
+    private static PluginConfiguration.Notifier notifier = new PluginConfiguration.Notifier();
+    @Setting(value = "Database")
+    private static PluginConfiguration.Database database = new PluginConfiguration.Database();
 
     @ConfigSerializable
     public static class Database {

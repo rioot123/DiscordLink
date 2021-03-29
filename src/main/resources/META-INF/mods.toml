@@ -1,0 +1,12 @@
+modLoader="javafml" #mandatory
+loaderVersion="[36,)" #mandatory This is typically bumped every Minecraft version by Forge. See our download page for lists of versions.
+license="All rights reserved"
+[[mods]] #mandatory
+modId="discord-link" #mandatory
+version="${file.jarVersion}" #mandatory
+displayName="Discord Link" #mandatory
+authors="ShinyAfro" #optional
+# The description text for the mod (multi line!) (#mandatory)
+description='''
+optional
+'''

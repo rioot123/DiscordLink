@@ -20,7 +20,6 @@ import net.dv8tion.jda.api.JDA;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLDedicatedServerSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLConfig;
@@ -36,7 +35,7 @@ import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.function.Supplier;
 
-public class DiscordLink extends ServerBootHandler implements DiscordApi {
+public class DiscordLink extends ServerBootHandler implements DiscordApi{
     private static final Logger LOGGER = LogManager.getLogger();
     private static DiscordLink instance;
 
@@ -55,14 +54,16 @@ public class DiscordLink extends ServerBootHandler implements DiscordApi {
     }
 
     public DiscordLink() {
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::commonSetup);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::dedicatedSetup);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::interModEnqueue);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::interModProcess);
-        MinecraftForge.EVENT_BUS.register(this);
+        JdaSupplier supplier = new JdaSupplier("NzcxMzExNjIyMTk4NjU3MDI0.X5qR7Q.K3L1A5F0Q1WSsQGI8rqGD6_TEhU");
+        //FMLJavaModLoadingContext.get().getModEventBus().addListener(this::commonSetup);
+        //FMLJavaModLoadingContext.get().getModEventBus().addListener(this::dedicatedSetup);
+        //FMLJavaModLoadingContext.get().getModEventBus().addListener(this::interModEnqueue);
+        //FMLJavaModLoadingContext.get().getModEventBus().addListener(this::interModProcess);
+        //MinecraftForge.EVENT_BUS.register(this);
     }
 
-    public void commonSetup(FMLCommonSetupEvent event) {
+    public void dedicatedSetup(FMLDedicatedServerSetupEvent event) {
+        /*
         Path configDir = FMLPaths.GAMEDIR.get()
                 .resolve(FMLConfig.defaultConfigPath())
                 .resolve("Discord-Link")
@@ -73,13 +74,12 @@ public class DiscordLink extends ServerBootHandler implements DiscordApi {
                 .defaultOptions(options)
                 .build();
         this.configManager = new ConfigManager(loader);
-        preInitialize(new JdaSupplier(loader));
-        super.commonSetup(event);
-    }
+        configManager.load();
 
-    public void dedicatedSetup(FMLDedicatedServerSetupEvent event) {
-        shouldDoPostInit = true;
-        postInitialize();
+         */
+        //preInitialize(supplier);
+        //shouldDoPostInit = true;
+        //postInitialize();
     }
 
     private void preInitialize(JdaSupplier supplier){
@@ -100,10 +100,10 @@ public class DiscordLink extends ServerBootHandler implements DiscordApi {
             this.commandManager = new DiscordCommandManagerImpl();
             jda.addEventListener(new DiscordEvents(this, provider));
             instance = this;
-            isReady = true;
+            //isReady = true;
             //todo platform executor
             server.execute(this::postInitialize);
-            sendGameStageEmbed(state);
+            //sendGameStageEmbed(state);
             LOGGER.info("Discord Link pre=initialized");
         });
     }
@@ -164,7 +164,6 @@ public class DiscordLink extends ServerBootHandler implements DiscordApi {
     public PlatformProvider getPlatformProvider() {
         return provider;
     }
-
     @Override
     public boolean isLoaded() {
         return isReady;
