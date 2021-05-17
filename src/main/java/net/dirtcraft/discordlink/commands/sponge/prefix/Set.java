@@ -2,6 +2,7 @@ package net.dirtcraft.discordlink.commands.sponge.prefix;
 
 import net.dirtcraft.discordlink.commands.sources.ConsoleSource;
 import net.dirtcraft.discordlink.storage.Permission;
+import net.dirtcraft.discordlink.storage.PluginConfiguration;
 import net.dirtcraft.discordlink.storage.Settings;
 import net.dirtcraft.discordlink.users.permission.PermissionProvider;
 import org.spongepowered.api.command.CommandException;
@@ -29,7 +30,9 @@ public class Set implements CommandExecutor {
             try {
                 final User target = args.<User>getOne("Target").orElseThrow(()->new CommandException(Text.of("§cYou must specify a target.")));
                 if (target != src && !src.hasPermission(Permission.PREFIX_OTHERS)) throw new CommandException(Text.of("§cYou do not have permission to set other players prefixes."));
-                setPrefix(src, target, args);
+                String prefix = getPrefixUsingArgs(src, target, args);
+                setPrefix(getSource(src), target, prefix);
+
             } catch (CommandException e){
                 if (e.getText() != null) src.sendMessage(e.getText());
                 else src.sendMessage(Text.of("§cAn error has occurred during execution."));
@@ -39,7 +42,11 @@ public class Set implements CommandExecutor {
         return CommandResult.success();
     }
 
-    private void setPrefix(@Nonnull CommandSource src, User target, @Nonnull CommandContext args) throws CommandException{
+    protected void setPrefix(@Nonnull ConsoleSource src, User target, String prefix) {
+        PermissionProvider.INSTANCE.setPlayerPrefix(src, target, prefix);
+    }
+
+    private String getPrefixUsingArgs(@Nonnull CommandSource src, User target, @Nonnull CommandContext args) throws CommandException{
         final String title = args.<String>getOne("Prefix").orElseThrow(()->new CommandException(Text.of("§cYou must specify a prefix.")));
         final Optional<Boolean> staff = args.<Boolean>getOne("s").filter(x->src.hasPermission(Permission.PREFIX_INDICATOR));
         final Optional<String> caratColor = args.<String>getOne("ArrowColor").filter(x->src.hasPermission(Permission.PREFIX_ARROW));
@@ -57,10 +64,13 @@ public class Set implements CommandExecutor {
                 .findFirst()
                 .map(s->String.format("%s[%s%s]", bracketColor, s.getValue(), bracketColor))
                 .orElse(bracketColor);
-        String prefix = String.format("%s %s[%s%s]&r", chevron, rankPrefix, title, bracketColor)
-                .replaceAll("\\?\"", "");
-
-        PermissionProvider.INSTANCE.setPlayerPrefix(getSource(src), target, prefix);
+        if (PluginConfiguration.Misc.omitChatArrow) {
+            return String.format("%s[%s%s]&r", rankPrefix, title, bracketColor)
+                    .replaceAll("\\?\"", "");
+        } else {
+            return String.format("%s %s[%s%s]&r", chevron, rankPrefix, title, bracketColor)
+                    .replaceAll("\\?\"", "");
+        }
     }
 
     private String getChevron(User user, String colour){

@@ -144,12 +144,12 @@ public class DiscordLink extends ServerBootHandler implements DiscordApi {
     private void preInitialize(){
         logger.info("Requesting JDA!");
         SpongeDiscordLib.getJDA(jda->{
-            logger.info("Discord Link pre=initializing...");
             if ((this.jda = jda) == null) {
                 logger.error("JDA failed to connect to discord gateway! " + container.getName() + " will not load.");
                 return;
             }
 
+            logger.info("Discord Link pre=initializing...");
             this.configManager = new ConfigManager(loader);
             this.storage = new Database();
             this.roleManager = new RoleManagerImpl(jda);
@@ -168,9 +168,9 @@ public class DiscordLink extends ServerBootHandler implements DiscordApi {
     }
 
     private void postInitialize(){
-        logger.info("Discord Link post=initializing...");
         if (!isReady || !shouldDoPostInit || gameListenersRegistered) return;
         gameListenersRegistered = true;
+        logger.info("Discord Link post=initializing...");
         this.registerCommands();
         Utility.setStatus();
         Utility.setTopic();

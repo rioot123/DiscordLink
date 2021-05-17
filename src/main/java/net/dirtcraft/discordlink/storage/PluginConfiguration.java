@@ -22,6 +22,8 @@ public class PluginConfiguration {
     private PluginConfiguration.Command command = new PluginConfiguration.Command();
     @Setting(value = "Notifier")
     private PluginConfiguration.Notifier notifier = new PluginConfiguration.Notifier();
+    @Setting(value = "Misc")
+    private PluginConfiguration.Misc misc = new PluginConfiguration.Misc();
 
 
 
@@ -172,6 +174,12 @@ public class PluginConfiguration {
 
         @Setting(value = "Notify-Users", comment = "Users to DM (Discord ID's)")
         public static List<Long> notify = new ArrayList<>(Arrays.asList(248056002274918400L, 261928443179040768L));
+    }
+
+    @ConfigSerializable
+    public static class Misc {
+        @Setting(value = "Omit-Chat-Arrow", comment = "Don't apply arrows to prefixes.")
+        public static boolean omitChatArrow = SpongeDiscordLib.getServerName().toLowerCase().contains("pixel");
     }
 
 }
