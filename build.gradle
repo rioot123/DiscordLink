@@ -10,6 +10,7 @@ version = pluginVersion
 repositories {
     jcenter()
     mavenCentral()
+    maven { url = 'https://repo.spongepowered.org/maven' }
     maven { url 'https://raw.github.com/FabioZumbi12/UltimateChat/mvn-repo/' }
     maven { url 'https://jitpack.io' }
 }

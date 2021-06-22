@@ -26,6 +26,7 @@ public class SpongeEvents {
     @Listener
     public void onPlayerJoin(ClientConnectionEvent.Join event, @Root Player player) {
         Utility.setRoles(PlatformProvider.getPlayer(player));
+        event.setMessageCancelled(player.get(Keys.VANISH).orElse(false));
         if (player.get(Keys.VANISH).orElse(false)) return;
         if (player.hasPlayedBefore()) {
             String prefix = TextSerializers.FORMATTING_CODE.stripCodes(player.getOption("prefix").orElse(PlatformProvider.getPlayer(player).getPrefix().orElse("")));
