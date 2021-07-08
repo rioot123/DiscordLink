@@ -1,4 +1,4 @@
-# Discord-Link
+# Discord-Link 2
 Handles gamechats on the DirtCraft Discord.
 
 Requires:
