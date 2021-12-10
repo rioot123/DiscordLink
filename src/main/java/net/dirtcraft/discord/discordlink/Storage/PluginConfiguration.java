@@ -46,6 +46,12 @@ public class PluginConfiguration {
         @Setting public static boolean leaveJoinMessages = true;
         @Setting public static boolean enabled = true;
         @Setting public static String serverId = "Hub";
+
+        @Setting(comment = "Does network-wide filtering for specific keywords. Currently this just stops a remote code execution exploit.")
+        public static boolean enableFiltering = true;
+
+        @Setting(comment = "For serious offenses (exploits) caught by the global filter, should the player be banned?")
+        public static boolean banSeriousFiltered = true;
     }
 
     @ConfigSerializable

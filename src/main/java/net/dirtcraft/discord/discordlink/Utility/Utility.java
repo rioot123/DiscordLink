@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -156,6 +157,12 @@ public class Utility {
         } else {
             return CommandResult.IGNORED;
         }
+    }
+
+    public static void toConsole(String command) {
+        CommandSender commandSender = ProxyServer.getInstance().getConsole();
+        PluginManager manager = ProxyServer.getInstance().getPluginManager();
+        manager.dispatchCommand(commandSender, command);
     }
 
     public static void toConsole(ConsoleSource commandSender, String command) {
