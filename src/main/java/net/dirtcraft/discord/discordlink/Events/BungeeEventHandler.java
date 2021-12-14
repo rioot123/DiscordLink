@@ -19,7 +19,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.regex.Pattern;
 
 public class BungeeEventHandler implements Listener {
-    private final Pattern finalPattern = Pattern.compile("$\\{jndi", Pattern.LITERAL);
+    private final Pattern finalPattern = Pattern.compile("\\$\\{.*}");
     {
         ProxyServer.getInstance().getPluginManager().registerListener(DiscordLink.getInstance(), this);
     }
