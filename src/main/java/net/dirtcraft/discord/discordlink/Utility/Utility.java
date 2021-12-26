@@ -69,6 +69,12 @@ public class Utility {
         TextChannel channel = DiscordLink
                 .getJDA()
                 .getTextChannelById(PluginConfiguration.Main.defaultChannelID);
+
+        if (channel == null) {
+            System.out.println("[Discord-Link] Bad configuration! Please verify if the gamechat channel id is valid.");
+            return;
+        }
+
         String code = channel.getName().split("-")[1];
 
         channel.getManager()
@@ -93,7 +99,9 @@ public class Utility {
             Role discordRole = role.getRole();
             if (discordRole == null || member.hasRole(role)) return;
             guild.addRoleToMember(member, discordRole).submit();
-        } catch (Exception ignored){}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     public static void setRoleIfAbsent(long id, Roles role){
         try {
@@ -104,7 +112,9 @@ public class Utility {
             Role discordRole = role.getRole();
             if (discordRole == null || member.hasRole(role)) return;
             guild.addRoleToMember(member, discordRole).submit();
-        } catch (Exception ignored){}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static void removeRoleIfPresent(Guild guild, GuildMember member, Roles role){
@@ -112,7 +122,9 @@ public class Utility {
             Role discordRole = role.getRole();
             if (discordRole == null || !member.hasRole(role)) return;
             guild.removeRoleFromMember(member, discordRole).submit();
-        } catch (Exception ignored){}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     public static void removeRoleIfPresent(long id, Roles role){
         try {
@@ -123,14 +135,18 @@ public class Utility {
             Role discordRole = role.getRole();
             if (discordRole == null || !member.hasRole(role)) return;
             guild.removeRoleFromMember(member, discordRole).submit();
-        } catch (Exception ignored){}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static void tryChangeNickname(Guild guild, GuildMember member, String name){
         try {
             if (name == null) return;
             guild.modifyNickname(member, name).submit();
-        } catch (Exception ignored){ }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static void setStatus() {
