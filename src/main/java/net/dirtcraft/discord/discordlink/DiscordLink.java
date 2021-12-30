@@ -27,6 +27,7 @@ import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitScheduler;
 
 import java.awt.*;
 import java.io.File;
@@ -72,12 +73,14 @@ public class DiscordLink extends JavaPlugin {
 
             Utility.setStatus();
             Utility.setTopic();
-            Channels.getDefaultChat().sendMessage(
+
+            BukkitScheduler scheduler = getServer().getScheduler();
+            scheduler.scheduleSyncDelayedTask(this, () -> Channels.getDefaultChat().sendMessage(
                     Utility.embedBuilder()
                             .setColor(Color.GREEN)
                             .setDescription(PluginConfiguration.Format.serverStart
                                     .replace("{modpack}", PluginConfiguration.Main.SERVER_NAME)
-                            ).build());
+                            ).build()), 0L);
 
             getCommand("verify").setExecutor(new Verify(storage));
             getCommand("unverify").setExecutor(new Unverify());

@@ -8,6 +8,7 @@ import net.dirtcraft.discord.discordlink.Utility.Compatability.Platform.Platform
 import net.dirtcraft.discord.discordlink.Utility.Utility;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.milkbowl.vault.chat.Chat;
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -20,11 +21,14 @@ public class SpigotEvents implements Listener {
         this.vault = chat;
     }
     private final Chat vault;
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onChat(AsyncPlayerChatEvent event){
-         if (event.isCancelled()) return;
+        if (event.isCancelled()) return;
+        event.setCancelled(true);
+        String chatMsg = String.format("%s &r%s&r: %s", vault.getPlayerPrefix(event.getPlayer()), event.getPlayer().getDisplayName(), event.getMessage()).replaceAll("&", "§");
+        Bukkit.broadcastMessage(chatMsg);
         String prefix = Utility.sanitiseMinecraftText(vault.getPlayerPrefix(event.getPlayer()));
-        String nickName = Utility.sanitiseMinecraftText(event.getPlayer().getDisplayName());
+        String nickName = Utility.sanitiseMinecraftText(event.getPlayer().getName());
         String message = Utility.sanitiseMinecraftText(event.getMessage());
         Channels.sendPlayerMessage(prefix, nickName, message);
         if (event.getPlayer().hasPermission(Permission.COLOUR_CHAT)) {

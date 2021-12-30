@@ -8,9 +8,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Settings {
-    public static final String ROOT_CHANNEL = "Discord-Link";
-    public static final String ROLES_CHANNEL = "set_roles";
-    public static final String PROMOTION_CHANNEL = "promotion";
+    public static final String ROOT_CHANNEL = "dirtcraft:discord_link";
+    public static final String ROLES_CHANNEL = "dirtcraft:set_roles";
+    public static final String PROMOTION_CHANNEL = "dirtcraft:promotion";
     public static final String VERSION = "@VERSION@";
     public static final Map<String, String> STAFF_PREFIXES = Stream.of(
             new Pair<>(Permission.ROLES_MANAGER,   "&f✯"),

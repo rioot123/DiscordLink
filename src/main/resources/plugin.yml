@@ -1,9 +1,9 @@
 name: Discord_Link
 version: @version@
 main: net.dirtcraft.discord.discordlink.DiscordLink
-api-version: 1.13
+api-version: 1.16
 load: STARTUP
-authors: [ShinyAfro]
+authors: [ShinyAfro,Combi]
 description: Discord Integration
 depend: [Vault]
 softdepend: [Essentials]
