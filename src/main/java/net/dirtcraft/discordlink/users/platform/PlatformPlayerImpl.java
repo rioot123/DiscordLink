@@ -1,72 +1,67 @@
+// 
+// Decompiled by Procyon v0.5.36
+// 
+
 package net.dirtcraft.discordlink.users.platform;
 
-
-import net.dirtcraft.discordlink.users.permission.PermissionProvider;
-import net.dirtcraft.spongediscordlib.users.platform.PlatformPlayer;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.entity.living.player.Player;
-
-import java.util.Optional;
 import java.util.UUID;
+import net.dirtcraft.discordlink.users.permission.PermissionProvider;
+import java.util.Optional;
+import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.entity.living.player.Player;
+import net.dirtcraft.spongediscordlib.users.platform.PlatformPlayer;
 
-public class PlatformPlayerImpl extends PlatformUserImpl implements PlatformPlayer {
+public class PlatformPlayerImpl extends PlatformUserImpl implements PlatformPlayer
+{
     private final Player player;
-
-    PlatformPlayerImpl(Player player){
-        super(player);
+    
+    PlatformPlayerImpl(final Player player) {
+        super((User)player);
         this.player = player;
     }
-
-    @Override
-    public String getNameAndPrefix(){
-        return getPrefix()
-                .map(pre->pre + " " + getName())
-                .orElse(getName());
+    
+    public String getNameAndPrefix() {
+        return this.getPrefix().map(pre -> pre + " " + this.getName()).orElse(this.getName());
     }
-
-    @Override
-    public String getName(){
-        return player.getName();
+    
+    public String getName() {
+        return this.player.getName();
     }
-
-    @Override
-    public Optional<String> getPrefix(){
-        if (player.getOption("prefix").isPresent()) return player.getOption("prefix");
-        else return PermissionProvider.INSTANCE.getPrefix(player.getUniqueId());
+    
+    public Optional<String> getPrefix() {
+        if (this.player.getOption("prefix").isPresent()) {
+            return (Optional<String>)this.player.getOption("prefix");
+        }
+        return PermissionProvider.INSTANCE.getPrefix(this.player.getUniqueId());
     }
-
+    
     @Override
-    public UUID getUUID(){
-        return player.getUniqueId();
+    public UUID getUUID() {
+        return this.player.getUniqueId();
     }
-
-    @Override
-    public boolean isVanished(){
-        return player.get(Keys.VANISH).orElse(false);
+    
+    public boolean isVanished() {
+        return this.player.get(Keys.VANISH).orElse(false);
     }
-
-    @Override
-    public boolean notVanished(){
-        return !isVanished();
+    
+    public boolean notVanished() {
+        return !this.isVanished();
     }
-
-    @Override
-    public boolean hasPlayedBefore(){
-        return player.hasPlayedBefore();
+    
+    public boolean hasPlayedBefore() {
+        return this.player.hasPlayedBefore();
     }
-
-    @Override
-    public boolean hasPermission(String perm){
-        return player.hasPermission(perm);
+    
+    public boolean hasPermission(final String perm) {
+        return this.player.hasPermission(perm);
     }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T> T getOnlinePlayer(){
-        return (T) player;
+    
+    public <T> T getOnlinePlayer() {
+        return (T)this.player;
     }
-
-    public Player getPlayer(){
-        return player;
+    
+    public Player getPlayer() {
+        return this.player;
     }
 }

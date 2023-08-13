@@ -1,30 +1,40 @@
+// 
+// Decompiled by Procyon v0.5.36
+// 
+
 package net.dirtcraft.discordlink.users;
 
-import net.dirtcraft.discordlink.DiscordLink;
-import net.dirtcraft.discordlink.channels.DiscordChannelImpl;
-import net.dirtcraft.discordlink.commands.sources.ConsoleSource;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dirtcraft.discordlink.commands.sources.DiscordResponder;
-import net.dirtcraft.discordlink.storage.Database;
+import net.dirtcraft.discordlink.commands.sources.ConsoleSource;
+import net.dirtcraft.discordlink.DiscordLink;
+import net.dv8tion.jda.api.entities.PrivateChannel;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dirtcraft.discordlink.storage.tables.Verification;
-import net.dirtcraft.discordlink.users.discord.WrappedMember;
-import net.dirtcraft.discordlink.users.permission.PermissionProvider;
-import net.dirtcraft.discordlink.users.permission.subject.PermissionResolver;
 import net.dirtcraft.discordlink.users.platform.PlatformProvider;
-import net.dirtcraft.spongediscordlib.users.DiscordMember;
 import net.dirtcraft.spongediscordlib.users.platform.PlatformPlayer;
-import net.dirtcraft.spongediscordlib.users.platform.PlatformUser;
-import net.dirtcraft.spongediscordlib.users.roles.DiscordRole;
-import net.dirtcraft.spongediscordlib.users.roles.DiscordRoles;
-import net.dirtcraft.spongediscordlib.users.roles.RoleManager;
-import net.dv8tion.jda.api.entities.*;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.Optional;
+import net.dirtcraft.discordlink.users.permission.PermissionProvider;
+import net.dv8tion.jda.api.entities.Role;
+import java.util.Collection;
+import java.util.function.Consumer;
+import net.dirtcraft.spongediscordlib.users.roles.DiscordRoles;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
+import java.util.HashSet;
+import net.dv8tion.jda.api.entities.Member;
+import net.dirtcraft.spongediscordlib.users.roles.DiscordRole;
 import java.util.Set;
+import net.dirtcraft.discordlink.storage.Database;
+import net.dirtcraft.discordlink.channels.DiscordChannelImpl;
+import net.dirtcraft.spongediscordlib.users.roles.RoleManager;
+import net.dirtcraft.discordlink.users.permission.subject.PermissionResolver;
+import net.dirtcraft.spongediscordlib.users.platform.PlatformUser;
+import net.dirtcraft.spongediscordlib.users.DiscordMember;
+import net.dirtcraft.discordlink.users.discord.WrappedMember;
 
-public class GuildMember extends WrappedMember implements DiscordMember {
+public class GuildMember extends WrappedMember implements DiscordMember
+{
     PlatformUser user;
     PermissionResolver permissions;
     boolean retrievedPlayer;
@@ -34,170 +44,155 @@ public class GuildMember extends WrappedMember implements DiscordMember {
     private final Database storage;
     private Set<DiscordRole> roles;
     private DiscordRole highestRank;
-
-    public GuildMember(Database storage, RoleManager roleManager, Member member){
+    
+    public GuildMember(final Database storage, final RoleManager roleManager, final Member member) {
         super(member);
         this.roleManager = roleManager;
         this.storage = storage;
-        Collection<Role> discordRoles = member.getRoles();
-        roles = new HashSet<>();
-        highestRank = roleManager.getRoles().stream()
-                .filter(e->discordRoles.contains(e.getRole()))
-                .map(DiscordRole::ordinal)
-                .reduce(Integer::min)
-                .map(roleManager::getRole)
-                .orElse(DiscordRoles.NONE);
-
-        roleManager.getRoles().stream()
-                .filter(e->(e.isStaff() && highestRank.getStaffLevel() >= e.getStaffLevel()) || (discordRoles.contains(e.getRole())))
-                .forEach(roles::add);
+        final Collection<Role> discordRoles = (Collection<Role>)member.getRoles();
+        this.roles = new HashSet<DiscordRole>();
+        this.highestRank = (DiscordRole)roleManager.getRoles().stream().filter(e -> discordRoles.contains(e.getRole())).map(DiscordRole::ordinal).reduce(Integer::min).map(roleManager::getRole).orElse(DiscordRoles.NONE);
+        final Collection collection;
+        roleManager.getRoles().stream().filter(e -> (e.isStaff() && this.highestRank.getStaffLevel() >= e.getStaffLevel()) || collection.contains(e.getRole())).forEach(this.roles::add);
     }
-
-    public boolean hasInGamePermission(String permission){
-        if (hasRole(DiscordRoles.DIRTY)) return true;
-        if (!retrievedPlayer) getPlayerData();
-        if (user == null) return false;
-        if (!retrievedPermissions) permissions = PermissionProvider.INSTANCE
-                .getPermission(user.getUUID())
-                .orElse(null);
-        if (permissions == null) return false;
-        boolean perm =  permissions.hasPermission(permission);
+    
+    public boolean hasInGamePermission(final String permission) {
+        if (this.hasRole(DiscordRoles.DIRTY)) {
+            return true;
+        }
+        if (!this.retrievedPlayer) {
+            this.getPlayerData();
+        }
+        if (this.user == null) {
+            return false;
+        }
+        if (!this.retrievedPermissions) {
+            this.permissions = PermissionProvider.INSTANCE.getPermission(this.user.getUUID()).orElse(null);
+        }
+        if (this.permissions == null) {
+            return false;
+        }
+        final boolean perm = this.permissions.hasPermission(permission);
         return perm;
     }
-
-    @Override
-    public Optional<PlatformPlayer> getPlayer(){
-        if (!retrievedPlayer) return getPlayerData().flatMap(PlatformProvider::getPlayer);
-        else return Optional.ofNullable(user).flatMap(PlatformProvider::getPlayer);
-    }
-
-    @Override
-    public Optional<PlatformUser> getPlayerData(){
-        if (!retrievedPlayer) {
-            final Optional<PlatformUser> optData = storage.getVerificationData(getId())
-                    .flatMap(Verification.VerificationData::getUUID)
-                    .flatMap(PlatformProvider::getPlayerOffline);
-            optData.ifPresent(u->this.user = u);
-            retrievedPlayer = true;
-            return optData;
-        } else return Optional.ofNullable(user);
-    }
-
-    @Override
-    public void sendPrivateMessage(MessageEmbed embed) {
-        member.getUser().openPrivateChannel().queue(dm-> dm.sendMessage(embed).queue());
-    }
-
-    @Override
-    public void sendPrivateMessage(String message) {
-        member.getUser().openPrivateChannel().queue(dm-> dm.sendMessage(message).queue());
-    }
-
-    public DiscordChannelImpl getPrivateChannel() {
-        if (privateChannel == null) {
-            PrivateChannel channel = getUser().openPrivateChannel().complete();
-            privateChannel = DiscordLink.get().getChannelManager()
-                    .getChannel(channel.getIdLong(), true);
+    
+    public Optional<PlatformPlayer> getPlayer() {
+        if (!this.retrievedPlayer) {
+            return this.getPlayerData().flatMap((Function<? super PlatformUser, ? extends Optional<? extends PlatformPlayer>>)PlatformProvider::getPlayer);
         }
-        return privateChannel;
+        return Optional.ofNullable(this.user).flatMap((Function<? super PlatformUser, ? extends Optional<? extends PlatformPlayer>>)PlatformProvider::getPlayer);
     }
-
-    public ConsoleSource getPrivateSource(String command) {
-        DiscordResponder responder = getPrivateChannel().getCommandResponder(this, command);
+    
+    public Optional<PlatformUser> getPlayerData() {
+        if (!this.retrievedPlayer) {
+            final Optional<PlatformUser> optData = this.storage.getVerificationData(this.getId()).flatMap((Function<? super Verification.VerificationData, ? extends Optional<?>>)Verification.VerificationData::getUUID).flatMap((Function<? super Object, ? extends Optional<? extends PlatformUser>>)PlatformProvider::getPlayerOffline);
+            optData.ifPresent(u -> this.user = u);
+            this.retrievedPlayer = true;
+            return optData;
+        }
+        return Optional.ofNullable(this.user);
+    }
+    
+    public void sendPrivateMessage(final MessageEmbed embed) {
+        this.member.getUser().openPrivateChannel().queue(dm -> dm.sendMessage(embed).queue());
+    }
+    
+    public void sendPrivateMessage(final String message) {
+        this.member.getUser().openPrivateChannel().queue(dm -> dm.sendMessage((CharSequence)message).queue());
+    }
+    
+    public DiscordChannelImpl getPrivateChannel() {
+        if (this.privateChannel == null) {
+            final PrivateChannel channel = (PrivateChannel)this.getUser().openPrivateChannel().complete();
+            this.privateChannel = DiscordLink.get().getChannelManager().getChannel(channel.getIdLong(), true);
+        }
+        return this.privateChannel;
+    }
+    
+    public ConsoleSource getPrivateSource(final String command) {
+        final DiscordResponder responder = this.getPrivateChannel().getCommandResponder(this, command);
         return DiscordResponder.getSender(responder);
     }
-
-    @Override
-    public boolean isStaff(){
-        return roles.contains(DiscordRoles.STAFF);
+    
+    public boolean isStaff() {
+        return this.roles.contains(DiscordRoles.STAFF);
     }
-
-    @Override
-    public boolean isMuted(){
-        return roles.contains(DiscordRoles.MUTED);
+    
+    public boolean isMuted() {
+        return this.roles.contains(DiscordRoles.MUTED);
     }
-
-    @Override
-    public boolean isDonor(){
-        return roles.contains(DiscordRoles.DONOR);
+    
+    public boolean isDonor() {
+        return this.roles.contains(DiscordRoles.DONOR);
     }
-
-    @Override
-    public boolean isBoosting(){
-        return roles.contains(DiscordRoles.NITRO);
+    
+    public boolean isBoosting() {
+        return this.roles.contains(DiscordRoles.NITRO);
     }
-
-    @Override
-    public boolean isVerified(){
-        return roles.contains(DiscordRoles.VERIFIED);
+    
+    public boolean isVerified() {
+        return this.roles.contains(DiscordRoles.VERIFIED);
     }
-
-    @Override
-    public boolean hasRole(DiscordRole role){
-        return roles.contains(role);
+    
+    public boolean hasRole(final DiscordRole role) {
+        return this.roles.contains(role);
     }
-
-    @Override
-    public String getChevron(){
-        return highestRank.getChevron();
+    
+    public String getChevron() {
+        return this.highestRank.getChevron();
     }
-
-    @Override
-    public String getNameStyle(){
-        return highestRank.getStyle();
+    
+    public String getNameStyle() {
+        return this.highestRank.getStyle();
     }
-
-    @Override
-    @NonNull public DiscordRole getHighestRank(){
-        return highestRank;
+    
+    public DiscordRole getHighestRank() {
+        return this.highestRank;
     }
-
-    @Override
-    public void setRoleIfAbsent(DiscordRole role){
+    
+    public void setRoleIfAbsent(final DiscordRole role) {
         try {
-            Guild guild = getGuild();
-            Role discordRole = role.getRole();
-            if (discordRole == null || hasRole(role)) return;
-            guild.addRoleToMember(member, discordRole).submit();
-        } catch (Exception ignored){}
+            final Guild guild = this.getGuild();
+            final Role discordRole = role.getRole();
+            if (discordRole == null || this.hasRole(role)) {
+                return;
+            }
+            guild.addRoleToMember(this.member, discordRole).submit();
+        }
+        catch (Exception ex) {}
     }
-
-    @Override
-    public void removeRoleIfPresent(DiscordRole role){
+    
+    public void removeRoleIfPresent(final DiscordRole role) {
         try {
-            Guild guild = getGuild();
-            Role discordRole = role.getRole();
-            if (discordRole == null || !hasRole(role)) return;
-            guild.removeRoleFromMember(member, discordRole).submit();
-        } catch (Exception ignored){}
+            final Guild guild = this.getGuild();
+            final Role discordRole = role.getRole();
+            if (discordRole == null || !this.hasRole(role)) {
+                return;
+            }
+            guild.removeRoleFromMember(this.member, discordRole).submit();
+        }
+        catch (Exception ex) {}
     }
-
-    @Override
-    public void tryChangeNickname(String name){
+    
+    public void tryChangeNickname(final String name) {
         try {
-            if (name == null) return;
-            getGuild().modifyNickname(this, name).submit();
-        } catch (Exception ignored){ }
+            if (name == null) {
+                return;
+            }
+            this.getGuild().modifyNickname((Member)this, name).submit();
+        }
+        catch (Exception ex) {}
     }
-
-    @Override
-    public void reloadRoles(){
-        Collection<Role> discordRoles = member.getRoles();
-        roles = new HashSet<>();
-        highestRank = roleManager.getRoles().stream()
-                .filter(e->discordRoles.contains(e.getRole()))
-                .map(DiscordRole::ordinal)
-                .reduce(Integer::min)
-                .map(roleManager::getRole)
-                .orElse(DiscordRoles.NONE);
-
-        roleManager.getRoles().stream()
-                .filter(e->(e.isStaff() && highestRank.getStaffLevel() <= e.getStaffLevel()) || (discordRoles.contains(e.getRole())))
-                .forEach(roles::add);
+    
+    public void reloadRoles() {
+        final Collection<Role> discordRoles = (Collection<Role>)this.member.getRoles();
+        this.roles = new HashSet<DiscordRole>();
+        this.highestRank = (DiscordRole)this.roleManager.getRoles().stream().filter(e -> discordRoles.contains(e.getRole())).map(DiscordRole::ordinal).reduce(Integer::min).map(this.roleManager::getRole).orElse(DiscordRoles.NONE);
+        final Collection collection;
+        this.roleManager.getRoles().stream().filter(e -> (e.isStaff() && this.highestRank.getStaffLevel() <= e.getStaffLevel()) || collection.contains(e.getRole())).forEach(this.roles::add);
     }
-
-    Member getWrappedMember(){
-        return member;
+    
+    Member getWrappedMember() {
+        return this.member;
     }
-
 }

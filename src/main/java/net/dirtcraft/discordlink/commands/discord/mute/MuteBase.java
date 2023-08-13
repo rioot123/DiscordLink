@@ -1,57 +1,58 @@
+// 
+// Decompiled by Procyon v0.5.36
+// 
+
 package net.dirtcraft.discordlink.commands.discord.mute;
 
-import net.dirtcraft.discordlink.commands.DiscordCommandImpl;
-import net.dirtcraft.discordlink.commands.DiscordCommandTree;
+import net.dirtcraft.spongediscordlib.exceptions.DiscordCommandException;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dirtcraft.spongediscordlib.users.DiscordMember;
 import net.dirtcraft.discordlink.storage.PluginConfiguration;
 import net.dirtcraft.discordlink.utility.Utility;
-import net.dirtcraft.spongediscordlib.exceptions.DiscordCommandException;
+import java.util.List;
 import net.dirtcraft.spongediscordlib.users.MessageSource;
+import net.dirtcraft.spongediscordlib.commands.DiscordCommand;
+import net.dirtcraft.spongediscordlib.commands.DiscordCommandExecutor;
 import net.dirtcraft.spongediscordlib.users.roles.DiscordRoles;
-import net.dv8tion.jda.api.EmbedBuilder;
+import net.dirtcraft.spongediscordlib.users.roles.DiscordRole;
+import net.dirtcraft.discordlink.commands.DiscordCommandImpl;
+import net.dirtcraft.discordlink.commands.DiscordCommandTree;
 
-public class MuteBase extends DiscordCommandTree {
-    DiscordCommandImpl add = DiscordCommandImpl.builder()
-            .setDescription("Mutes a player!")
-            .setCommandUsage("<@Discord> [duration] [reason]")
-            .setRequiredRoles(DiscordRoles.MOD)
-            .setCommandExecutor(new Mute())
-            .build();
-
-    public MuteBase(){
-        DiscordCommandImpl remove = DiscordCommandImpl.builder()
-                .setDescription("Removes a players mute")
-                .setCommandUsage("<@Discord>")
-                .setRequiredRoles(DiscordRoles.MOD)
-                .setCommandExecutor(new Unmute())
-                .build();
-
-        DiscordCommandImpl info = DiscordCommandImpl.builder()
-                .setDescription("Shows the details of a mute")
-                .setCommandUsage("<@Discord>")
-                .setRequiredRoles(DiscordRoles.STAFF)
-                .setCommandExecutor(new MuteInfo())
-                .build();
-
-        register(add, "add");
-        register(remove, "remove");
-        register(info, "info");
+public class MuteBase extends DiscordCommandTree
+{
+    DiscordCommandImpl add;
+    
+    public MuteBase() {
+        this.add = DiscordCommandImpl.builder().setDescription("Mutes a player!").setCommandUsage("<@Discord> [duration] [reason]").setRequiredRoles(DiscordRoles.MOD).setCommandExecutor((DiscordCommandExecutor)new Mute()).build();
+        final DiscordCommandImpl remove = DiscordCommandImpl.builder().setDescription("Removes a players mute").setCommandUsage("<@Discord>").setRequiredRoles(DiscordRoles.MOD).setCommandExecutor((DiscordCommandExecutor)new Unmute()).build();
+        final DiscordCommandImpl info = DiscordCommandImpl.builder().setDescription("Shows the details of a mute").setCommandUsage("<@Discord>").setRequiredRoles(DiscordRoles.STAFF).setCommandExecutor((DiscordCommandExecutor)new MuteInfo()).build();
+        this.register((DiscordCommand)this.add, "add");
+        this.register((DiscordCommand)remove, "remove");
+        this.register((DiscordCommand)info, "info");
     }
-
+    
     @Override
-    public void defaultResponse(MessageSource member, String command, java.util.List<String> args) throws DiscordCommandException {
-        if (!args.isEmpty() && !defaults.contains(args.get(0))) {
-            add.process(member, command, args);
+    public void defaultResponse(final MessageSource member, final String command, final List<String> args) throws DiscordCommandException {
+        if (!args.isEmpty() && !this.defaults.contains(args.get(0))) {
+            this.add.process(member, command, args);
             return;
         }
-        EmbedBuilder embed = Utility.embedBuilder();
-        String pre = PluginConfiguration.Main.discordCommand;
-        getCommandMap().forEach((alias, cmd)->{
-            if (!cmd.hasPermission(member)) return;
-            String header = pre + command + " " + alias + " " + cmd.getUsage();
-            embed.addField(header, cmd.getDescription(), false);
-            embed.setFooter("Requested By: " + member.getUser().getAsTag(), member.getUser().getAvatarUrl());
+        final EmbedBuilder embed = Utility.embedBuilder();
+        final String pre = PluginConfiguration.Main.discordCommand;
+        final String str;
+        String header;
+        final EmbedBuilder embedBuilder;
+        this.getCommandMap().forEach((alias, cmd) -> {
+            if (!cmd.hasPermission((DiscordMember)member)) {
+                return;
+            }
+            else {
+                header = str + command + " " + alias + " " + cmd.getUsage();
+                embedBuilder.addField(header, cmd.getDescription(), false);
+                embedBuilder.setFooter("Requested By: " + member.getUser().getAsTag(), member.getUser().getAvatarUrl());
+                return;
+            }
         });
         member.sendCommandResponse(embed.build(), 30);
     }
-
 }

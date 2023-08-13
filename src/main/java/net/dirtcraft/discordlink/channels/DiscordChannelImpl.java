@@ -1,121 +1,122 @@
+// 
+// Decompiled by Procyon v0.5.36
+// 
+
 package net.dirtcraft.discordlink.channels;
 
 import net.dirtcraft.discordlink.commands.sources.DiscordResponder;
-import net.dirtcraft.discordlink.users.GuildMember;
 import net.dirtcraft.discordlink.utility.Utility;
-import net.dirtcraft.spongediscordlib.channels.DiscordChannel;
+import net.dirtcraft.discordlink.users.GuildMember;
 import net.dirtcraft.spongediscordlib.users.DiscordMember;
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import net.dv8tion.jda.api.entities.Message;
+import java.util.concurrent.CompletableFuture;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.JDA;
+import net.dirtcraft.spongediscordlib.channels.DiscordChannel;
 
-public class DiscordChannelImpl implements DiscordChannel {
+public class DiscordChannelImpl implements DiscordChannel
+{
     private final JDA jda;
     private final long channel;
     private final boolean isPrivate;
-
-    DiscordChannelImpl(JDA jda, long channel){
+    
+    DiscordChannelImpl(final JDA jda, final long channel) {
         this.jda = jda;
         this.channel = channel;
         this.isPrivate = false;
     }
-
-    DiscordChannelImpl(JDA jda, long channel, boolean isPrivate){
+    
+    DiscordChannelImpl(final JDA jda, final long channel, final boolean isPrivate) {
         this.jda = jda;
         this.channel = channel;
         this.isPrivate = isPrivate;
     }
-
-    public MessageChannel getChannel(){
-        return isPrivate? jda.getPrivateChannelById(channel) : jda.getTextChannelById(channel);
+    
+    public MessageChannel getChannel() {
+        return (MessageChannel)(this.isPrivate ? this.jda.getPrivateChannelById(this.channel) : this.jda.getTextChannelById(this.channel));
     }
-
-    public long getId(){
-        return channel;
+    
+    public long getId() {
+        return this.channel;
     }
-
-    @Override
-    public CompletableFuture<Message> sendMessage(MessageEmbed embed) {
-        return getChannel().sendMessage(embed).submit();
+    
+    public CompletableFuture<Message> sendMessage(final MessageEmbed embed) {
+        return (CompletableFuture<Message>)this.getChannel().sendMessage(embed).submit();
     }
-
-    @Override
-    public CompletableFuture<Message> sendMessage(String message) {
-        return getChannel().sendMessage(message).submit();
+    
+    public CompletableFuture<Message> sendMessage(final String message) {
+        return (CompletableFuture<Message>)this.getChannel().sendMessage((CharSequence)message).submit();
     }
-
-    @Override
-    public CompletableFuture<Message> sendMessage(String message, int delay){
-        return sendMessage(message).whenComplete((msg, ex)-> msg.delete().queueAfter(delay, TimeUnit.SECONDS));
+    
+    public CompletableFuture<Message> sendMessage(final String message, final int delay) {
+        return this.sendMessage(message).whenComplete((msg, ex) -> msg.delete().queueAfter((long)delay, TimeUnit.SECONDS));
     }
-
-    @Override
-    public CompletableFuture<Message> sendMessage(MessageEmbed message, int delay){
-        return sendMessage(message).whenComplete((msg, ex)-> msg.delete().queueAfter(delay, TimeUnit.SECONDS));
+    
+    public CompletableFuture<Message> sendMessage(final MessageEmbed message, final int delay) {
+        return this.sendMessage(message).whenComplete((msg, ex) -> msg.delete().queueAfter((long)delay, TimeUnit.SECONDS));
     }
-
-    @Override
-    public void sendMessage(DiscordMember source, String header, String message) {
-        if (!(source instanceof GuildMember)) return;
-        GuildMember member = (GuildMember) source;
-        header = header == null? "" : header;
-        MessageEmbed embed = Utility.embedBuilder()
-                .addField(header, message, false)
-                .setFooter("Requested By: " + member.getUser().getAsTag(), member.getUser().getAvatarUrl())
-                .build();
-        sendMessage(embed);
+    
+    public void sendMessage(final DiscordMember source, String header, final String message) {
+        if (!(source instanceof GuildMember)) {
+            return;
+        }
+        final GuildMember member = (GuildMember)source;
+        header = ((header == null) ? "" : header);
+        final MessageEmbed embed = Utility.embedBuilder().addField(header, message, false).setFooter("Requested By: " + member.getUser().getAsTag(), member.getUser().getAvatarUrl()).build();
+        this.sendMessage(embed);
     }
-
-    @Override
-    public void sendMessage(String header, String message) {
-        header = header == null? "" : header;
-        MessageEmbed embed = Utility.embedBuilder()
-                .addField(header, message, false)
-                .build();
-        sendMessage(embed);
+    
+    public void sendMessage(String header, final String message) {
+        header = ((header == null) ? "" : header);
+        final MessageEmbed embed = Utility.embedBuilder().addField(header, message, false).build();
+        this.sendMessage(embed);
     }
-
-    public DiscordResponder getCommandResponder(GuildMember member, String command){
+    
+    public DiscordResponder getCommandResponder(final GuildMember member, final String command) {
         return new DiscordResponder() {
             @Override
-            public void sendDiscordResponse(String message) {
-                if (message.length() > getCharLimit()) return;
-                sendMessage(toEmbed(message));
+            public void sendDiscordResponse(final String message) {
+                if (message.length() > this.getCharLimit()) {
+                    return;
+                }
+                DiscordChannelImpl.this.sendMessage(this.toEmbed(message));
             }
-
-            private MessageEmbed toEmbed(String s){
-                return Utility.embedBuilder().addField("__Command__ \"**/" + command.toLowerCase() + "**\" __Sent__", s, false)
-                        .setFooter("Sent By: " + member.getUser().getAsTag(), member.getUser().getAvatarUrl())
-                        .build();
+            
+            private MessageEmbed toEmbed(final String s) {
+                return Utility.embedBuilder().addField("__Command__ \"**/" + command.toLowerCase() + "**\" __Sent__", s, false).setFooter("Sent By: " + member.getUser().getAsTag(), member.getUser().getAvatarUrl()).build();
             }
-
-            public int getCharLimit(){
+            
+            @Override
+            public int getCharLimit() {
                 return 1024;
             }
-
-            public boolean sanitise(){
+            
+            @Override
+            public boolean sanitise() {
                 return true;
             }
         };
     }
-
-    public DiscordResponder getChatResponder(){
+    
+    public DiscordResponder getChatResponder() {
         return new DiscordResponder() {
             @Override
-            public void sendDiscordResponse(String message) {
-                if (message.length() > getCharLimit()) return;
-                sendMessage(message);
+            public void sendDiscordResponse(final String message) {
+                if (message.length() > this.getCharLimit()) {
+                    return;
+                }
+                DiscordChannelImpl.this.sendMessage(message);
             }
-
-            public int getCharLimit(){
+            
+            @Override
+            public int getCharLimit() {
                 return 1996;
             }
-
-            public boolean sanitise(){
+            
+            @Override
+            public boolean sanitise() {
                 return false;
             }
         };

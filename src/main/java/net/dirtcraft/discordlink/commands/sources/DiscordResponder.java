@@ -1,63 +1,68 @@
+// 
+// Decompiled by Procyon v0.5.36
+// 
+
 package net.dirtcraft.discordlink.commands.sources;
 
 import org.spongepowered.api.text.Text;
-
 import java.util.function.Consumer;
 
-public interface DiscordResponder {
-    void sendDiscordResponse(String message);
-
+public interface DiscordResponder
+{
+    void sendDiscordResponse(final String p0);
+    
     int getCharLimit();
-
+    
     boolean sanitise();
-
-    static DiscordResponder getSender(Consumer<String> output, int limit, boolean sanitise) {
+    
+    default DiscordResponder getSender(final Consumer<String> output, final int limit, final boolean sanitise) {
         return new DiscordResponder() {
             @Override
-            public void sendDiscordResponse(String message) {
+            public void sendDiscordResponse(final String message) {
                 output.accept(message);
             }
-
+            
             @Override
-            public int getCharLimit(){
+            public int getCharLimit() {
                 return limit;
             }
-
+            
             @Override
-            public boolean sanitise(){
+            public boolean sanitise() {
                 return sanitise;
             }
         };
     }
-
-    static ConsoleSender getSender(DiscordResponder console){
-        return console instanceof ConsoleSender? (ConsoleSender) console : new ConsoleSender(console);
+    
+    default ConsoleSender getSender(final DiscordResponder console) {
+        return (ConsoleSender)((console instanceof ConsoleSender) ? console : new ConsoleSender(console));
     }
-
-    class ConsoleSender extends ConsoleSource implements DiscordResponder {
+    
+    public static class ConsoleSender extends ConsoleSource implements DiscordResponder
+    {
         final DiscordResponder scheduledSender;
-        protected ConsoleSender(DiscordResponder scheduledSender){
+        
+        protected ConsoleSender(final DiscordResponder scheduledSender) {
             this.scheduledSender = scheduledSender;
         }
-
-        @Override
-        public void sendMessage(Text message) {
+        
+        public void sendMessage(final Text message) {
             ResponseScheduler.submit(this, message.toPlain());
         }
-
+        
         @Override
-        public void sendDiscordResponse(String message) {
-            scheduledSender.sendDiscordResponse(message);
+        public void sendDiscordResponse(final String message) {
+            this.scheduledSender.sendDiscordResponse(message);
         }
-
+        
         @Override
         public int getCharLimit() {
-            return scheduledSender.getCharLimit();
+            return this.scheduledSender.getCharLimit();
         }
-
+        
         @Override
         public boolean sanitise() {
-            return scheduledSender.sanitise();
+            return this.scheduledSender.sanitise();
         }
     }
 }

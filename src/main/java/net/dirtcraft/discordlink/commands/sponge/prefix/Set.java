@@ -1,96 +1,112 @@
+// 
+// Decompiled by Procyon v0.5.36
+// 
+
 package net.dirtcraft.discordlink.commands.sponge.prefix;
 
-import net.dirtcraft.discordlink.commands.sources.ConsoleSource;
-import net.dirtcraft.discordlink.storage.Permission;
+import java.util.Map;
+import java.util.Optional;
 import net.dirtcraft.discordlink.storage.PluginConfiguration;
 import net.dirtcraft.discordlink.storage.Settings;
 import net.dirtcraft.discordlink.users.permission.PermissionProvider;
-import org.spongepowered.api.command.CommandException;
-import org.spongepowered.api.command.CommandResult;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandContext;
-import org.spongepowered.api.command.spec.CommandExecutor;
-import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.text.Text;
-
-import javax.annotation.Nonnull;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Optional;
+import net.dirtcraft.discordlink.commands.sources.ConsoleSource;
 import java.util.concurrent.CompletableFuture;
+import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.command.CommandResult;
+import org.spongepowered.api.command.args.CommandContext;
+import javax.annotation.Nonnull;
+import org.spongepowered.api.command.CommandSource;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Arrays;
+import org.spongepowered.api.command.spec.CommandExecutor;
 
-public class Set implements CommandExecutor {
-
-    private final java.util.Set<String> forbidden = new HashSet<>(Arrays.asList("staff", "helper", "mod", "moderator", "admin", "manager", "owner"));
-
+public class Set implements CommandExecutor
+{
+    private final java.util.Set<String> forbidden;
+    
+    public Set() {
+        this.forbidden = new HashSet<String>(Arrays.asList("staff", "helper", "mod", "moderator", "admin", "manager", "owner"));
+    }
+    
     @Nonnull
-    @Override
-    public CommandResult execute(@Nonnull CommandSource src, @Nonnull CommandContext args) throws CommandException {
-        CompletableFuture.runAsync(()->{
+    public CommandResult execute(@Nonnull final CommandSource src, @Nonnull final CommandContext args) throws CommandException {
+        User target;
+        String prefix;
+        CompletableFuture.runAsync(() -> {
             try {
-                final User target = args.<User>getOne("Target").orElseThrow(()->new CommandException(Text.of("§cYou must specify a target.")));
-                if (target != src && !src.hasPermission(Permission.PREFIX_OTHERS)) throw new CommandException(Text.of("§cYou do not have permission to set other players prefixes."));
-                String prefix = getPrefixUsingArgs(src, target, args);
-                setPrefix(getSource(src), target, prefix);
-
-            } catch (CommandException e){
-                if (e.getText() != null) src.sendMessage(e.getText());
-                else src.sendMessage(Text.of("§cAn error has occurred during execution."));
+                target = args.getOne("Target").orElseThrow(() -> new CommandException((Text)Text.of("§cYou must specify a target.")));
+                if (target != src && !src.hasPermission("discordlink.prefix.others")) {
+                    throw new CommandException((Text)Text.of("§cYou do not have permission to set other players prefixes."));
+                }
+                else {
+                    prefix = this.getPrefixUsingArgs(src, target, args);
+                    this.setPrefix(this.getSource(src), target, prefix);
+                }
             }
+            catch (CommandException e) {
+                if (e.getText() != null) {
+                    src.sendMessage(e.getText());
+                }
+                else {
+                    src.sendMessage((Text)Text.of("§cAn error has occurred during execution."));
+                }
+            }
+            return;
         });
-
         return CommandResult.success();
     }
-
-    protected void setPrefix(@Nonnull ConsoleSource src, User target, String prefix) {
-        PermissionProvider.INSTANCE.setPlayerPrefix(src, target, prefix);
+    
+    protected void setPrefix(@Nonnull final ConsoleSource src, final User target, final String prefix) {
+        PermissionProvider.INSTANCE.setPlayerPrefix((org.spongepowered.api.command.source.ConsoleSource)src, target, prefix);
     }
-
-    private String getPrefixUsingArgs(@Nonnull CommandSource src, User target, @Nonnull CommandContext args) throws CommandException{
-        final String title = args.<String>getOne("Prefix").orElseThrow(()->new CommandException(Text.of("§cYou must specify a prefix.")));
-        final Optional<Boolean> staff = args.<Boolean>getOne("s").filter(x->src.hasPermission(Permission.PREFIX_INDICATOR));
-        final Optional<String> caratColor = args.<String>getOne("ArrowColor").filter(x->src.hasPermission(Permission.PREFIX_ARROW));
-        final Optional<String> optBracketColor = args.<String>getOne("BracketColor").filter(x->src.hasPermission(Permission.PREFIX_BRACKETS));
-
-        if (title.length() > 20 && !src.hasPermission(Permission.PREFIX_LONG)) throw new CommandException(Text.of("§cThe prefix specified is too long."));
-        if (isNotAllowed(title) && !src.hasPermission(Permission.ROLES_STAFF)) throw new CommandException(Text.of("§cThat prefix is not allowed."));
-        if (optBracketColor.isPresent() && isNonColor(optBracketColor.get())) throw new CommandException(Text.of("§cInvalid bracket color."));
-        if (caratColor.isPresent() && isNonColor(caratColor.get())) throw new CommandException(Text.of("§cInvalid arrow color."));
-
-        String bracketColor = optBracketColor.orElse("&7");
-        String chevron = getChevron(target, caratColor.orElse("&a&l"));
-        String rankPrefix = staff.isPresent()? bracketColor: Settings.STAFF_PREFIXES.entrySet().stream()
-                .filter(p->target.hasPermission(p.getKey()))
-                .findFirst()
-                .map(s->String.format("%s[%s%s]", bracketColor, s.getValue(), bracketColor))
-                .orElse(bracketColor);
-        if (PluginConfiguration.Misc.omitChatArrow) {
-            return String.format("%s[%s%s]&r", rankPrefix, title, bracketColor)
-                    .replaceAll("\\?\"", "");
-        } else {
-            return String.format("%s %s[%s%s]&r", chevron, rankPrefix, title, bracketColor)
-                    .replaceAll("\\?\"", "");
+    
+    private String getPrefixUsingArgs(@Nonnull final CommandSource src, final User target, @Nonnull final CommandContext args) throws CommandException {
+        final String title = args.getOne("Prefix").orElseThrow(() -> new CommandException((Text)Text.of("§cYou must specify a prefix.")));
+        final Optional<Boolean> staff = args.getOne("s").filter(x -> src.hasPermission("discordlink.prefix.indicator"));
+        final Optional<String> caratColor = args.getOne("ArrowColor").filter(x -> src.hasPermission("discordlink.prefix.arrow"));
+        final Optional<String> optBracketColor = args.getOne("BracketColor").filter(x -> src.hasPermission("discordlink.prefix.brackets"));
+        if (title.length() > 20 && !src.hasPermission("discordlink.prefix.long")) {
+            throw new CommandException((Text)Text.of("§cThe prefix specified is too long."));
         }
+        if (this.isNotAllowed(title) && !src.hasPermission("discordlink.roles.staff")) {
+            throw new CommandException((Text)Text.of("§cThat prefix is not allowed."));
+        }
+        if (optBracketColor.isPresent() && this.isNonColor(optBracketColor.get())) {
+            throw new CommandException((Text)Text.of("§cInvalid bracket color."));
+        }
+        if (caratColor.isPresent() && this.isNonColor(caratColor.get())) {
+            throw new CommandException((Text)Text.of("§cInvalid arrow color."));
+        }
+        final String bracketColor = optBracketColor.orElse("&7");
+        final String chevron = this.getChevron(target, caratColor.orElse("&a&l"));
+        final Object o;
+        final String rankPrefix = staff.isPresent() ? bracketColor : Settings.STAFF_PREFIXES.entrySet().stream().filter(p -> target.hasPermission((String)p.getKey())).findFirst().map(s -> String.format("%s[%s%s]", o, s.getValue(), o)).orElse(bracketColor);
+        if (PluginConfiguration.Misc.omitChatArrow) {
+            return String.format("%s[%s%s]&r", rankPrefix, title, bracketColor).replaceAll("\\?\"", "");
+        }
+        return String.format("%s %s[%s%s]&r", chevron, rankPrefix, title, bracketColor).replaceAll("\\?\"", "");
     }
-
-    private String getChevron(User user, String colour){
-        final String carat = user.hasPermission(Permission.ROLES_DONOR) ? "&l✯" : "&l»";
+    
+    private String getChevron(final User user, final String colour) {
+        final String carat = user.hasPermission("discordlink.roles.donor") ? "&l\u272f" : "&l»";
         return colour + carat;
     }
-
-    private boolean isNonColor(String input){
+    
+    private boolean isNonColor(final String input) {
         return !input.matches("(?i)([§&][0-9a-frlonm]){1,5}");
     }
-
-    private boolean isNotAllowed(String title){
-        String raw = title.replaceAll("(?i)([§&][0-9a-frlonm])", "").toLowerCase();
-        return forbidden.contains(raw);
+    
+    private boolean isNotAllowed(final String title) {
+        final String raw = title.replaceAll("(?i)([§&][0-9a-frlonm])", "").toLowerCase();
+        return this.forbidden.contains(raw);
     }
-
-    private ConsoleSource getSource(CommandSource source){
-        return new ConsoleSource(){
-            @Override
-            public void sendMessage(@Nonnull Text message) {
+    
+    private ConsoleSource getSource(final CommandSource source) {
+        return new ConsoleSource() {
+            public void sendMessage(@Nonnull final Text message) {
                 source.sendMessage(message);
             }
         };

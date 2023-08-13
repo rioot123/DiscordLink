@@ -1,60 +1,65 @@
+// 
+// Decompiled by Procyon v0.5.36
+// 
+
 package net.dirtcraft.discordlink.users.permission.dummy;
 
-import net.dirtcraft.discordlink.users.permission.PermissionProvider;
 import net.dirtcraft.discordlink.users.permission.subject.PermissionResolver;
-import net.dirtcraft.spongediscordlib.users.MessageSource;
-import org.spongepowered.api.command.source.ConsoleSource;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.text.Text;
-
 import javax.annotation.Nullable;
+import org.spongepowered.api.entity.living.player.Player;
 import java.util.Optional;
 import java.util.UUID;
+import org.spongepowered.api.command.source.ConsoleSource;
+import org.spongepowered.api.entity.living.player.User;
+import net.dirtcraft.spongediscordlib.users.MessageSource;
+import net.dirtcraft.discordlink.users.permission.PermissionProvider;
 
-public class DefaultProvider extends PermissionProvider {
+public class DefaultProvider extends PermissionProvider
+{
     @Override
-    public void printUserGroups(MessageSource source, User user) {
+    public void printUserGroups(final MessageSource source, final User user) {
         source.sendCommandResponse("This version of luckperms is not supported!");
     }
-
+    
     @Override
-    public void printUserKits(MessageSource source, User player) {
+    public void printUserKits(final MessageSource source, final User player) {
         source.sendCommandResponse("This version of luckperms is not supported!");
     }
-
+    
     @Override
-    public void setPlayerPrefix(ConsoleSource source, User target, String prefix) {
-
+    public void setPlayerPrefix(final ConsoleSource source, final User target, final String prefix) {
     }
-
+    
     @Override
-    public void clearPlayerPrefix(ConsoleSource source, User target) {
-
+    public void clearPlayerPrefix(final ConsoleSource source, final User target) {
     }
-
+    
     @Override
-    public void setPlayerPrefix(MessageSource source, User target, String prefix){
+    public void setPlayerPrefix(final MessageSource source, final User target, final String prefix) {
         source.sendCommandResponse("This version of luckperms is not supported!");
     }
-
+    
     @Override
-    public void clearPlayerPrefix(MessageSource source, User target){
+    public void clearPlayerPrefix(final MessageSource source, final User target) {
         source.sendCommandResponse("This version of luckperms is not supported!");
     }
-
+    
     @Override
-    public Optional<String> getPrefix(UUID uuid) {
+    public Optional<String> getPrefix(final UUID uuid) {
         return Optional.empty();
     }
-
-    public Optional<RankUpdate> modifyRank(@Nullable Player source, @Nullable UUID targetUUID, @Nullable String trackName, boolean promote) {
-        if (source != null) source.sendMessage(Text.of("This version of luckperms is not supported!"));
+    
+    @Override
+    public Optional<RankUpdate> modifyRank(@Nullable final Player source, @Nullable final UUID targetUUID, @Nullable final String trackName, final boolean promote) {
+        if (source != null) {
+            source.sendMessage((Text)Text.of("This version of luckperms is not supported!"));
+        }
         return Optional.empty();
     }
-
+    
     @Override
-    public Optional<PermissionResolver> getPermission(UUID uuid) {
+    public Optional<PermissionResolver> getPermission(final UUID uuid) {
         return Optional.empty();
     }
 }

@@ -1,58 +1,62 @@
+// 
+// Decompiled by Procyon v0.5.36
+// 
+
 package net.dirtcraft.discordlink.channels;
 
+import net.dirtcraft.spongediscordlib.channels.GameChatChannel;
+import net.dirtcraft.spongediscordlib.channels.LogChannel;
+import net.dirtcraft.spongediscordlib.channels.DiscordChannel;
 import net.dirtcraft.discordlink.storage.PluginConfiguration;
-import net.dirtcraft.spongediscordlib.channels.ChannelManager;
-import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.JDA;
+import net.dirtcraft.spongediscordlib.channels.ChannelManager;
 
-public class ChannelManagerImpl implements ChannelManager {
+public class ChannelManagerImpl implements ChannelManager
+{
     private final JDA jda;
     private LogChannelImpl logChannel;
     private GameChatChannelImpl defaultChannel;
     private long guild;
-
-    public ChannelManagerImpl(JDA jda){
+    
+    public ChannelManagerImpl(final JDA jda) {
         this.jda = jda;
-        loadFromConfig();
+        this.loadFromConfig();
     }
-
-    @Override
-    public DiscordChannelImpl getChannel(long channel){
-        return new DiscordChannelImpl(jda, channel);
+    
+    public DiscordChannelImpl getChannel(final long channel) {
+        return new DiscordChannelImpl(this.jda, channel);
     }
-
-    @Override
-    public DiscordChannelImpl getChannel(long channel, boolean isPrivate){
-        return new DiscordChannelImpl(jda, channel, isPrivate);
+    
+    public DiscordChannelImpl getChannel(final long channel, final boolean isPrivate) {
+        return new DiscordChannelImpl(this.jda, channel, isPrivate);
     }
-
-    @Override
-    public GameChatChannelImpl getGameChat(){
-        return defaultChannel;
+    
+    public GameChatChannelImpl getGameChat() {
+        return this.defaultChannel;
     }
-
-    @Override
+    
     public LogChannelImpl getLogChannel() {
-        return logChannel;
+        return this.logChannel;
     }
-
-    public TextChannel getDefaultChannel(){
-        return jda.getTextChannelById(defaultChannel.getId());
+    
+    public TextChannel getDefaultChannel() {
+        return this.jda.getTextChannelById(this.defaultChannel.getId());
     }
-
-    public boolean isGamechat(MessageChannel channel){
-        return channel.getIdLong() == defaultChannel.getId();
+    
+    public boolean isGamechat(final MessageChannel channel) {
+        return channel.getIdLong() == this.defaultChannel.getId();
     }
-
-    public Guild getGuild(){
-        return jda.getGuildById(guild);
+    
+    public Guild getGuild() {
+        return this.jda.getGuildById(this.guild);
     }
-
-    public void loadFromConfig(){
-        logChannel = new LogChannelImpl(jda, Long.parseLong(PluginConfiguration.Main.serverLogChannelID));
-        defaultChannel = new GameChatChannelImpl(jda, PluginConfiguration.Main.defaultChannelID);
-        guild = getDefaultChannel() != null ? getDefaultChannel().getGuild().getIdLong() : -1;
+    
+    public void loadFromConfig() {
+        this.logChannel = new LogChannelImpl(this.jda, Long.parseLong(PluginConfiguration.Main.serverLogChannelID));
+        this.defaultChannel = new GameChatChannelImpl(this.jda, PluginConfiguration.Main.defaultChannelID);
+        this.guild = ((this.getDefaultChannel() != null) ? this.getDefaultChannel().getGuild().getIdLong() : -1L);
     }
 }

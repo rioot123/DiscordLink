@@ -1,10 +1,14 @@
+// 
+// Decompiled by Procyon v0.5.36
+// 
+
 package net.dirtcraft.discordlink.storage;
 
-public class Permission {
+public class Permission
+{
     public static final String CONSOLE = "discordlink.console";
     public static final String PROMOTE_PERMISSION_GROUP_PREFIX = "discordlink.promote.";
     public static final String PROMOTE_PERMISSION = "discordlink.promote.use";
-
     public static final String PREFIX_USE = "discordlink.prefix.use";
     public static final String PREFIX_MODIFY = "discordlink.prefix.modify";
     public static final String PREFIX_TEST = "discordlink.prefix.test";
@@ -16,7 +20,6 @@ public class Permission {
     public static final String PREFIX_BRACKETS = "discordlink.prefix.brackets";
     public static final String PREFIX_LONG = "discordlink.prefix.long";
     public static final String PREFIX_INDICATOR = "discordlink.prefix.indicator";
-
     public static final String ROLES_MANAGER = "discordlink.roles.manager";
     public static final String ROLES_ADMIN = "discordlink.roles.admin";
     public static final String ROLES_MODERATOR = "discordlink.roles.moderator";

@@ -1,74 +1,68 @@
+// 
+// Decompiled by Procyon v0.5.36
+// 
+
 package net.dirtcraft.discordlink.users.discord;
 
+import net.dirtcraft.discordlink.storage.PluginConfiguration;
+import java.util.Collection;
 import com.google.common.collect.ImmutableList;
-import net.dirtcraft.discordlink.utility.Pair;
-import net.dirtcraft.spongediscordlib.users.roles.DiscordRole;
+import java.util.stream.Stream;
 import net.dirtcraft.spongediscordlib.users.roles.DiscordRoles;
-import net.dirtcraft.spongediscordlib.users.roles.RoleManager;
-import net.dv8tion.jda.api.JDA;
-
+import net.dirtcraft.discordlink.utility.Pair;
 import java.util.ArrayList;
 import java.util.HashMap;
+import net.dv8tion.jda.api.JDA;
 import java.util.List;
+import net.dirtcraft.spongediscordlib.users.roles.DiscordRole;
 import java.util.Map;
-import java.util.stream.Stream;
+import net.dirtcraft.spongediscordlib.users.roles.RoleManager;
 
-import static net.dirtcraft.discordlink.storage.PluginConfiguration.Roles.*;
-
-public class RoleManagerImpl extends RoleManager {
-    private final Map<String, DiscordRole> nameMap = new HashMap<>();
-    private final List<DiscordRole> roles = new ArrayList<>();
+public class RoleManagerImpl extends RoleManager
+{
+    private final Map<String, DiscordRole> nameMap;
+    private final List<DiscordRole> roles;
     private final JDA jda;
-
-    public RoleManagerImpl(JDA jda) {
+    
+    public RoleManagerImpl(final JDA jda) {
+        this.nameMap = new HashMap<String, DiscordRole>();
+        this.roles = new ArrayList<DiscordRole>();
         this.jda = jda;
-        Stream.of(
-                new Pair<DiscordRole, DiscordRole.RoleSupplier>(DiscordRoles.OWNER,     () -> ownerRoleID       ),
-                new Pair<DiscordRole, DiscordRole.RoleSupplier>(DiscordRoles.DIRTY,     () -> dirtyRoleID       ),
-                new Pair<DiscordRole, DiscordRole.RoleSupplier>(DiscordRoles.ADMIN,     () -> adminRoleID       ),
-                new Pair<DiscordRole, DiscordRole.RoleSupplier>(DiscordRoles.MOD,       () -> moderatorRoleID   ),
-                new Pair<DiscordRole, DiscordRole.RoleSupplier>(DiscordRoles.HELPER,    () -> helperRoleID      ),
-                new Pair<DiscordRole, DiscordRole.RoleSupplier>(DiscordRoles.STAFF,     () -> staffRoleID       ),
-                new Pair<DiscordRole, DiscordRole.RoleSupplier>(DiscordRoles.NITRO,     () -> nitroRoleID       ),
-                new Pair<DiscordRole, DiscordRole.RoleSupplier>(DiscordRoles.DONOR,     () -> donatorRoleID     ),
-                new Pair<DiscordRole, DiscordRole.RoleSupplier>(DiscordRoles.VERIFIED,  () -> verifiedRoleID    ),
-                new Pair<DiscordRole, DiscordRole.RoleSupplier>(DiscordRoles.MUTED,     () -> mutedRoleID       )
-        ).forEach(role->registerRole(role.getKey(), role.getValue()));
+        Stream.of((Pair[])new Pair[] { new Pair((T)DiscordRoles.OWNER, () -> PluginConfiguration.Roles.ownerRoleID), new Pair((T)DiscordRoles.DIRTY, () -> PluginConfiguration.Roles.dirtyRoleID), new Pair((T)DiscordRoles.ADMIN, () -> PluginConfiguration.Roles.adminRoleID), new Pair((T)DiscordRoles.MOD, () -> PluginConfiguration.Roles.moderatorRoleID), new Pair((T)DiscordRoles.HELPER, () -> PluginConfiguration.Roles.helperRoleID), new Pair((T)DiscordRoles.STAFF, () -> PluginConfiguration.Roles.staffRoleID), new Pair((T)DiscordRoles.NITRO, () -> PluginConfiguration.Roles.nitroRoleID), new Pair((T)DiscordRoles.DONOR, () -> PluginConfiguration.Roles.donatorRoleID), new Pair((T)DiscordRoles.VERIFIED, () -> PluginConfiguration.Roles.verifiedRoleID), new Pair((T)DiscordRoles.MUTED, () -> PluginConfiguration.Roles.mutedRoleID) }).forEach(role -> this.registerRole(role.getKey(), (DiscordRole.RoleSupplier)role.getValue()));
     }
-
-    @Override
-    public DiscordRole getRole(String name) {
-        return nameMap.getOrDefault(name, DiscordRoles.NONE);
+    
+    public DiscordRole getRole(final String name) {
+        return this.nameMap.getOrDefault(name, DiscordRoles.NONE);
     }
-
-    @Override
-    public DiscordRole getRole(int ordinal) {
-        return ordinal >= 0 && roles.size() < ordinal? DiscordRoles.NONE: roles.get(ordinal);
+    
+    public DiscordRole getRole(final int ordinal) {
+        return (ordinal >= 0 && this.roles.size() < ordinal) ? DiscordRoles.NONE : this.roles.get(ordinal);
     }
-
-    @Override
-    public int getOrdinal(DiscordRole role) {
-        return roles.indexOf(role);
+    
+    public int getOrdinal(final DiscordRole role) {
+        return this.roles.indexOf(role);
     }
-
-    @Override
+    
     public List<DiscordRole> getRoles() {
-        return ImmutableList.copyOf(roles);
+        return (List<DiscordRole>)ImmutableList.copyOf((Collection)this.roles);
     }
-
-    @Override
-    public void registerRole(DiscordRole role) {
-        if (nameMap.containsKey(role.getName())) return;
-        nameMap.put(role.getName(), role);
-        roles.add(role);
-        setFields(role, jda);
+    
+    public void registerRole(final DiscordRole role) {
+        if (this.nameMap.containsKey(role.getName())) {
+            return;
+        }
+        this.nameMap.put(role.getName(), role);
+        this.roles.add(role);
+        this.setFields(role, this.jda);
     }
-
-    private void registerRole(DiscordRole role, DiscordRole.RoleSupplier roleSupplier) {
-        if (nameMap.containsKey(role.getName())) return;
-        nameMap.put(role.getName(), role);
-        roles.add(role);
-        setFields(role, jda, roleSupplier);
+    
+    private void registerRole(final DiscordRole role, final DiscordRole.RoleSupplier roleSupplier) {
+        if (this.nameMap.containsKey(role.getName())) {
+            return;
+        }
+        this.nameMap.put(role.getName(), role);
+        this.roles.add(role);
+        this.setFields(role, this.jda, roleSupplier);
         role.reload();
     }
 }

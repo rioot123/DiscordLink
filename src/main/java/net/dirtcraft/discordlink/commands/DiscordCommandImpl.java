@@ -1,114 +1,112 @@
+// 
+// Decompiled by Procyon v0.5.36
+// 
+
 package net.dirtcraft.discordlink.commands;
 
-import com.google.common.collect.Lists;
-import net.dirtcraft.discordlink.users.platform.PlatformProvider;
-import net.dirtcraft.discordlink.utility.Utility;
-import net.dirtcraft.spongediscordlib.commands.DiscordCommand;
-import net.dirtcraft.spongediscordlib.commands.DiscordCommandExecutor;
-import net.dirtcraft.spongediscordlib.exceptions.DiscordPermissionException;
-import net.dirtcraft.spongediscordlib.users.DiscordMember;
-import net.dirtcraft.spongediscordlib.users.MessageSource;
-import net.dirtcraft.spongediscordlib.users.roles.DiscordRole;
-
+import net.dirtcraft.spongediscordlib.exceptions.DiscordCommandException;
 import java.util.ArrayList;
+import com.google.common.collect.Lists;
+import net.dirtcraft.spongediscordlib.users.DiscordMember;
+import net.dirtcraft.spongediscordlib.exceptions.DiscordPermissionException;
+import net.dirtcraft.discordlink.utility.Utility;
+import java.util.function.Predicate;
+import net.dirtcraft.discordlink.users.platform.PlatformProvider;
+import net.dirtcraft.spongediscordlib.users.MessageSource;
+import net.dirtcraft.spongediscordlib.commands.DiscordCommandExecutor;
+import net.dirtcraft.spongediscordlib.users.roles.DiscordRole;
 import java.util.List;
+import net.dirtcraft.spongediscordlib.commands.DiscordCommand;
 
-public class DiscordCommandImpl implements DiscordCommand {
+public class DiscordCommandImpl implements DiscordCommand
+{
     private final List<DiscordRole> allowedRoles;
     private final String description;
     private final DiscordCommandExecutor executor;
     private final String commandUsage;
     private final boolean preBoot;
-
-    private DiscordCommandImpl(List<DiscordRole> allowed, DiscordCommandExecutor executor, String commandUsage, String description, boolean preBoot){
+    
+    private DiscordCommandImpl(final List<DiscordRole> allowed, final DiscordCommandExecutor executor, final String commandUsage, final String description, final boolean preBoot) {
         this.allowedRoles = allowed;
         this.executor = executor;
         this.commandUsage = commandUsage;
         this.description = description;
         this.preBoot = preBoot;
     }
-
-    public static BuilderImpl builder()         {
+    
+    public static BuilderImpl builder() {
         return new BuilderImpl();
     }
-
-    public final void process(MessageSource member, String command, List<String> args) {
-        if (!preBoot && !PlatformProvider.isGameReady()) return;
-        if (!allowedRoles.stream().allMatch(member::hasRole)) {
+    
+    public final void process(final MessageSource member, final String command, final List<String> args) {
+        if (!this.preBoot && !PlatformProvider.isGameReady()) {
+            return;
+        }
+        if (!this.allowedRoles.stream().allMatch((Predicate<? super Object>)member::hasRole)) {
             Utility.sendPermissionError(member);
             return;
         }
         try {
-            executor.execute(member, command, args);
-        } catch (DiscordPermissionException e) {
+            this.executor.execute(member, command, (List)args);
+        }
+        catch (DiscordPermissionException e2) {
             Utility.sendPermissionError(member);
-        } catch (Exception e) {
-            //e.printStackTrace();
-            Utility.sendCommandError(member, e.getMessage() != null ? e.getMessage() : "an error occurred while executing the command.");
+        }
+        catch (Exception e) {
+            Utility.sendCommandError(member, (e.getMessage() != null) ? e.getMessage() : "an error occurred while executing the command.");
         }
     }
-
-    public boolean hasPermission(DiscordMember member){
-        return allowedRoles.stream().allMatch(member::hasRole);
+    
+    public boolean hasPermission(final DiscordMember member) {
+        return this.allowedRoles.stream().allMatch((Predicate<? super Object>)member::hasRole);
     }
-
+    
     public String getDescription() {
-        return description;
+        return this.description;
     }
-
+    
     public String getUsage() {
-        return commandUsage;
+        return this.commandUsage;
     }
-
-    public static class BuilderImpl extends DiscordCommand.Builder {
+    
+    public static class BuilderImpl extends DiscordCommand.Builder
+    {
         private List<DiscordRole> allowedRoles;
         private DiscordCommandExecutor executor;
         private String commandUsage;
         private String description;
         private boolean preBootCommand;
-
-        private BuilderImpl(){}
-
-        @Override
-        public final BuilderImpl setRequiredRoles(DiscordRole... roles){
-            allowedRoles = Lists.newArrayList(roles);
+        
+        private BuilderImpl() {
+        }
+        
+        public final BuilderImpl setRequiredRoles(final DiscordRole... roles) {
+            this.allowedRoles = (List<DiscordRole>)Lists.newArrayList((Object[])roles);
             return this;
         }
-
-        @Override
-        public final BuilderImpl setCommandExecutor(DiscordCommandExecutor executor){
+        
+        public final BuilderImpl setCommandExecutor(final DiscordCommandExecutor executor) {
             this.executor = executor;
             return this;
         }
-
-        @Override
-        public final BuilderImpl setDescription(String description){
+        
+        public final BuilderImpl setDescription(final String description) {
             this.description = description;
             return this;
         }
-
-        @Override
-        public final BuilderImpl setCommandUsage(String commandUsage){
+        
+        public final BuilderImpl setCommandUsage(final String commandUsage) {
             this.commandUsage = commandUsage;
             return this;
         }
-
-        @Override
-        public final BuilderImpl setPreBootEnabled(boolean b){
+        
+        public final BuilderImpl setPreBootEnabled(final boolean b) {
             this.preBootCommand = b;
             return this;
         }
-
-        @Override
-        public DiscordCommandImpl build(){
-            return new DiscordCommandImpl(
-                    allowedRoles != null ? allowedRoles : new ArrayList<>(),
-                    executor     != null ? executor     : (member, command, event)->{},
-                    commandUsage != null ? commandUsage : "",
-                    description  != null ? description  : "",
-                    preBootCommand
-            );
+        
+        public DiscordCommandImpl build() {
+            return new DiscordCommandImpl((this.allowedRoles != null) ? this.allowedRoles : new ArrayList<DiscordRole>(), (this.executor != null) ? this.executor : ((member, command, event) -> {}), (this.commandUsage != null) ? this.commandUsage : "", (this.description != null) ? this.description : "", this.preBootCommand, null);
         }
-
     }
 }

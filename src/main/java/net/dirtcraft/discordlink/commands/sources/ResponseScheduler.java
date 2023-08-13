@@ -1,61 +1,79 @@
+// 
+// Decompiled by Procyon v0.5.36
+// 
+
 package net.dirtcraft.discordlink.commands.sources;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
+import java.util.Iterator;
 import net.dirtcraft.discordlink.utility.Utility;
-
+import com.google.common.collect.Multimap;
 import java.util.Collection;
-import java.util.Queue;
-import java.util.Timer;
+import com.google.common.collect.ArrayListMultimap;
 import java.util.TimerTask;
+import java.util.Timer;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.Queue;
 
-public class ResponseScheduler {
-    public static final ResponseScheduler instance = new ResponseScheduler();
-    final Queue<Message> tasks = new ConcurrentLinkedQueue<>();
-
+public class ResponseScheduler
+{
+    public static final ResponseScheduler instance;
+    final Queue<Message> tasks;
+    
     private ResponseScheduler() {
-        Timer timer = new Timer();
-        timer.scheduleAtFixedRate(new Messenger(), 1000, 1000);
+        this.tasks = new ConcurrentLinkedQueue<Message>();
+        final Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new Messenger(), 1000L, 1000L);
     }
-
-    public static void submit(DiscordResponder provider, String message) {
-        instance.tasks.add(new Message(provider, message));
+    
+    public static void submit(final DiscordResponder provider, final String message) {
+        ResponseScheduler.instance.tasks.add(new Message(provider, message));
     }
-
-    private static class Message {
+    
+    static {
+        instance = new ResponseScheduler();
+    }
+    
+    private static class Message
+    {
         final DiscordResponder provider;
         final String message;
-        private Message(DiscordResponder provider, String message){
+        
+        private Message(final DiscordResponder provider, final String message) {
             this.message = message;
             this.provider = provider;
         }
     }
-
-    private class Messenger extends TimerTask {
+    
+    private class Messenger extends TimerTask
+    {
         @Override
         public void run() {
-            Multimap<DiscordResponder, String> messages = ArrayListMultimap.create();
-            while (!tasks.isEmpty()){
-                Message message = tasks.poll();
-                messages.put(message.provider, message.message);
+            final Multimap<DiscordResponder, String> messages = (Multimap<DiscordResponder, String>)ArrayListMultimap.create();
+            while (!ResponseScheduler.this.tasks.isEmpty()) {
+                final Message message = ResponseScheduler.this.tasks.poll();
+                messages.put((Object)message.provider, (Object)message.message);
             }
-            messages.keySet().forEach(provider -> dispatchMessages(provider, messages.get(provider)));
+            messages.keySet().forEach(provider -> this.dispatchMessages(provider, messages.get((Object)provider)));
         }
-
-        private void dispatchMessages(DiscordResponder provider, Collection<String> messages){
+        
+        private void dispatchMessages(final DiscordResponder provider, final Collection<String> messages) {
             StringBuilder output = new StringBuilder();
-            for (String message : messages){
-                if (provider.sanitise()) message = Utility.sanitiseMinecraftText(message);
-                if (output.length() + message.length() > provider.getCharLimit()){
+            for (String message : messages) {
+                if (provider.sanitise()) {
+                    message = Utility.sanitiseMinecraftText(message);
+                }
+                if (output.length() + message.length() > provider.getCharLimit()) {
                     provider.sendDiscordResponse(output.toString());
                     output = new StringBuilder(message);
-                } else {
-                    output.append(output.length() > 0? "\n" : "");
+                }
+                else {
+                    output.append((output.length() > 0) ? "\n" : "");
                     output.append(message);
                 }
             }
-            if (output.length() > 0) provider.sendDiscordResponse(output.toString());
+            if (output.length() > 0) {
+                provider.sendDiscordResponse(output.toString());
+            }
         }
     }
 }

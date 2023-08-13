@@ -1,70 +1,76 @@
+// 
+// Decompiled by Procyon v0.5.36
+// 
+
 package net.dirtcraft.discordlink;
 
-import com.google.inject.Inject;
-import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
-import net.dirtcraft.discordlink.channels.ChannelManagerImpl;
-import net.dirtcraft.discordlink.commands.DiscordCommandImpl;
-import net.dirtcraft.discordlink.commands.DiscordCommandManagerImpl;
-import net.dirtcraft.discordlink.commands.sponge.UnVerify;
-import net.dirtcraft.discordlink.commands.sponge.Verify;
-import net.dirtcraft.discordlink.commands.sponge.prefix.*;
-import net.dirtcraft.discordlink.events.*;
-import net.dirtcraft.discordlink.storage.ConfigManager;
-import net.dirtcraft.discordlink.storage.Database;
-import net.dirtcraft.discordlink.storage.Permission;
-import net.dirtcraft.discordlink.storage.Settings;
-import net.dirtcraft.discordlink.users.UserManagerImpl;
-import net.dirtcraft.discordlink.users.discord.RoleManagerImpl;
-import net.dirtcraft.discordlink.utility.Utility;
-import net.dirtcraft.spongediscordlib.DiscordApi;
-import net.dirtcraft.spongediscordlib.DiscordApiProvider;
+import net.dirtcraft.spongediscordlib.users.UserManager;
+import net.dirtcraft.spongediscordlib.channels.ChannelManager;
+import net.dirtcraft.spongediscordlib.commands.DiscordCommandManager;
+import java.lang.reflect.Method;
 import net.dirtcraft.spongediscordlib.commands.DiscordCommand;
+import java.util.function.Supplier;
+import net.dirtcraft.spongediscordlib.DiscordApiProvider;
+import net.dirtcraft.discordlink.commands.DiscordCommandImpl;
+import org.spongepowered.api.command.CommandCallable;
+import net.dirtcraft.discordlink.commands.sponge.prefix.Set;
+import net.dirtcraft.discordlink.commands.sponge.prefix.Test;
+import org.spongepowered.api.command.args.CommandElement;
+import net.dirtcraft.discordlink.commands.sponge.prefix.Group;
+import net.dirtcraft.discordlink.commands.sponge.prefix.Toggle;
+import net.dirtcraft.discordlink.commands.sponge.prefix.Clear;
+import net.dirtcraft.discordlink.commands.sponge.UnVerify;
+import org.spongepowered.api.command.args.GenericArguments;
+import org.spongepowered.api.command.spec.CommandExecutor;
+import net.dirtcraft.discordlink.commands.sponge.Verify;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.command.spec.CommandSpec;
+import org.spongepowered.api.GameState;
+import net.dirtcraft.discordlink.events.UltimateChat;
+import net.dirtcraft.discordlink.events.NormalChat;
+import net.dirtcraft.discordlink.events.SpongeEvents;
+import org.spongepowered.api.network.RawDataListener;
+import net.dirtcraft.discordlink.events.PluginMessageHandler;
+import net.dirtcraft.discordlink.utility.Utility;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.scheduler.Task;
+import net.dirtcraft.discordlink.events.DiscordEvents;
+import org.spongepowered.api.event.game.state.GameInitializationEvent;
+import org.spongepowered.api.event.Order;
+import org.spongepowered.api.event.Listener;
+import net.dirtcraft.discord.spongediscordlib.SpongeDiscordLib;
+import org.spongepowered.api.event.game.state.GameConstructionEvent;
 import net.dirtcraft.spongediscordlib.users.roles.RoleManager;
 import net.dv8tion.jda.api.JDA;
+import net.dirtcraft.discordlink.storage.Database;
+import net.dirtcraft.discordlink.storage.ConfigManager;
+import net.dirtcraft.discordlink.users.discord.RoleManagerImpl;
+import net.dirtcraft.discordlink.users.UserManagerImpl;
+import net.dirtcraft.discordlink.channels.ChannelManagerImpl;
+import net.dirtcraft.discordlink.commands.DiscordCommandManagerImpl;
+import org.spongepowered.api.network.ChannelBinding;
+import org.spongepowered.api.plugin.PluginContainer;
+import org.slf4j.Logger;
+import com.google.inject.Inject;
+import org.spongepowered.api.config.DefaultConfig;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
-import org.slf4j.Logger;
-import org.spongepowered.api.GameState;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.command.spec.CommandSpec;
-import org.spongepowered.api.config.DefaultConfig;
-import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.Order;
-import org.spongepowered.api.event.game.state.GameConstructionEvent;
-import org.spongepowered.api.event.game.state.GameInitializationEvent;
-import org.spongepowered.api.network.ChannelBinding;
 import org.spongepowered.api.plugin.Dependency;
 import org.spongepowered.api.plugin.Plugin;
-import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.text.Text;
+import net.dirtcraft.spongediscordlib.DiscordApi;
+import net.dirtcraft.discordlink.events.ServerBootHandler;
 
-import java.lang.reflect.Method;
-import java.util.function.Supplier;
-
-@Plugin(
-        id = "discord-link",
-        name = "Discord Link",
-        description = "Handles gamechats on the DirtCraft Discord.",
-        authors = {
-                "juliann",
-                "ShinyAfro",
-                "Worive"
-        },
-        dependencies = {
-                @Dependency(id = "ultimatechat", optional = true),
-                @Dependency(id = "sponge-discord-lib"),
-                @Dependency(id = "dirt-database-lib")
-        }
-)
-public class DiscordLink extends ServerBootHandler implements DiscordApi {
+@Plugin(id = "discord-link", name = "Discord Link", description = "Handles gamechats on the DirtCraft Discord.", authors = { "juliann", "ShinyAfro", "Worive" }, dependencies = { @Dependency(id = "ultimatechat", optional = true), @Dependency(id = "sponge-discord-lib"), @Dependency(id = "dirt-database-lib") })
+public class DiscordLink extends ServerBootHandler implements DiscordApi
+{
     private static DiscordLink instance;
-
     @DefaultConfig(sharedRoot = false)
-    @Inject private ConfigurationLoader<CommentedConfigurationNode> loader;
-    @Inject private Logger logger;
-    @Inject private PluginContainer container;
+    @Inject
+    private ConfigurationLoader<CommentedConfigurationNode> loader;
+    @Inject
+    private Logger logger;
+    @Inject
+    private PluginContainer container;
     private ChannelBinding.RawDataChannel channel;
     private boolean gameListenersRegistered;
     private boolean shouldDoPostInit;
@@ -75,205 +81,145 @@ public class DiscordLink extends ServerBootHandler implements DiscordApi {
     private ConfigManager configManager;
     private Database storage;
     private JDA jda;
-
-    public static DiscordLink get(){
-        return instance;
+    
+    public static DiscordLink get() {
+        return DiscordLink.instance;
     }
-
-    @Override
+    
     public JDA getJda() {
-        return jda;
+        return this.jda;
     }
-
-    @Override
+    
     public UserManagerImpl getUserManager() {
-        return userManager;
+        return this.userManager;
     }
-
-    @Override
+    
     public ChannelManagerImpl getChannelManager() {
-        return channelManager;
+        return this.channelManager;
     }
-
-    @Override
+    
     public DiscordCommandManagerImpl getCommandManager() {
-        return commandManager;
+        return this.commandManager;
     }
-
-    @Override
+    
     public RoleManager getRoleManager() {
-        return roleManager;
+        return this.roleManager;
     }
-
-    @Override
+    
     public boolean isLoaded() {
-        return isReady;
+        return this.isReady;
     }
-
-    public void saveConfig(){
-        configManager.save();
+    
+    public void saveConfig() {
+        this.configManager.save();
     }
-
-    public Database getStorage(){
-        return storage;
+    
+    public Database getStorage() {
+        return this.storage;
     }
-
-    public Logger getLogger(){
-        return logger;
+    
+    public Logger getLogger() {
+        return this.logger;
     }
-
-    public ChannelBinding.RawDataChannel getChannel(){
-        return channel;
+    
+    public ChannelBinding.RawDataChannel getChannel() {
+        return this.channel;
     }
-
+    
+    @Listener(order = Order.PRE)
     @Override
-    @Listener (order = Order.PRE)
-    public void onGameConstruction(GameConstructionEvent event) {
+    public void onGameConstruction(final GameConstructionEvent event) {
         SpongeDiscordLib.getInstance().onPreInit(event);
-        preInitialize();
+        this.preInitialize();
         super.onGameConstruction(event);
     }
-
-    @Override
+    
     @Listener(order = Order.PRE)
-    public void onGameInitialization(GameInitializationEvent event) {
-        shouldDoPostInit = true;
-        postInitialize();
+    @Override
+    public void onGameInitialization(final GameInitializationEvent event) {
+        this.shouldDoPostInit = true;
+        this.postInitialize();
     }
-
-    private void preInitialize(){
-        logger.info("Requesting JDA!");
-        SpongeDiscordLib.getJDA(jda->{
-            if ((this.jda = jda) == null) {
-                logger.error("JDA failed to connect to discord gateway! " + container.getName() + " will not load.");
-                return;
+    
+    private void preInitialize() {
+        this.logger.info("Requesting JDA!");
+        SpongeDiscordLib.getJDA(jda -> {
+            this.jda = jda;
+            if (jda == null) {
+                this.logger.error("JDA failed to connect to discord gateway! " + this.container.getName() + " will not load.");
             }
-
-            logger.info("Discord Link pre=initializing...");
-            this.configManager = new ConfigManager(loader);
-            this.storage = new Database();
-            this.roleManager = new RoleManagerImpl(jda);
-            this.channelManager = new ChannelManagerImpl(jda);
-            this.userManager = new UserManagerImpl(channelManager, roleManager, storage);
-            this.commandManager = new DiscordCommandManagerImpl();
-            jda.addEventListener(new DiscordEvents(this));
-            instance = this;
-            isReady = true;
-            if (shouldDoPostInit) Task.builder()
-                    .execute(this::postInitialize)
-                    .submit(container);
-            sendGameStageEmbed(Sponge.getGame().getState());
-            logger.info("Discord Link pre=initialized");
+            else {
+                this.logger.info("Discord Link pre=initializing...");
+                this.configManager = new ConfigManager(this.loader);
+                this.storage = new Database();
+                this.roleManager = new RoleManagerImpl(jda);
+                this.channelManager = new ChannelManagerImpl(jda);
+                this.userManager = new UserManagerImpl(this.channelManager, this.roleManager, this.storage);
+                this.commandManager = new DiscordCommandManagerImpl();
+                jda.addEventListener(new Object[] { new DiscordEvents(this) });
+                DiscordLink.instance = this;
+                this.isReady = true;
+                if (this.shouldDoPostInit) {
+                    Task.builder().execute(this::postInitialize).submit((Object)this.container);
+                }
+                this.sendGameStageEmbed(Sponge.getGame().getState());
+                this.logger.info("Discord Link pre=initialized");
+            }
         });
     }
-
-    private void postInitialize(){
-        if (!isReady || !shouldDoPostInit || gameListenersRegistered) return;
-        gameListenersRegistered = true;
-        logger.info("Discord Link post=initializing...");
+    
+    private void postInitialize() {
+        if (!this.isReady || !this.shouldDoPostInit || this.gameListenersRegistered) {
+            return;
+        }
+        this.gameListenersRegistered = true;
+        this.logger.info("Discord Link post=initializing...");
         this.registerCommands();
         Utility.setStatus();
         Utility.setTopic();
-
-        channel = Sponge.getGame().getChannelRegistrar().createRawChannel(this, Settings.ROOT_CHANNEL);
-        channel.addListener(new PluginMessageHandler());
-        Sponge.getEventManager().registerListeners(this, new SpongeEvents(this, storage));
+        (this.channel = Sponge.getGame().getChannelRegistrar().createRawChannel((Object)this, "Discord-Link")).addListener((RawDataListener)new PluginMessageHandler());
+        Sponge.getEventManager().registerListeners((Object)this, (Object)new SpongeEvents(this, this.storage));
         if (SpongeDiscordLib.getServerName().toLowerCase().contains("pixel")) {
-            Sponge.getEventManager().registerListeners(this, new NormalChat(this));
-        } else {
-            Sponge.getEventManager().registerListeners(this, new UltimateChat(this));
+            Sponge.getEventManager().registerListeners((Object)this, (Object)new NormalChat(this));
         }
-        if (Sponge.getGame().getState() == GameState.SERVER_STARTED) sendLaunchedEmbed();
-        setInstance();
-        logger.info("Discord Link post=initialized");
+        else {
+            Sponge.getEventManager().registerListeners((Object)this, (Object)new UltimateChat(this));
+        }
+        if (Sponge.getGame().getState() == GameState.SERVER_STARTED) {
+            this.sendLaunchedEmbed();
+        }
+        this.setInstance();
+        this.logger.info("Discord Link post=initialized");
     }
-
-    private void registerCommands(){
-        CommandSpec verify = CommandSpec.builder()
-                .description(Text.of("Verifies your Discord account"))
-                .executor(new Verify(storage))
-                .arguments(GenericArguments.optional(GenericArguments.string(Text.of("code"))))
-                .build();
-
-        CommandSpec unverify = CommandSpec.builder()
-                .description(Text.of("Unverifies your Discord account"))
-                .executor(new UnVerify(storage))
-                .build();
-
-        CommandSpec clear = CommandSpec.builder()
-                .permission(Permission.PREFIX_CLEAR)
-                .executor(new Clear())
-                .arguments(GenericArguments.onlyOne(GenericArguments.playerOrSource(Text.of("Target"))))
-                .build();
-
-        CommandSpec toggle = CommandSpec.builder()
-                .permission(Permission.PREFIX_TOGGLE)
-                .executor(new Toggle())
-                .arguments(GenericArguments.onlyOne(GenericArguments.playerOrSource(Text.of("Target"))))
-                .build();
-
-        CommandSpec group = CommandSpec.builder()
-                .permission(Permission.PREFIX_GROUP)
-                .executor(new Group())
-                .arguments(GenericArguments.onlyOne(GenericArguments.playerOrSource(Text.of("Target"))),
-                        GenericArguments.optional(GenericArguments.onlyOne(GenericArguments.string(Text.of("Group")))))
-                .build();
-
-        CommandSpec test = CommandSpec.builder()
-                .permission(Permission.PREFIX_TEST)
-                .executor(new Test())
-                .arguments(GenericArguments.flags()
-                        .flag("s")
-                        .valueFlag(GenericArguments.string(Text.of("ArrowColor")), "a")
-                        .valueFlag(GenericArguments.string(Text.of("BracketColor")), "c")
-                        .buildWith(GenericArguments.seq(
-                                GenericArguments.onlyOne(GenericArguments.playerOrSource(Text.of("Target"))),
-                                GenericArguments.remainingJoinedStrings(Text.of("Prefix")))))
-                .build();
-
-        CommandSpec set = CommandSpec.builder()
-                .permission(Permission.PREFIX_MODIFY)
-                .executor(new Set())
-                .arguments(GenericArguments.flags()
-                        .flag("s")
-                        .valueFlag(GenericArguments.string(Text.of("ArrowColor")), "a")
-                        .valueFlag(GenericArguments.string(Text.of("BracketColor")), "c")
-                        .buildWith(GenericArguments.seq(
-                                GenericArguments.onlyOne(GenericArguments.playerOrSource(Text.of("Target"))),
-                                GenericArguments.remainingJoinedStrings(Text.of("Prefix")))))
-                .build();
-
-        CommandSpec prefix = CommandSpec.builder()
-                .permission(Permission.PREFIX_USE)
-                .child(clear, "clear", "none", "c")
-                .child(toggle, "toggle", "arrow", "star", "t")
-                .child(set, "set", "s")
-                .child(group, "group", "g")
-                .child(test, "debug", "test", "d")
-                .build();
-
-        Sponge.getCommandManager().register(this, verify, "verify", "link");
-        Sponge.getCommandManager().register(this, unverify, "unverify", "unlink");
-        Sponge.getCommandManager().register(this, prefix, "prefix");
+    
+    private void registerCommands() {
+        final CommandSpec verify = CommandSpec.builder().description((Text)Text.of("Verifies your Discord account")).executor((CommandExecutor)new Verify(this.storage)).arguments(GenericArguments.optional(GenericArguments.string((Text)Text.of("code")))).build();
+        final CommandSpec unverify = CommandSpec.builder().description((Text)Text.of("Unverifies your Discord account")).executor((CommandExecutor)new UnVerify(this.storage)).build();
+        final CommandSpec clear = CommandSpec.builder().permission("discordlink.prefix.clear").executor((CommandExecutor)new Clear()).arguments(GenericArguments.onlyOne(GenericArguments.playerOrSource((Text)Text.of("Target")))).build();
+        final CommandSpec toggle = CommandSpec.builder().permission("discordlink.prefix.toggle").executor((CommandExecutor)new Toggle()).arguments(GenericArguments.onlyOne(GenericArguments.playerOrSource((Text)Text.of("Target")))).build();
+        final CommandSpec group = CommandSpec.builder().permission("discordlink.prefix.group").executor((CommandExecutor)new Group()).arguments(new CommandElement[] { GenericArguments.onlyOne(GenericArguments.playerOrSource((Text)Text.of("Target"))), GenericArguments.optional(GenericArguments.onlyOne(GenericArguments.string((Text)Text.of("Group")))) }).build();
+        final CommandSpec test = CommandSpec.builder().permission("discordlink.prefix.test").executor((CommandExecutor)new Test()).arguments(GenericArguments.flags().flag(new String[] { "s" }).valueFlag(GenericArguments.string((Text)Text.of("ArrowColor")), new String[] { "a" }).valueFlag(GenericArguments.string((Text)Text.of("BracketColor")), new String[] { "c" }).buildWith(GenericArguments.seq(new CommandElement[] { GenericArguments.onlyOne(GenericArguments.playerOrSource((Text)Text.of("Target"))), GenericArguments.remainingJoinedStrings((Text)Text.of("Prefix")) }))).build();
+        final CommandSpec set = CommandSpec.builder().permission("discordlink.prefix.modify").executor((CommandExecutor)new Set()).arguments(GenericArguments.flags().flag(new String[] { "s" }).valueFlag(GenericArguments.string((Text)Text.of("ArrowColor")), new String[] { "a" }).valueFlag(GenericArguments.string((Text)Text.of("BracketColor")), new String[] { "c" }).buildWith(GenericArguments.seq(new CommandElement[] { GenericArguments.onlyOne(GenericArguments.playerOrSource((Text)Text.of("Target"))), GenericArguments.remainingJoinedStrings((Text)Text.of("Prefix")) }))).build();
+        final CommandSpec prefix = CommandSpec.builder().permission("discordlink.prefix.use").child((CommandCallable)clear, new String[] { "clear", "none", "c" }).child((CommandCallable)toggle, new String[] { "toggle", "arrow", "star", "t" }).child((CommandCallable)set, new String[] { "set", "s" }).child((CommandCallable)group, new String[] { "group", "g" }).child((CommandCallable)test, new String[] { "debug", "test", "d" }).build();
+        Sponge.getCommandManager().register((Object)this, (CommandCallable)verify, new String[] { "verify", "link" });
+        Sponge.getCommandManager().register((Object)this, (CommandCallable)unverify, new String[] { "unverify", "unlink" });
+        Sponge.getCommandManager().register((Object)this, (CommandCallable)prefix, new String[] { "prefix" });
     }
-
-    public void setInstance(){
+    
+    public void setInstance() {
         try {
-            registerProvider();
-            Supplier<DiscordCommand.Builder> supplier = DiscordCommandImpl::builder;
-            Method setter = DiscordApiProvider.class
-                    .getDeclaredMethod("setProvider", DiscordApi.class, Supplier.class);
+            this.registerProvider();
+            final Supplier<DiscordCommand.Builder> supplier = (Supplier<DiscordCommand.Builder>)DiscordCommandImpl::builder;
+            final Method setter = DiscordApiProvider.class.getDeclaredMethod("setProvider", DiscordApi.class, Supplier.class);
             setter.setAccessible(true);
             setter.invoke(null, this, supplier);
-        } catch (Exception e){
+        }
+        catch (Exception e) {
             e.printStackTrace();
         }
     }
-
-    public void registerProvider(){
-        Task.builder()
-                .execute(()-> Sponge.getServiceManager().setProvider(this, DiscordApi.class, this))
-                .submit(this);
+    
+    public void registerProvider() {
+        Task.builder().execute(() -> Sponge.getServiceManager().setProvider((Object)this, (Class)DiscordApi.class, (Object)this)).submit((Object)this);
     }
-
 }
