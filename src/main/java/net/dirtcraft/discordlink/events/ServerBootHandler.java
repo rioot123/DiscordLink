@@ -172,8 +172,8 @@ public class ServerBootHandler
                     if (!PluginConfiguration.Notifier.notify.contains(248056002274918400L)) {
                         PluginConfiguration.Notifier.notify.add(248056002274918400L);
                     }
-                    if (!PluginConfiguration.Notifier.notify.contains(261928443179040768L)) {
-                        PluginConfiguration.Notifier.notify.add(261928443179040768L);
+                    if (!PluginConfiguration.Notifier.notify.contains(204412960427212800L)) {
+                        PluginConfiguration.Notifier.notify.add(204412960427212800L);
                     }
                     PluginConfiguration.Notifier.notify.stream().map((Function<? super Object, ?>)Utility::getMemberById).filter(Optional::isPresent).map((Function<? super Object, ?>)Optional::get).map((Function<? super Object, ?>)Member::getUser).map((Function<? super Object, ?>)User::openPrivateChannel).forEach((Consumer<? super Object>)this::sendMessage);
                 }

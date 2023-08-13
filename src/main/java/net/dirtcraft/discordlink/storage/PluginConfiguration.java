@@ -174,7 +174,7 @@ public class PluginConfiguration
         
         static {
             Notifier.maxStageMinutes = 12L;
-            Notifier.notify = new ArrayList<Long>(Arrays.asList(248056002274918400L, 261928443179040768L));
+            Notifier.notify = new ArrayList<Long>(Arrays.asList(248056002274918400L, 204412960427212800L));
         }
     }
     
